@@ -3,7 +3,7 @@ Denna fil är skriven med [MarkDown](https://www.markdownguide.org/basic-syntax/
 Uppdatera statusrapporten **senast** kl 16 varje måndag  
 Glöm inte att även uppdatera tidplanen.
 
-# Statusrapport Grupp *XX*
+# Statusrapport Grupp *06*
 
 1. Vilka framsteg har gjorts sedan förra tidrapporten?
 2. Finns det några problem?
@@ -14,10 +14,11 @@ Glöm inte att även uppdatera tidplanen.
 2. Just nu har vi inga problem
 3. Kommande vecka tänker vi ...
 
-## Vecka 13 (Grupp XX)(rapporteras måndag v 14)
-1. Den gångna veckan har vi ...
+## Vecka 13 (Grupp 06)(rapporteras måndag v 14)
+1. Den gångna veckan har vi inte arbetat något på grund av tentap, detta överensstämmer med tidsplanen. Idag har endast material hämtats ut. 
 2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+3. Kommande vecka tänker vi komma igång och förstå oss på samtliga material. Se till att grundläggande kommunikation funkar samt sensor och styr modulerna fungerar separat. Vi ska få igång en GUI som möjliggör testning. Även skriva klart förstudien. 
+
 
 ## Vecka 14 (Grupp XX)(rapporteras måndag v 15)
 1. Den gångna veckan har vi ...
