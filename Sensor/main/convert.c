@@ -10,6 +10,7 @@
 #include <math.h>
 
 
+
 int convert_uint8_t(uint8_t num1)
 {
 	int array[8];
@@ -33,5 +34,18 @@ int volt_to_dist(int digital_out)
 	float volt = digital_out*5.1/1023;
 	int distance = 27/pow(volt,1.15);
 	return distance;
+}
+
+
+uint8_t AD_convert()
+{
+	ADCSRA |= (1 << ADSC);
+	
+	while(ADCSRA & (1<<ADSC)) // FEL TAR SIG ALDRIG UT
+	{
+	}
+	
+	uint8_t indata = ADCH;
+	return indata;
 }
 
