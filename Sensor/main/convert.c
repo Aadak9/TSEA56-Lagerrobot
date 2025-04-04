@@ -8,8 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <math.h>
-
-
+#include "convert.h"
 
 int convert_uint8_t(uint8_t num1)
 {
@@ -29,6 +28,14 @@ int convert_uint8_t(uint8_t num1)
 	return conversion;
 }
 
+
+int line_to_volt(int digital_out)
+{
+	int volt = digital_out*5.1/1023;
+	return volt;
+}
+
+
 int volt_to_dist(int digital_out)
 {
 	float volt = digital_out*5.1/1023;
@@ -41,11 +48,11 @@ uint8_t AD_convert()
 {
 	ADCSRA |= (1 << ADSC);
 	
-	while(ADCSRA & (1<<ADSC)) // FEL TAR SIG ALDRIG UT
+	while(ADCSRA & (1<<ADSC))
 	{
 	}
 	
-	uint8_t indata = ADCH;
-	return indata;
+	uint8_t indata_t = ADCH;
+	return indata_t;
 }
 

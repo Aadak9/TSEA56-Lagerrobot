@@ -2,29 +2,31 @@
  * main.c
  *
  * Created: 2025-04-02 15:58:02
- * Author : andno773
+ * Author : andno773, sigry751
  */ 
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <math.h>
 #include <stdio.h>
-#include "init.c"
-#include "convert.c"
+#include "init.h"
+#include "convert.h"
 
-int indata = 0;
+
 int dist = 0;
-int sensorValues[11] = {};
+int sum = 0;
 int data = 0;
 int test = 0;
+int indata_volt = 0;
 
 
 
 void read_reflex()
 {
 	int i;
-	uint8_t indata_digital = 0;
-	int indata = 0;
+	uint8_t indata_digital;
+	int indata_t = 0;
+	sum = 0;
 	
 	for(i = 0; i < 11; i++)
 	{
@@ -35,20 +37,17 @@ void read_reflex()
 		
 		indata_digital = AD_convert();
 		PORTA &= 0xEF;									// Stänger av sensorn
-	//	indata = indata_digitaconvert_uint8_t(indata_digital);
 		
-		sensorValues[i] = indata;
-		
-		test =2;
-		
+		indata_t = convert_uint8_t(indata_digital);
+		indata_volt = line_to_volt(indata_t);
+		sum += indata_volt;
 	}
-	
-//	return sensorValues;
+	test = sum;
 }
 
 int main()
 {
-	init_interrupt();
+//	init_interrupt();
 	
 	DDRD |= 0x04;
 	PORTD &= 1;
@@ -67,13 +66,11 @@ int main()
 		
 		init_reflex();
 		read_reflex();
-		read_reflex();
 		// SEND REFLEX
 	}
 }
 
 
-//PORTB = sensorValues;
 
 /*
 PORTB = indata_bin;
