@@ -12,55 +12,56 @@
 #include "init.h"
 #include "convert.h"
 
-
+uint8_t indata_t;
+int indata = 0;
 int dist = 0;
-int sum = 0;
-int data = 0;
 int test = 0;
-int indata_volt = 0;
-
-
 
 void read_reflex()
 {
 	int i;
-	uint8_t indata_digital;
-	int indata_t = 0;
-	sum = 0;
+	int indata = 0;
+	int sum = 0;
+	int array[11];
 	
 	for(i = 0; i < 11; i++)
 	{
-		
 		PORTA &= 0xF0;									// Nollställer de fyra sista bitarna i PORT A 
 		PORTA |= i;										// Sätter Muxen till index i
 		PORTA |= 0x10;									// Startar sensorn
 		
-		indata_digital = AD_convert();
+		indata = is_active_reflex();
 		PORTA &= 0xEF;									// Stänger av sensorn
 		
-		indata_t = convert_uint8_t(indata_digital);
-		indata_volt = line_to_volt(indata_t);
-		sum += indata_volt;
+		array[i] = indata;
+		sum += indata;
 	}
-	test = sum;
+	
+	// Lägg till funktion som konverterar array till information om potentiell korsning
 }
+
+
+void read_IR()
+{
+	indata_t = AD_convert();
+	indata = convert_uint8_t(indata_t);
+	dist = volt_to_dist(indata);
+	// Skicka dist till bussen
+}
+
 
 int main()
 {
-//	init_interrupt();
-	
-	DDRD |= 0x04;
-	PORTD &= 1;
-	
+	init_interrupt();	
 	sei();
 	
 	while (1)
 	{
-		//		init_IR();
-		// READ IR
+		init_IR();
+		read_IR();
 		// SEND IR
 		
-		//		init_gyro();
+		// init_gyro();
 		// READ GYRO
 		// SEND GYRO
 		
@@ -73,14 +74,9 @@ int main()
 
 
 /*
-PORTB = indata_bin;
-indata = convert_uint8_t(indata_bin);
-dist = volt_to_dist(indata);
-sei();
 
-
-
-
+	DDRD |= 0x04;	// Aktiverar PORT PD2 för att möjligöra avbrott via att dess PIN aktiveras manuellt
+	PORTD &= 1;
 
 ISR(INT0_vect)
 {
@@ -88,10 +84,9 @@ ISR(INT0_vect)
 }
 
 
-ISR(ADC_vect)
+ISR(ADC_vect) 
 {
 	uint8_t indata_binary = ADCH;
 }
-
 
 */
