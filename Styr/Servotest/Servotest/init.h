@@ -1,7 +1,7 @@
 #define F_CPU 16000000UL
 #include <avr/io.h>
 #include <util/delay.h>
-
+#include <avr/interrupt.h>
 
 
 
@@ -29,4 +29,11 @@ void init_pwm(){
 	TCCR2B |= (1 << CS21);
 
 	OCR2A = 0x0;
-	OCR2B = 0x0;	}
+	OCR2B = 0x0;	}void SPI_init() {
+	// sätt upp SPI i slavläge
+	
+	DDRB = (1 << DDB6); //MISO som utgång
+	SPCR = (1 << SPE) | (1 << SPIE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA); // Aktivera SPI
+	sei(); // Aktivera globala avbrott
+	
+}
