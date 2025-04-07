@@ -1,13 +1,12 @@
 /*
- * main.c
+ * init.c
  *
  * Created: 2025-04-02 15:58:02
- * Author : andno773
+ * Author : andno773, sigry751
  */ 
 
 #include <avr/io.h>
 #include "init.h"
-
 
 void init_IR()
 {
@@ -15,10 +14,12 @@ void init_IR()
 	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
+
 void init_gyro()
 {
 
 }
+
 
 void init_reflex()
 {
