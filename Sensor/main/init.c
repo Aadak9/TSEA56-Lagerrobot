@@ -17,7 +17,9 @@ void init_IR()
 
 void init_gyro()
 {
-
+	// Kan behöva alla bitars noggranhet, i så fall ändra ADLAR
+	ADMUX = (1<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);
+	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
 

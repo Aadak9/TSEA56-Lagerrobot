@@ -12,21 +12,28 @@
 #include "init.h"
 #include "convert.h"
 
+int test = 0;
+
+// Avståndssensor
 uint8_t indata_t;
 int indata = 0;
 int dist = 0;
-int test = 0;
+
+// Reflexsensor
+int array[11];
+int sum = 0;
+
 
 void read_reflex()
 {
 	int i;
-	int indata = 0;
-	int sum = 0;
-	int array[11];
+	indata = 0;
+	sum = 0;
+	
 	
 	for(i = 0; i < 11; i++)
 	{
-		PORTA &= 0xF0;									// Nollställer de fyra sista bitarna i PORT A 
+		PORTA &= 0xF0;									// Nollställer de fyra LSB bitarna i PORT A 
 		PORTA |= i;										// Sätter Muxen till index i
 		PORTA |= 0x10;									// Startar sensorn
 		
@@ -35,8 +42,8 @@ void read_reflex()
 		
 		array[i] = indata;
 		sum += indata;
+		
 	}
-	
 	// Lägg till funktion som konverterar array till information om potentiell korsning
 }
 
@@ -47,6 +54,12 @@ void read_IR()
 	indata = convert_uint8_t(indata_t);
 	dist = volt_to_dist(indata);
 	// Skicka dist till bussen
+}
+
+
+void read_gyro()
+{
+	
 }
 
 
@@ -61,8 +74,8 @@ int main()
 		read_IR();
 		// SEND IR
 		
-		// init_gyro();
-		// READ GYRO
+		init_gyro();
+		read_gyro();
 		// SEND GYRO
 		
 		init_reflex();

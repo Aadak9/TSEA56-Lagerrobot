@@ -10,6 +10,10 @@
 #include <math.h>
 #include "convert.h"
 
+// Reflexsensor
+uint8_t indata_t = 0;
+int indata_int = 0;
+int indata_volt = 0;
 
 uint8_t AD_convert()
 {
@@ -21,6 +25,12 @@ uint8_t AD_convert()
 	
 	uint8_t indata_t = ADCH;
 	return indata_t;
+}
+
+int digtal_to_volt(int digital_out)
+{
+	int volt = digital_out*5.1/1023;
+	return volt;
 }
 
 
@@ -47,11 +57,11 @@ int convert_uint8_t(uint8_t num1)
 
 int is_active_reflex()
 {
-	uint8_t indata_t = AD_convert();
-	int indata_int = convert_uint8_t(indata_t);
-	int indata_volt = line_to_volt(indata_int);
+	indata_t = AD_convert();
+	indata_int = convert_uint8_t(indata_t);
+	indata_volt = digtal_to_volt(indata_int);
 	
-	if (indata_volt > 3) {
+	if (indata_volt > 2) {						// Ändra 2 till ett värde som kalibreras
 		return 1;
 	} else {
 		return 0;
@@ -59,16 +69,9 @@ int is_active_reflex()
 }
 
 
-int line_to_volt(int digital_out)
-{
-	int volt = digital_out*5.1/1023;
-	return volt;
-}
-
-
 int volt_to_dist(int digital_out)
 {
-	float volt = digital_out*5.1/1023;
+	float volt = digtal_to_volt(digital_out);
 	int distance = 27/pow(volt,1.15);
 	return distance;
 }
