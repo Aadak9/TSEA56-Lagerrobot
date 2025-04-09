@@ -6,6 +6,7 @@
  */ 
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "init.h"
 
 void init_IR()
@@ -17,8 +18,7 @@ void init_IR()
 
 void init_gyro()
 {
-	// Kan behöva alla bitars noggranhet, i så fall ändra ADLAR
-	ADMUX = (1<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);
+	ADMUX = (1<<REFS0)|(0<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);
 	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
@@ -35,4 +35,11 @@ void init_interrupt()
 {
 	EICRA |=(1<<ISC01)|(1<<ISC00);
 	EIMSK |= (1<<INT0);
+}
+
+
+void init_SPI()
+{
+	DDRB = (1 << DDB6);
+	SPCR = (1 << SPE) | (1 << SPIE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA); 
 }

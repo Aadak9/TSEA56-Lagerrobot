@@ -11,95 +11,36 @@
 #include <stdio.h>
 #include "init.h"
 #include "convert.h"
+#include "read.h"
 
-int test = 0;
-
-// Avståndssensor
-uint8_t indata_t;
-int indata = 0;
-int dist = 0;
-
-// Reflexsensor
-int array[11];
-int sum = 0;
-
-
-void read_reflex()
-{
-	int i;
-	indata = 0;
-	sum = 0;
-	
-	
-	for(i = 0; i < 11; i++)
-	{
-		PORTA &= 0xF0;									// Nollställer de fyra LSB bitarna i PORT A 
-		PORTA |= i;										// Sätter Muxen till index i
-		PORTA |= 0x10;									// Startar sensorn
-		
-		indata = is_active_reflex();
-		PORTA &= 0xEF;									// Stänger av sensorn
-		
-		array[i] = indata;
-		sum += indata;
-		
-	}
-	// Lägg till funktion som konverterar array till information om potentiell korsning
-}
-
-
-void read_IR()
-{
-	indata_t = AD_convert();
-	indata = convert_uint8_t(indata_t);
-	dist = volt_to_dist(indata);
-	// Skicka dist till bussen
-}
-
-
-void read_gyro()
-{
-	
-}
+volatile uint8_t IR_send = 0;
+volatile uint8_t gyro_send = 0;
+volatile uint8_t reflex_send = 0;
 
 
 int main()
 {
-	init_interrupt();	
+	init_interrupt();
+	init_SPI();
 	sei();
 	
 	while (1)
 	{
 		init_IR();
-		read_IR();
-		// SEND IR
+		IR_send = read_IR();
 		
 		init_gyro();
-		read_gyro();
-		// SEND GYRO
+		gyro_send = read_gyro();
 		
 		init_reflex();
-		read_reflex();
-		// SEND REFLEX
+		reflex_send = read_reflex();
 	}
 }
 
 
-
-/*
-
-	DDRD |= 0x04;	// Aktiverar PORT PD2 för att möjligöra avbrott via att dess PIN aktiveras manuellt
-	PORTD &= 1;
-
-ISR(INT0_vect)
+ISR(SPI_STC_VECT)
 {
-	ADCSRA |= (1 << ADSC);
+	SPDR = IR_send;
+	SPDR = gyro_send;
+	SPDR = reflex_send;
 }
-
-
-ISR(ADC_vect) 
-{
-	uint8_t indata_binary = ADCH;
-}
-
-*/
