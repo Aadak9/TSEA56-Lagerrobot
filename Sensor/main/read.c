@@ -2,33 +2,23 @@
 #include <avr/interrupt.h>
 #include <math.h>
 #include "read.h"
+#include "convert.h"
 
 int test = 0;
-volatile uint8_t indata_t;
-volatile int indata = 0;
-
-// Avståndssensor
-volatile int dist = 0;
-
-// Reflexsensor
-volatile int array[11];
-volatile int sum = 0;
-volatile int roadmark = 0;
-
-// Gyro
-volatile uint8_t indata_MSB;
-volatile uint8_t indata_LSB;
-volatile uint16_t indata16_t;
-volatile float volt = 0;
-volatile float w = 0;
 
 uint8_t read_reflex()
 {
 	int i;
-	uint8_t data;
+	volatile uint8_t data;
+	volatile int array[11];
 	
-	indata = 0;
-	sum = 0;
+	volatile uint8_t indata = 0;
+	volatile int sum = 0;
+	volatile int sum_index = 0;
+	volatile int roadmark = 0;
+	volatile int pivot = 0;
+	volatile int offset = 0;
+	
 	
 	for(i = 0; i < 11; i++)
 	{
@@ -39,23 +29,27 @@ uint8_t read_reflex()
 		indata = is_active_reflex();
 		PORTA &= 0xEF;									// Stänger av sensorn
 		
-		array[i] = indata;
 		sum += indata;
+		sum_index += i*indata;
+		
 	}
 	
-	roadmark = is_roadmark(array[11]);
+	roadmark = is_roadmark(sum);
 	
-	return data = (uint8_t)(roadmark*16 + sum);
+	pivot = sum_index/sum;
+	offset = (6 - pivot);
+	
+	return data = (uint8_t)(roadmark*16 + offset);			//Dela upp i två array, offset negativt problem??
 }
 
 
 uint8_t read_IR()
 {
-	uint8_t data;
+	volatile uint8_t data;
 	
-	indata_t = AD_convert(1);
-	indata = convert_uint8_t(indata_t);
-	dist = volt_to_dist(indata);
+	volatile uint8_t indata_t = AD_convert(1);
+	volatile int indata = convert_uint8_t(indata_t);
+	volatile int dist = volt_to_dist(indata);
 	
 	if (dist > 250){									// Förhindrar integer overflow
 		return data = 0xFF;
@@ -67,14 +61,17 @@ uint8_t read_IR()
 
 uint8_t read_gyro()
 {
-	indata_MSB = AD_convert(1);
-	indata_LSB = AD_convert(0);
-	indata16_t = ((uint16_t)indata_MSB << 8) | indata_LSB;
+	volatile uint8_t indata_MSB = AD_convert(1);
+	volatile uint8_t indata_LSB = AD_convert(0);
+	volatile uint16_t indata16_t = ((uint16_t)indata_MSB << 8) | indata_LSB;
 	
-	indata = convert_uint16_t(indata16_t);
-	volt = digital_to_volt(indata);
-	w = (volt - 2.5)/(2*volt) * 150;
+	volatile int indata = convert_uint16_t(indata16_t);
+	volatile float volt = digital_to_volt(indata);
+	volatile float w = (volt - 2.5)/(2*volt) * 150;
+	theta += w*dt;
 	
+	uint8_t result = 0;
 	
+	return  result;
 	// Skicka dist till bussen
 }

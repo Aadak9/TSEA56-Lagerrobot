@@ -10,16 +10,10 @@
 #include <math.h>
 #include "convert.h"
 
-volatile uint8_t indata_t = 1000;
-volatile int indata_int = 0;
-volatile int indata_volt = 0;
-volatile int volt_convert = 0;
-volatile int distance = 0;
-volatile int sum_t = 0;
-
 uint8_t AD_convert(int is_MSB)
 {
 	ADCSRA |= (1 << ADSC);
+	volatile uint8_t indata_t;
 	
 	while(ADCSRA & (1<<ADSC))
 	{
@@ -35,7 +29,7 @@ uint8_t AD_convert(int is_MSB)
 
 float digital_to_volt(int digital_out)
 {
-	volt_convert = digital_out*5.1/1023;				// Kalibrera intern spänning
+	volatile float volt_convert = digital_out*4.94/1023;				// Kalibrera intern spänning
 	return volt_convert;
 }
 
@@ -82,9 +76,9 @@ int convert_uint16_t(uint16_t num)
 
 int is_active_reflex()
 {
-	indata_t = AD_convert(1);
-	indata_int = convert_uint8_t(indata_t);
-	indata_volt = digital_to_volt(indata_int);
+	volatile uint8_t indata_t = AD_convert(1);
+	volatile int indata_int = convert_uint8_t(indata_t);
+	volatile int indata_volt = digital_to_volt(indata_int);
 	
 	if (indata_volt > 2) {								// Ändra 2 till ett värde som kalibreras
 		return 1;
@@ -94,21 +88,17 @@ int is_active_reflex()
 }
 
 
-int volt_to_dist(int digital_out)
+int volt_to_dist(int indata)
 {
-	distance = 27/pow(digital_to_volt(digital_out),1.15);
+	volatile float volt_convert = digital_to_volt(indata);
+	volatile int distance = 27/(pow(volt_convert,1.15));
 	return distance;
 }
 
 
-int is_roadmark(int array[11])
+int is_roadmark(int sum)
 {
-	for (int index = 0; index < 11; index++)
-	{
-		sum_t += array[index];
-	}
-	
-	if (sum_t > 4) {									// Placeholder värde
+	if (sum > 4) {									// Placeholder värde
 		return 1;
 		} else {
 		return 0;

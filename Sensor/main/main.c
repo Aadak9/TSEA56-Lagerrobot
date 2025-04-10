@@ -10,8 +10,8 @@
 #include <math.h>
 #include <stdio.h>
 #include "init.h"
-#include "convert.h"
 #include "read.h"
+#include "convert.h"
 
 volatile uint8_t IR_send = 0;
 volatile uint8_t gyro_send = 0;
@@ -37,8 +37,12 @@ int main()
 	}
 }
 
+ISR(TIMER1_COMPA_vect)
+{
+	read_gyro();
+}
 
-ISR(SPI_STC_VECT)
+ISR(SPI_STC_vect)
 {
 	SPDR = IR_send;
 	SPDR = gyro_send;
