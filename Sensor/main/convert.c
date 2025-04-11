@@ -10,26 +10,24 @@
 #include <math.h>
 #include "convert.h"
 
-uint8_t AD_convert(int is_MSB)
+uint8_t AD_convert()
 {
+//	cli();
+	volatile uint8_t indata_t = 0;
 	ADCSRA |= (1 << ADSC);
-	volatile uint8_t indata_t;
 	
 	while(ADCSRA & (1<<ADSC))
 	{
 	}
 	
-	if (is_MSB){
-		return indata_t = ADCH;
-	} else {
-		return indata_t = ADCL;
-	}
+//	sei();
+	return indata_t = ADCH;
 }
 
 
 float digital_to_volt(int digital_out)
 {
-	volatile float volt_convert = digital_out*4.94/1023;				// Kalibrera intern spänning
+	volatile float volt_convert = digital_out*5./1023;				// Kalibrera intern spänning
 	return volt_convert;
 }
 
@@ -48,26 +46,7 @@ int convert_uint8_t(uint8_t num)
 	
 	for (int index = 0; index < 8; index++)
 	{	
-		conversion += array[index]*(1 << (7-index+2));
-	}
-	
-	return conversion;
-}
-
-
-int convert_uint16_t(uint16_t num)
-{
-	int array[16];
-	for (int i = 0; i < 16; i++ )
-	{
-		array[i] = (num >>(15-i)) & 1;
-	}
-	
-	int conversion = 0;
-	
-	for (int index = 0; index < 16; index++)
-	{
-		conversion += array[index]*(1 << (15-index+2));
+		conversion += array[index]*(1 << (7 - index + 2));
 	}
 	
 	return conversion;
@@ -76,7 +55,7 @@ int convert_uint16_t(uint16_t num)
 
 int is_active_reflex()
 {
-	volatile uint8_t indata_t = AD_convert(1);
+	volatile uint8_t indata_t = AD_convert();
 	volatile int indata_int = convert_uint8_t(indata_t);
 	volatile int indata_volt = digital_to_volt(indata_int);
 	

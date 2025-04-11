@@ -4,21 +4,19 @@
 #include "read.h"
 #include "convert.h"
 
-int test = 0;
+volatile float theta;
+
 
 uint8_t read_reflex()
 {
 	int i;
 	volatile uint8_t data;
-	volatile int array[11];
-	
 	volatile uint8_t indata = 0;
 	volatile int sum = 0;
 	volatile int sum_index = 0;
 	volatile int roadmark = 0;
 	volatile int pivot = 0;
 	volatile int offset = 0;
-	
 	
 	for(i = 0; i < 11; i++)
 	{
@@ -34,11 +32,16 @@ uint8_t read_reflex()
 		
 	}
 	
-	roadmark = is_roadmark(sum);
+	roadmark = is_roadmark(sum);						
+	
+	if (roadmark == 1)									//Starta timer här?
+	{
+		TCCR1B |=  (1 << CS11) | (1 << CS10);
+	}
 	
 	pivot = sum_index/sum;
 	offset = (6 - pivot);
-	
+								
 	return data = (uint8_t)(roadmark*16 + offset);			//Dela upp i två array, offset negativt problem??
 }
 
@@ -47,7 +50,7 @@ uint8_t read_IR()
 {
 	volatile uint8_t data;
 	
-	volatile uint8_t indata_t = AD_convert(1);
+	volatile uint8_t indata_t = AD_convert();
 	volatile int indata = convert_uint8_t(indata_t);
 	volatile int dist = volt_to_dist(indata);
 	
@@ -59,19 +62,17 @@ uint8_t read_IR()
 }
 
 
-uint8_t read_gyro()
+int read_gyro()
 {
-	volatile uint8_t indata_MSB = AD_convert(1);
-	volatile uint8_t indata_LSB = AD_convert(0);
-	volatile uint16_t indata16_t = ((uint16_t)indata_MSB << 8) | indata_LSB;
+	init_gyro();
+	volatile float dt = 0.01;
 	
-	volatile int indata = convert_uint16_t(indata16_t);
+	volatile uint8_t indata_t = AD_convert();
+	volatile int indata = convert_uint8_t(indata_t);
 	volatile float volt = digital_to_volt(indata);
-	volatile float w = (volt - 2.5)/(2*volt) * 150;
-	theta += w*dt;
 	
-	uint8_t result = 0;
+	volatile float w_degree = (volt - 2.4)/0.033;
+	theta += w_degree*dt;
 	
-	return  result;
-	// Skicka dist till bussen
+	return theta;
 }

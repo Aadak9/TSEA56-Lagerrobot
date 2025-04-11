@@ -18,7 +18,7 @@ void init_IR()
 
 void init_gyro()
 {
-	ADMUX = (0<<REFS0)|(0<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);
+	ADMUX = (0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);
 	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
@@ -39,11 +39,11 @@ void init_interrupt()
 
 void init_timer()
 {
-	TCCR1B |= (1 << WGM12 ) | (1 << CS11) | (1 << CS10); //64 Prescaler 
-	TIMSK1 |= (1 << OCIE1A);
-	TCNT1 = 0;
+	TCCR1B |= (1 << WGM12 );		// CTC-läge
+	TIMSK1 |= (1 << OCIE1A);		// Möjliggör output compare A
+	TCNT1 = 0;						// Klockan börjar på 0
 	
-	OCR1A = 
+	OCR1A = 2499;					// Avbrott på 10ms
 }
 
 

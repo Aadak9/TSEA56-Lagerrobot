@@ -13,25 +13,31 @@
 #include "read.h"
 #include "convert.h"
 
-volatile uint8_t IR_send = 0;
-volatile uint8_t gyro_send = 0;
-volatile uint8_t reflex_send = 0;
+volatile uint8_t IR_send;
+volatile uint8_t gyro_send;
+volatile uint8_t reflex_send;
+
+extern volatile int theta;
 
 
 int main()
 {
+	volatile uint8_t IR_send = 0;
+	volatile uint8_t gyro_send = 0;
+	volatile uint8_t reflex_send = 0;
+	
 	init_interrupt();
 	init_SPI();
+	init_timer();
+	
+	theta = 0;
 	sei();
 	
 	while (1)
 	{
 		init_IR();
 		IR_send = read_IR();
-		
-		init_gyro();
-		gyro_send = read_gyro();
-		
+
 		init_reflex();
 		reflex_send = read_reflex();
 	}
@@ -40,6 +46,13 @@ int main()
 ISR(TIMER1_COMPA_vect)
 {
 	read_gyro();
+	
+	if (theta > 90 || theta < -90)
+	{
+		theta = 0;
+		TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10)); // Stänger av alla prescaler-bitar
+
+	}
 }
 
 ISR(SPI_STC_vect)
