@@ -15,7 +15,7 @@ void USART_Init( unsigned char ubrr)
 	/*Enable transmit och receive */
 	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
 	/* Frame format 8 data 2 stop */
-	UCSR0C = (1<<USBS0)|(3<<UCSZ00);
+	UCSR0C = (0<<USBS0)|(3<<UCSZ00);
 }
 
 

@@ -14,6 +14,9 @@
 #define BAUD 1000000
 #define MYUBRR FOSC/16/BAUD-1
 
+volatile unsigned long counter = 0;
+
+volatile unsigned long timertime = 2500;
 
 
 
@@ -50,19 +53,76 @@
 	_delay_us(30);
 
 
+
 	while (1)
 	{
 		
 		if(current_action == 0x1)
 		{
 			drive_fwd();
+			counter += 1;
+			if(counter >= timertime)
+			{
+				add1degree(3);
+				counter = 0;
+			}
+			
 		}
 		else if(current_action == 0x2)
 		{
 			rotate_left_maybe();
+			move_servo(3, 0);
 		}
 		else if(current_action == 0x3)
 		{
+			reverse();
+			sub1degree(3);
+		}
+		else if(current_action == 0x4)
+		{
+			rotate_right_maybe();
+			move_servo(3, 300);
+		}
+		else if(current_action == 0)
+		{
 			stop();
 		}
+		else if(current_action == 0x14 && current_action != last_action)
+		{
+			decrease_speed();
+		}
+		else if(current_action == 0x15 && current_action != last_action)
+		{
+			increase_speed();
+		}
+		else if(current_action == 0x20 && current_action != last_action && currentID < 5)
+		{
+			currentID += 1;
+		}
+		else if(current_action == 0x21 && current_action != last_action && currentID > 1)
+		{
+			currentID -= 1;
+		}
+		else if(current_action == 0x31)
+		{
+			counter += 1;
+			if(counter >= timertime)
+			{
+				add1degree(currentID);
+				counter = 0;
+			}
+		}
+		else if(current_action == 0x32)
+		{
+			counter +=1;
+			if(counter >= timertime)
+			{
+				sub1degree(currentID);
+				counter = 0;
+			}
+		}
+		
+		
+		
+		last_action = current_action;
 	}}
