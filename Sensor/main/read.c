@@ -4,8 +4,6 @@
 #include "read.h"
 #include "convert.h"
 
-volatile float theta;
-
 
 uint8_t read_reflex()
 {
@@ -34,11 +32,6 @@ uint8_t read_reflex()
 	
 	roadmark = is_roadmark(sum);						
 	
-	if (roadmark == 1)									//Starta timer här?
-	{
-		TCCR1B |=  (1 << CS11) | (1 << CS10);
-	}
-	
 	pivot = sum_index/sum;
 	offset = (6 - pivot);
 								
@@ -62,17 +55,11 @@ uint8_t read_IR()
 }
 
 
-int read_gyro()
-{
-	init_gyro();
-	volatile float dt = 0.01;
-	
+int8_t read_gyro()
+{		
 	volatile uint8_t indata_t = AD_convert();
 	volatile int indata = convert_uint8_t(indata_t);
 	volatile float volt = digital_to_volt(indata);
-	
-	volatile float w_degree = (volt - 2.4)/0.033;
-	theta += w_degree*dt;
-	
-	return theta;
+	volatile int8_t w = (volt - 2.5)/0.033;
+	return w;
 }

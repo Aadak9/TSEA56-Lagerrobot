@@ -27,7 +27,7 @@ uint8_t AD_convert()
 
 float digital_to_volt(int digital_out)
 {
-	volatile float volt_convert = digital_out*5./1023;				// Kalibrera intern spänning
+	volatile float volt_convert = digital_out*5.0/1023.0;				// Kalibrera intern spänning
 	return volt_convert;
 }
 
