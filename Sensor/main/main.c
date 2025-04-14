@@ -27,7 +27,6 @@ int main()
 	init_interrupt();
 	init_SPI();
 	
-
 	sei();
 	
 	while (1)
