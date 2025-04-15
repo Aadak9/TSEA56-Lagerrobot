@@ -13,7 +13,9 @@ def bluetoothinit():
     
     return
 
-
+def sendbyte(byte):
+    s.send(byte.to_bytes(1, 'big'))
+    return
 
 #while 1:
 #    data = input()
@@ -26,6 +28,3 @@ def bluetoothinit():
 #     elif(data == "stop"):
 #        break
 
-def sendbyte(byte):
-    s.send(byte.to_bytes(1, 'big'))
-    return

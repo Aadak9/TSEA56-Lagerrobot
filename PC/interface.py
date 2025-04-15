@@ -72,6 +72,9 @@ window.update()
 winwidth = window.winfo_width()
 winheight = window.winfo_height()
 
+###############################################################
+###############################################################
+
 
 # Lager-rutan
 lager_width = winwidth * 0.44
@@ -81,6 +84,45 @@ lager_y = (winheight - lager_height) / 2
 
 Lager = tk.Frame(master=window, width=lager_width, height=lager_height, bd=1, relief="solid", padx=4, pady=4)
 Lager.place(x=lager_x, y= lager_y)
+
+###############################################################
+###############################################################
+
+# Data-rutan
+data_width = winwidth*0.44
+data_height = winheight*0.2
+data_x = winwidth*0.51
+data_y = (winheight - lager_height)/2
+
+Data = tk.Frame(master=window, width=data_width, height=data_height, bd=1, relief="solid", padx=4, pady=4)
+Data.grid_propagate(False)
+Data.place(x=data_x, y=data_y)
+
+Data.grid_rowconfigure(0, weight=1)
+Data.grid_rowconfigure(1, weight=1)
+Data.grid_rowconfigure(2, weight=1)
+Data.grid_columnconfigure(0, weight=1)
+Data.grid_columnconfigure(1, weight=1)
+
+text1 = tk.Label(Data, text="Lateral position: ", font=("Arial", 15))
+text1.grid(column= 0, row = 0, sticky="nsw")
+
+text2 = tk.Label(Data, text="Gaspådrag: ", font=("Arial", 15))
+text2.grid(column= 0, row = 1, sticky="nsw")
+
+text3 = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
+text3.grid(column= 0, row = 2, sticky="nsw")
+
+text4 = tk.Label(Data, text="Avstånd till hinder: ", font=("Arial", 15))
+text4.grid(column= 1, row = 0, sticky="nsw")
+
+text5 = tk.Label(Data, text="Rotation platta: ", font=("Arial", 15))
+text5.grid(column= 1, row = 1, sticky="nsw")
+
+
+###############################################################
+###############################################################
+
 
 # Kontrollruta-rutan
 kontroll_width = winwidth * 0.44
@@ -125,8 +167,7 @@ for i in range(3):  # 3 kolumner
 for i in range(2):  # 2 rader
     ruta3.grid_rowconfigure(i, weight=1)
 
-###############################################################
-###############################################################
+
 
 # INNEHÅLL RUTA1
 
@@ -153,8 +194,6 @@ platta.grid(column= 1, row = 0)
 
 pressed_keys = set()
 
-###############################################################
-###############################################################
 
 # INNEHÅLL RUTA2
 
@@ -173,8 +212,7 @@ button_turnright.pack(padx=30, pady=25)
 button_turnleft = tk.Button(ruta2, text="Vrid vänster", width =20, height=3, command=lambda: buttonpressed("Vrid vänster"))
 button_turnleft.pack(padx=30, pady=25)
 
-###############################################################
-###############################################################
+
 
 # INNEHÅLL RUTA3
 
