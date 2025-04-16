@@ -47,6 +47,7 @@ int main()
 
 ISR(SPI_STC_vect)
 {
+<<<<<<< HEAD
 	uint8_t choose_sensor = (uint8_t)SPDR;
 	
 	if(choose_sensor == 0)
@@ -61,4 +62,12 @@ ISR(SPI_STC_vect)
 	{
 		SPDR = gyro_send;
 	}
+=======
+	//IR_send = 0xA4;
+	SPDR = IR_send;
+	//while (!(SPSR & (1 << SPIF)));
+	//SPDR = gyro_send;
+	//SPDR = reflex_send;
+>>>>>>> f3ad03b3ebc4cc0446a7d7d3083bc36b9ab442b5
 }
+
