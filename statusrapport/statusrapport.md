@@ -19,16 +19,16 @@ Glöm inte att även uppdatera tidplanen.
 2. Just nu har vi inga problem
 3. Kommande vecka tänker vi komma igång och förstå oss på samtliga material. Se till att grundläggande kommunikation funkar samt sensor och styr modulerna fungerar separat. Vi ska få igång en GUI som möjliggör testning. Även skriva klart förstudien. 
 
-
 ## Vecka 14 (Grupp XX)(rapporteras måndag v 15)
 1. Den gångna veckan har vi kommit igång med att kunna styra hjulen och skicka data till servon. Vi har också fått SPI-kommunikationen mellan Raspberry och AVR att fungera. Vi kan också läsa av vården från avståndssensorn och reflexsensorn.
 2. Just nu har vi inga problem i och med att vi har avslutat förra veckans uppgifter och ska nu jobba vidare på andra delar.
 3. Kommande vecka tänker vi jobba med Blutetooth-kommunikationen mellan Raspberry och PC för att kunna styra roboten från laptop. Vi ska även fortsätta på samma spår som innan med sensorenheten. 
+# Kommentar: denna vecka (v.14) var många i gruppen sjuka.
 
 ## Vecka 15 (Grupp XX)(rapporteras måndag v 16)
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+1. Den gångna veckan har vi fått bluetooth att funka. Vi har skapat en grundläggande GUI där vissa saker fungerar som vi vill. Vi kan styra roboten manuellt från PC och även styra två servon samtidigt, dock endast från en hårdkodad "utgångsvinkel" och vi vill istället kunna läsa av aktuell vinkel. Avståndssensorn och reflexsensorn fungerar. Gyrot fungerar nästan helt.
+2. Just nu har vi problem med att kunna läsa av aktuell vinkel för servona. Vi har problem id på servona. Vi har problem med att få gyron att stanna när vi vill, den går inte heller att nollställa. Vi funderar också på att ändra tillvägagångssätt och då borde problemen med gyrot gå att lösa.
+3. Kommande vecka tänker vi försöka lösa problemen med servona. Vi vill fixa en till "ruta" vi har planerat att ha i vår GUI. Vi ska också göra klart gyrot samt börja med regleringen på Raspberryn. 
 
 ## Vecka 16 (Grupp XX)(rapporteras tisdag v 17)
 1. Den gångna veckan har vi ...

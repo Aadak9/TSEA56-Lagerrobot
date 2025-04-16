@@ -18,7 +18,7 @@ void init_IR()
 
 void init_gyro()
 {
-	ADMUX = (0<<REFS0)|(0<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);
+	ADMUX = (0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);
 	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
@@ -37,18 +37,12 @@ void init_interrupt()
 	EIMSK |= (1<<INT0);
 }
 
-void init_timer()
-{
-	TCCR1B |= (1 << WGM12 ) | (1 << CS11) | (1 << CS10); //64 Prescaler 
-	TIMSK1 |= (1 << OCIE1A);
-	TCNT1 = 0;
-	
-	OCR1A = 
-}
+
 
 
 void init_SPI()
 {
-	DDRB = (1 << DDB6);
-	SPCR = (1 << SPE) | (1 << SPIE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA); 
+	DDRB &= ~((1<<PORTB5)|(1<<PORTB7)|(1<<PORTB4));
+	DDRB |= (1 << DDB6);
+	SPCR = (1 << SPIE) | (1 << SPE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA); 
 }
