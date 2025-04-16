@@ -12,7 +12,7 @@
 
 uint8_t AD_convert()
 {
-//	cli();
+	cli();
 	volatile uint8_t indata_t = 0;
 	ADCSRA |= (1 << ADSC);
 	
@@ -20,7 +20,7 @@ uint8_t AD_convert()
 	{
 	}
 	
-//	sei();
+	sei();
 	return indata_t = ADCH;
 }
 

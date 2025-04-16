@@ -45,7 +45,10 @@ int main()
 
 ISR(SPI_STC_vect)
 {
+	//IR_send = 0xA4;
 	SPDR = IR_send;
-	SPDR = gyro_send;
-	SPDR = reflex_send;
+	//while (!(SPSR & (1 << SPIF)));
+	//SPDR = gyro_send;
+	//SPDR = reflex_send;
 }
+
