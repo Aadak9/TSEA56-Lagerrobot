@@ -55,7 +55,6 @@ int8_t read_gyro()
 {		
 	volatile uint8_t indata_t = AD_convert();
 	volatile int indata = convert_uint8_t(indata_t);
-	volatile float volt = digital_to_volt(indata);
-	volatile int8_t w = (volt - 2.5)/0.033;
+	volatile int w = w_table(indata);
 	return w;
 }

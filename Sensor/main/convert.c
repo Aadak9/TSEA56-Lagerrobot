@@ -111,3 +111,50 @@ int dist_table(int indata)
 		return 80;
 	}
 }
+
+int w_table(int indata)
+{
+	volatile int array_indata[11] = {936,851,766,681,596,511,426,341,256,171,86};
+	volatile int array_output[11] = {63,50,38,25,12,0,-12,-25,-37,-50-63};
+	
+	for (int i = 0; i < 11; i++ )
+	{
+		if (indata > array_indata[i]){
+			linear_interpolation(int indata,)
+			return
+		}
+	}
+		
+		
+	if (indata >= 936) {
+		return 63;
+	} else if (indata >= 851) {
+		linear_interpolation()
+		return w;
+	} else if (indata >= 766) {
+		return 38;
+	} else if (indata >= 681) {
+		return 25;
+	} else if (indata >= 596) {
+		return 12;
+	} else if (indata >= 511) {
+		return 0;
+	} else if (indata >= 426) {
+		return -12;
+	} else if (indata >= 341) {
+		return -25;
+	} else if (indata >= 256) {
+		return -37;
+	} else if (indata >= 171) {
+		return -50;
+	} else if (indata >= 86) {
+		return -62;
+	}
+	
+
+}
+
+int linear_interpolation(int indata)
+{
+	
+}
