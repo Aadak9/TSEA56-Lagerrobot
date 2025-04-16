@@ -37,18 +37,12 @@ void init_interrupt()
 	EIMSK |= (1<<INT0);
 }
 
-void init_timer()
-{
-	TCCR1B |= (1 << WGM12 );		// CTC-läge
-	TIMSK1 |= (1 << OCIE1A);		// Möjliggör output compare A
-	TCNT1 = 0;						// Klockan börjar på 0
-	
-	OCR1A = 2499;					// Avbrott på 10ms
-}
+
 
 
 void init_SPI()
 {
-	DDRB = (1 << DDB6);
-	SPCR = (1 << SPE) | (1 << SPIE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA); 
+	DDRB &= ~((1<<PORTB5)|(1<<PORTB7)|(1<<PORTB4));
+	DDRB |= (1 << DDB6);
+	SPCR = (1 << SPIE) | (1 << SPE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA); 
 }
