@@ -83,3 +83,31 @@ int is_roadmark(int sum)
 		return 0;
 	}
 }
+
+
+int dist_table(int indata)
+{
+	if (indata >= 600){ 
+		return 10;
+	} else if (indata >= 470) {
+		return 15;
+	} else if (indata >= 390) {
+		return 20;
+	} else if (indata >= 307) {
+		return 25;
+	} else if (indata >= 256) { 
+		return 30;
+	} else if (indata >= 225) { 
+		return 35;
+	} else if (indata >= 200) { 
+		return 40;
+	} else if (indata >= 163) { 
+		return 50;
+	} else if (indata >= 133) { 
+		return 60;
+	} else if (indata >= 112) { 
+		return 70;
+	} else {
+		return 80;
+	}
+}

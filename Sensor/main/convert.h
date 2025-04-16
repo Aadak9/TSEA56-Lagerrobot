@@ -7,5 +7,6 @@ int convert_uint8_t(uint8_t num);
 int is_active_reflex();
 int volt_to_dist(int digital_out);
 int is_roadmark(int sum);
+int dist_table(int indata);
 
 #endif
