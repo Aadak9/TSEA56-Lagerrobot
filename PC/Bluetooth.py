@@ -17,14 +17,13 @@ def sendbyte(byte):
     s.send(byte.to_bytes(1, 'big'))
     return
 
+#bluetoothinit()
+#size = 1024
 
-while 1:
-    if(input("wat") == "w"):
-        size = 1024
-        bluetoothinit()
-        sendbyte(0xFF)
-        data = s.recv(size)
-        print(data)
+#while 1:
+#  sendbyte(0xFF)
+#  data = s.recv(size)
+#   print(data)
 
 
 

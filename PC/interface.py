@@ -255,6 +255,8 @@ def windowclosed():
     return
 
 
+
+
 #knapp_frame = tk.Frame(master=Kontrollruta, bd=1, relief="solid", padx=4, pady=4)
 #knapp_frame.pack(padx=20, pady=20)
 
@@ -263,3 +265,5 @@ def windowclosed():
 
 window.protocol("WM_DELETE_WINDOW", windowclosed)
 window.mainloop()
+
+
