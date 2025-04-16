@@ -45,13 +45,9 @@ uint8_t read_IR()
 	
 	volatile uint8_t indata_t = AD_convert();
 	volatile int indata = convert_uint8_t(indata_t);
-	volatile int dist = volt_to_dist(indata);
+	volatile int dist = dist_table(indata);
 	
-	if (dist > 250){									// Förhindrar integer overflow
-		return data = 0xFF;
-		} else {
-		return data = (uint8_t)dist;
-	}
+	return data = (uint8_t)dist;
 }
 
 
@@ -59,7 +55,6 @@ int8_t read_gyro()
 {		
 	volatile uint8_t indata_t = AD_convert();
 	volatile int indata = convert_uint8_t(indata_t);
-	volatile float volt = digital_to_volt(indata);
-	volatile int8_t w = (volt - 2.5)/0.033;
+	volatile int w = w_table(indata);
 	return w;
 }
