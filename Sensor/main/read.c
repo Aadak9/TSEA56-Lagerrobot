@@ -4,6 +4,7 @@
 #include "read.h"
 #include "convert.h"
 
+volatile int w_int;
 
 int8_t read_reflex()
 {
@@ -14,7 +15,7 @@ int8_t read_reflex()
 	volatile int sum_index = 0;
 	volatile int roadmarkLeft = 0;
 	volatile int roadmarkRight = 0;
-	volatile int pivot = 0;
+	volatile int pivot = 0;	
 	volatile int offset = 0;
 	
 	for(i = 0; i < 11; i++)
@@ -27,7 +28,7 @@ int8_t read_reflex()
 		PORTA &= 0xEF;									// Stänger av sensorn
 		
 		sum += indata;
-		sum_index += i*indata;
+		sum_index += (i+1)*indata;
 		
 		if ((i == 0) && (indata == 1)) {
 			roadmarkLeft = 1;
@@ -40,8 +41,8 @@ int8_t read_reflex()
 	
 	pivot = sum_index/sum;
 	offset = (6 - pivot);
-								
-	return data = (int8_t)(offset);			//Dela upp i två array, offset negativt problem??
+						
+	return data = (int8_t)(offset);
 }
 
 
@@ -61,6 +62,7 @@ int8_t read_gyro()
 {		
 	volatile uint8_t indata_t = AD_convert();
 	volatile int indata = convert_uint8_t(indata_t);
-	volatile int w = w_table(indata);
+	w_int += indata;
+	volatile int8_t w = (int8_t)w_int;
 	return w;
 }
