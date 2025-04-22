@@ -125,10 +125,17 @@ int linear_interpolation(int indata)
 	
 	for (int i = 0; i < 14; i++)
 	{
-		if (voltage >= voltages[i] && voltage <= voltages[i+1])
+		if (voltage <= voltages[i] && voltage >= voltages[i+1])
 		{
 			return distances[i] + (voltage - voltages[i]) * (distances[i+1] - distances[i]) / (voltages[i+1] - voltages[i]);
 		}
 	}
-	
+	if (voltage > voltages[0])
+	{
+		return  distances[0];
+	}
+	if (voltage < voltages[14])
+	{
+		return distances[14];
+	}	
 }
