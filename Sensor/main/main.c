@@ -16,7 +16,7 @@
 
 volatile uint8_t IR_send;
 volatile int8_t gyro_send;
-volatile uint8_t reflex_send;
+volatile int8_t reflex_send;
 
 
 int main()
@@ -45,6 +45,24 @@ int main()
 }
 
 
+uint8_t fetch_IR()
+{
+	return IR_send;
+}
+
+
+int8_t fetch_gyro()
+{
+	return gyro_send;
+}
+
+
+int8_t fetch_reflex()
+{
+	return reflex_send;
+}
+
+
 ISR(SPI_STC_vect)
 {
 
@@ -52,15 +70,11 @@ ISR(SPI_STC_vect)
 	
 	if(choose_sensor == 0)
 	{
-		SPDR = IR_send;
-	}
-	else if(choose_sensor == 1)
-	{
-		SPDR = reflex_send;
-	}
-	else if(choose_sensor == 2)
-	{
-		SPDR = gyro_send;
+		SPDR = fetch_IR();
+	} else if(choose_sensor == 1) {
+		SPDR = fetch_reflex();
+	} else if(choose_sensor == 2) {
+		SPDR = fetch_gyro();
 	}
 
 }

@@ -5,14 +5,15 @@
 #include "convert.h"
 
 
-uint8_t read_reflex()
+int8_t read_reflex()
 {
 	int i;
-	volatile uint8_t data;
+	volatile int8_t data;
 	volatile uint8_t indata = 0;
 	volatile int sum = 0;
 	volatile int sum_index = 0;
-	volatile int roadmark = 0;
+	volatile int roadmarkLeft = 0;
+	volatile int roadmarkRight = 0;
 	volatile int pivot = 0;
 	volatile int offset = 0;
 	
@@ -28,14 +29,19 @@ uint8_t read_reflex()
 		sum += indata;
 		sum_index += i*indata;
 		
+//		if (i == 0 && ) {
+			
+//		} 
+		
 	}
 	
-	roadmark = is_roadmark(sum);						
+	roadmarkLeft = is_roadmarkLeft(sum_index);
+	roadmarkRight = is_roadmarkRight(sum_index);						
 	
 	pivot = sum_index/sum;
 	offset = (6 - pivot);
 								
-	return data = (uint8_t)(roadmark*16 + offset);			//Dela upp i två array, offset negativt problem??
+	return data = (int8_t)(offset);			//Dela upp i två array, offset negativt problem??
 }
 
 
@@ -45,9 +51,9 @@ uint8_t read_IR()
 	
 	volatile uint8_t indata_t = AD_convert();
 	volatile int indata = convert_uint8_t(indata_t);
-	volatile int dist = dist_table(indata);
+	volatile int is_blocked = dist_table(indata);
 	
-	return data = (uint8_t)dist;
+	return data = (uint8_t)is_blocked;
 }
 
 
