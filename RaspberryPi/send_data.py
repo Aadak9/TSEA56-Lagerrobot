@@ -2,7 +2,7 @@ import spidev
 import time
 import socket
 #from bluetooth_server import *
-import test_sensor
+#import test_sensor
 
 import regler
 
@@ -39,24 +39,24 @@ while True:
 			
 			if not data:
 				print("inget data mottaget")
+				client.close()
 				break
 				
 			try:
 				received_value = data[0]
 				print("Mottagen data: ", received_value)
 			
-			except UnicodeDecodeError:
-				print("Kunde inte avkoda")
+			except Exception as e:
+				print("Kunde inte avkoda", e)
 				continue
 				
 				
 			if received_value == 255:  ##ändra sen, endast grundläggande
-				response = spi.xfer2(0)
+				response = "1"
 				print(response)
-			elif recieve_value == 0:
+			elif received_value == 0:
 				response = "0"
-				client.send(response.encode('utf-8'))
-				break
+				print(response)
 			else:
 				response = "3"
 				print(response)
@@ -64,16 +64,14 @@ while True:
 					
 			client.send(response.encode('utf-8'))
 			
-		close_connection()
+	
 						
 					
-	except:
-		print("Disconnected, looking for new socket")
-		s.close()
+	except Exception as e:
+		print("Disconnected, looking for new socket", e)
 
 def close_connection():
 	client.close()
-	s.close()
 	spi.close()
 	sys.exit()
 	
