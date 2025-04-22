@@ -2,7 +2,7 @@ import spidev
 import time
 import socket
 #from bluetooth_server import *
-#import test_sensor
+
 
 import regler
 
@@ -14,7 +14,7 @@ s.bind((hostMACaddress, port))
 s.listen(1)
 
 spi = spidev.SpiDev()
-spi.open(0, 0) #Öppna SPI-bussen
+spi.open(0, 1) #Öppna SPI-bussen
 spi.max_speed_hz = 1000000 #Ställ in klockhastighet
 spi.mode = 0
 spi.bits_per_word = 8
@@ -51,18 +51,20 @@ while True:
 				continue
 				
 				
-			if received_value == 255:  ##ändra sen, endast grundläggande
-				response = "1"
+			if received_value == 0:  #IR
+				response = spi.xfer2([0])
 				print(response)
-			elif received_value == 0:
-				response = "0"
+			elif received_value == 1: #Reflex
+				response = spi.xfer2([1])
 				print(response)
+			elif received_value == 2:  #Gyro
+				response = spi.xfer2([2])
 			else:
 				response = "3"
 				print(response)
 					
-					
-			client.send(response.encode('utf-8'))
+			client.send(response[0].to_bytes(1, 'big'))	
+			#client.send(response.encode('utf-8'))
 			
 	
 						

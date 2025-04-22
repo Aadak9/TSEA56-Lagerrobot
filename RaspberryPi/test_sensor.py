@@ -17,7 +17,7 @@ address = None
 while 1:	
 		
 	try:
-		sensor_data = spi.xfer2([1])
+		sensor_data = spi.xfer2([0])
 		print(f"Sensorvärde: {sensor_data}")
 		time.sleep(1)
 	except:
