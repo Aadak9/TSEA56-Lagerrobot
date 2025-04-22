@@ -257,11 +257,27 @@ def windowclosed():
 
 
 
+
+def draw_map()
+#
+#
+#
+    window.after(100, draw_map)
+
+
+
+
 #knapp_frame = tk.Frame(master=Kontrollruta, bd=1, relief="solid", padx=4, pady=4)
 #knapp_frame.pack(padx=20, pady=20)
 
 #forwardbutton = tk.Button(window, text="W", width=50, height=50)
 #forwardbutton.place(x=200, y= 200)
+
+
+window.update()
+window.update_idletasks()
+draw_map()
+
 
 window.protocol("WM_DELETE_WINDOW", windowclosed)
 window.mainloop()
