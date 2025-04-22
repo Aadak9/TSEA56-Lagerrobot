@@ -51,7 +51,7 @@ while True:
 				
 				
 			if received_value == 255:  ##ändra sen, endast grundläggande
-				response = "1"
+				response = spi.xfer2(0)
 				print(response)
 			elif recieve_value == 0:
 				response = "0"
