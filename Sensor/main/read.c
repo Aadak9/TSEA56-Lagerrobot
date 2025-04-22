@@ -52,7 +52,8 @@ uint8_t read_IR()
 	
 	volatile uint8_t indata_t = AD_convert();
 	volatile int indata = convert_uint8_t(indata_t);
-	volatile int distance_cm = dist_table(indata);
+	//volatile int distance_cm = dist_table(indata);
+	volatile int distance_cm = linear_interpolation(indata);
 	
 	return data = (uint8_t)distance_cm;
 }
