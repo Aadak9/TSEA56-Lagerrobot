@@ -34,11 +34,11 @@ float digital_to_volt(int digital_out)
 
 int convert_uint8_t(uint8_t num)
 {
-	return (int)num;
-}
+	//return (int)num;
+
 	// Konverterar en uint8_t variabel till int
 	
-	/*int array[8];
+	int array[8];
 	for (int i = 0; i <8; i++ )
 	{
 		array[i] = (num >>(7-i)) & 1;	
@@ -53,7 +53,7 @@ int convert_uint8_t(uint8_t num)
 	
 	return conversion;
 }
-*/
+
 
 int is_active_reflex()
 {
