@@ -75,45 +75,18 @@ int volt_to_dist(int indata)
 }
 
 
-int is_roadmark(int sum)
-{
-	if (sum > 4) {									// Placeholder värde
-		return 1;
-		} else {
-		return 0;
-	}
-}
-
-
 int dist_table(int indata)
 {
-	if (indata >= 600){ 
-		return 10;
-	} else if (indata >= 470) {
-		return 15;
-	} else if (indata >= 390) {
-		return 20;
-	} else if (indata >= 307) {
-		return 25;
-	} else if (indata >= 256) { 
-		return 30;
-	} else if (indata >= 225) { 
-		return 35;
-	} else if (indata >= 200) { 
-		return 40;
-	} else if (indata >= 163) { 
-		return 50;
-	} else if (indata >= 133) { 
-		return 60;
-	} else if (indata >= 112) { 
-		return 70;
+	if (indata <= 225) {
+		return 0;
 	} else {
-		return 80;
+		return 1;
 	}
 }
 
 int w_table(int indata)
 {
+	/*
 	volatile int array_indata[11] = {936,851,766,681,596,511,426,341,256,171,86};
 	volatile int array_output[11] = {63,50,38,25,12,0,-12,-25,-37,-50-63};
 	
@@ -121,7 +94,7 @@ int w_table(int indata)
 	{
 		if (indata > array_indata[i]){
 			linear_interpolation(int indata,)
-			return
+			return 0;
 		}
 	}
 		
@@ -129,8 +102,7 @@ int w_table(int indata)
 	if (indata >= 936) {
 		return 63;
 	} else if (indata >= 851) {
-		linear_interpolation()
-		return w;
+		return 37;
 	} else if (indata >= 766) {
 		return 38;
 	} else if (indata >= 681) {
@@ -150,7 +122,9 @@ int w_table(int indata)
 	} else if (indata >= 86) {
 		return -62;
 	}
+	*/
 	
+	return 0;
 
 }
 
