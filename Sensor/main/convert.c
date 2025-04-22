@@ -34,9 +34,11 @@ float digital_to_volt(int digital_out)
 
 int convert_uint8_t(uint8_t num)
 {
+	return (int)num;
+}
 	// Konverterar en uint8_t variabel till int
 	
-	int array[8];
+	/*int array[8];
 	for (int i = 0; i <8; i++ )
 	{
 		array[i] = (num >>(7-i)) & 1;	
@@ -51,7 +53,7 @@ int convert_uint8_t(uint8_t num)
 	
 	return conversion;
 }
-
+*/
 
 int is_active_reflex()
 {
@@ -74,7 +76,7 @@ int volt_to_dist(int indata)
 	return distance;
 }
 
-
+/*
 int dist_table(int indata)
 {
 	if (indata <= 225) {
@@ -83,50 +85,36 @@ int dist_table(int indata)
 		return 1;
 	}
 }
+*/
 
-int w_table(int indata)
+int dist_table(int indata)
 {
-	/*
-	volatile int array_indata[11] = {936,851,766,681,596,511,426,341,256,171,86};
-	volatile int array_output[11] = {63,50,38,25,12,0,-12,-25,-37,-50-63};
-	
-	for (int i = 0; i < 11; i++ )
-	{
-		if (indata > array_indata[i]){
-			linear_interpolation(int indata,)
-			return 0;
-		}
-	}
-		
-		
-	if (indata >= 936) {
-		return 63;
-	} else if (indata >= 851) {
-		return 37;
-	} else if (indata >= 766) {
-		return 38;
-	} else if (indata >= 681) {
+	if (indata >= 600){
+		return 10;
+		} else if (indata >= 470) {
+		return 15;
+		} else if (indata >= 390) {
+		return 20;
+		} else if (indata >= 307) {
 		return 25;
-	} else if (indata >= 596) {
-		return 12;
-	} else if (indata >= 511) {
-		return 0;
-	} else if (indata >= 426) {
-		return -12;
-	} else if (indata >= 341) {
-		return -25;
-	} else if (indata >= 256) {
-		return -37;
-	} else if (indata >= 171) {
-		return -50;
-	} else if (indata >= 86) {
-		return -62;
+		} else if (indata >= 256) {
+		return 30;
+		} else if (indata >= 225) {
+		return 35;
+		} else if (indata >= 200) {
+		return 40;
+		} else if (indata >= 163) {
+		return 50;
+		} else if (indata >= 133) {
+		return 60;
+		} else if (indata >= 112) {
+		return 70;
+		} else {
+		return 80;
 	}
-	*/
-	
-	return 0;
 
 }
+
 
 int linear_interpolation(int indata)
 {
