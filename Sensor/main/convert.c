@@ -85,7 +85,7 @@ int dist_table(int indata)
 		return 1;
 	}
 }
-*/
+
 
 int dist_table(int indata)
 {
@@ -114,9 +114,21 @@ int dist_table(int indata)
 	}
 
 }
-
+*/
 
 int linear_interpolation(int indata)
 {
+	int distances[] = {10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80};
+	float voltages[] = {2.3, 1.65, 1.3, 0.98 , 0.9, 0.85, 0.73, 0.68, 0.6, 0.56, 0.5, 0.48, 0.45, 0.43, 0.4};
+	
+	float voltage = digital_to_volt(indata);
+	
+	for (int i = 0; i < 14; i++)
+	{
+		if (voltage >= voltages[i] && voltage <= voltages[i+1])
+		{
+			return distances[i] + (voltage - voltages[i]) * (distances[i+1] - distances[i]) / (voltages[i+1] - voltages[i]);
+		}
+	}
 	
 }
