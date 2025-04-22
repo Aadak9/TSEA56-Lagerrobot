@@ -38,7 +38,6 @@ int8_t read_reflex()
 		}
 	}					
 	
-	funktion = 
 	pivot = sum_index/sum;
 	offset = (6 - pivot);
 								
