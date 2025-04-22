@@ -10,5 +10,4 @@ ISR(SPI_STC_vect) {
 	{
 		reglerstyr = SPDR;
 	}
-
 }
