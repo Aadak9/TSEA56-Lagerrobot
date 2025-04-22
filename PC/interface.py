@@ -68,6 +68,23 @@ def increase_lager_width():
     global lagerbredd
     lagerbredd += 1
     draw_lager()
+
+def decrease_lager_width():
+    global lagerbredd
+    if(lagerbredd > 1):
+        lagerbredd -= 1
+    draw_lager()
+
+def increase_lager_height():
+    global lagerhöjd
+    lagerbredd += 1
+    draw_lager()
+
+def decrease_lager_height():
+    global lagerhöjd
+    if(lagerhöjd > 1):
+        lagerhöjd -= 1
+    draw_lager()
     
 
 
@@ -192,7 +209,10 @@ for i in range(2):  # 2 rader
 buttonq = tk.Button(ruta1, text="Q", width =8, height=4, command=lambda: increase_lager_width())
 buttonq.grid(row = 1, column=0, padx=5, pady= 5)
 
-buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: buttonpressed("E"))
+#buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: buttonpressed("E"))
+#buttone.grid(row = 1, column=2, padx=5, pady= 5)
+
+buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: decrease_lager_width())
 buttone.grid(row = 1, column=2, padx=5, pady= 5)
 
 buttonw = tk.Button(ruta1, text= "W", width =8, height=4, command=lambda: buttonpressed("W"))
@@ -275,6 +295,16 @@ def windowclosed():
 
 
 
+
+def draw_map()
+#
+#
+#
+    window.after(100, draw_map)
+
+
+
+
 #knapp_frame = tk.Frame(master=Kontrollruta, bd=1, relief="solid", padx=4, pady=4)
 #knapp_frame.pack(padx=20, pady=20)
 
@@ -282,6 +312,12 @@ def windowclosed():
 #forwardbutton.place(x=200, y= 200)
 
 
+<<<<<<< HEAD
+window.update()
+window.update_idletasks()
+draw_map()
+
+=======
 
 
 
@@ -344,6 +380,7 @@ def draw_lager():
 
 draw_lager()
 
+>>>>>>> 51e6d6a26ad4257dc2b570273c939ff8344f5e83
 
 window.protocol("WM_DELETE_WINDOW", windowclosed)
 window.mainloop()
