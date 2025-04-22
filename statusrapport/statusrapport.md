@@ -31,9 +31,9 @@ Glöm inte att även uppdatera tidplanen.
 3. Kommande vecka tänker vi försöka lösa problemen med servona. Vi vill fixa en till "ruta" vi har planerat att ha i vår GUI. Vi ska också göra klart gyrot samt börja med regleringen på Raspberryn. 
 
 ## Vecka 16 (Grupp XX)(rapporteras tisdag v 17)
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+1. Den gångna veckan har vi påbörjat kodning för regleringen och utveckling av dataöverförning mellan pc och Raspberryn för att möjliggöra sensordata till pc. Suttit med gyrot och utevcklat koden för att kunna skicka data från avr till raspberry. Jobbat vidare med servon så det mesta ska funka som det ska.
+2. Just nu har vi problem med att bla servona hackar något, dvs dem går inte riktigt fullt så som de ska. Något problem med gyrot och hur vi avgör svängning tex. 
+3. Kommande vecka tänker vi fortsätta så att kommunikationen mellan samtliga enheter fungerar. Se till att lösa de problem som finns, dvs gyrot och servona. 
 
 ## Vecka 17 (Grupp XX)(rapporteras måndag v 18)
 1. Den gångna veckan har vi ...

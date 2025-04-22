@@ -16,17 +16,20 @@
 
 volatile uint8_t IR_send;
 volatile int8_t gyro_send;
-volatile uint8_t reflex_send;
+volatile int8_t reflex_send;
+volatile int start_gyro;
 
 
 int main()
 {
-	volatile uint8_t IR_send = 0;
-	volatile int8_t gyro_send = 0;
-	volatile uint8_t reflex_send = 0;
+	IR_send = 0;
+	gyro_send = 0;
+	reflex_send = 0;
+	start_gyro = 0;
 	
 	init_interrupt();
 	init_SPI();
+	init_timer();
 	
 	sei();
 	
@@ -37,31 +40,30 @@ int main()
 
 		init_reflex();
 		reflex_send = read_reflex();
-		
-		init_gyro();
-		gyro_send = read_gyro();
-		
 	}
+}
+
+
+ISR(TIMER1_COMPA_vect)
+{
+	init_gyro();
+	gyro_send = read_gyro();
 }
 
 
 ISR(SPI_STC_vect)
 {
-
-	uint8_t choose_sensor = (uint8_t)SPDR;
+	uint8_t volatile choose_sensor = SPDR;
 	
-	if(choose_sensor == 0)
-	{
+	if(choose_sensor == 0) {
 		SPDR = IR_send;
-	}
-	else if(choose_sensor == 1)
-	{
+	} else if(choose_sensor == 1) {
 		SPDR = reflex_send;
-	}
-	else if(choose_sensor == 2)
-	{
+	} else if(choose_sensor == 2) {
 		SPDR = gyro_send;
+	} else if(choose_sensor == 4) {
+		TCCR1B |= (1 << CS11) | (1 << CS10); // Sätter på timern och gyrot
+	} else if(choose_sensor == 5) {
+		TCCR1B &= ~(1 << CS11) | (1 << CS10); // Stänger av timern och gyrot
 	}
-
 }
-

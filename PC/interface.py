@@ -2,6 +2,14 @@ import tkinter as tk
 import Bluetooth as bt
 
 
+global lagerbredd
+lagerbredd = 3
+
+global lagerhöjd
+lagerhöjd = 3
+
+
+
 def buttonpressed(button):
     if(button=="W"):
         bt.sendbyte(1)
@@ -36,6 +44,7 @@ def buttonpressed(button):
     return
 
 
+
 def on_key_press(event):
     key = event.keysym.lower()
     if key in ["w", "a", "s", "d", "q", "e", "y", "h", "z", "c"] and (key not in pressed_keys):
@@ -54,6 +63,29 @@ def all_keys_released():
     bt.sendbyte(0)
 
 
+
+def increase_lager_width():
+    global lagerbredd
+    lagerbredd += 1
+    draw_lager()
+
+def decrease_lager_width():
+    global lagerbredd
+    if(lagerbredd > 1):
+        lagerbredd -= 1
+    draw_lager()
+
+def increase_lager_height():
+    global lagerhöjd
+    lagerbredd += 1
+    draw_lager()
+
+def decrease_lager_height():
+    global lagerhöjd
+    if(lagerhöjd > 1):
+        lagerhöjd -= 1
+    draw_lager()
+    
 
 
 
@@ -171,10 +203,16 @@ for i in range(2):  # 2 rader
 
 # INNEHÅLL RUTA1
 
-buttonq = tk.Button(ruta1, text="Q", width =8, height=4, command=lambda: buttonpressed("Q"))
+#buttonq = tk.Button(ruta1, text="Q", width =8, height=4, command=lambda: buttonpressed("Q"))
+#buttonq.grid(row = 1, column=0, padx=5, pady= 5)
+
+buttonq = tk.Button(ruta1, text="Q", width =8, height=4, command=lambda: increase_lager_width())
 buttonq.grid(row = 1, column=0, padx=5, pady= 5)
 
-buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: buttonpressed("E"))
+#buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: buttonpressed("E"))
+#buttone.grid(row = 1, column=2, padx=5, pady= 5)
+
+buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: decrease_lager_width())
 buttone.grid(row = 1, column=2, padx=5, pady= 5)
 
 buttonw = tk.Button(ruta1, text= "W", width =8, height=4, command=lambda: buttonpressed("W"))
@@ -274,12 +312,75 @@ def draw_map()
 #forwardbutton.place(x=200, y= 200)
 
 
+<<<<<<< HEAD
 window.update()
 window.update_idletasks()
 draw_map()
 
+=======
+
+
+
+
+
+
+
+## LAGERRUTA
+
+Lager.update()
+Canvas = tk.Canvas(Lager, height=str(Lager.winfo_height()), width=str(Lager.winfo_width()) ,bg="white")
+Canvas.pack()
+
+
+def draw_circle(canvas, x, y, r, color="blue"):
+    return canvas.create_oval(x - r, y - r, x + r, y + r, fill=color, outline="black")
+
+
+
+
+
+
+
+def draw_lager():
+    Canvas.delete("all")
+    nr_xnodes = lagerbredd + 1
+    nr_ynodes = lagerhöjd + 1
+
+    xposlist =[]
+    nr = 1
+    while nr <= nr_xnodes:
+        xposlist.append(Lager.winfo_width()/(nr_xnodes + 1) * nr)
+        nr += 1
+
+    yposlist = []
+    nr = 1
+    while nr <= nr_ynodes:
+        yposlist.append(Lager.winfo_height()/(nr_ynodes + 1) * nr)
+        print(yposlist)
+        nr += 1
+
+
+
+
+    # Draw horizontal lines
+    for y in yposlist:
+        for i in range(len(xposlist) - 1):
+            Canvas.create_line(xposlist[i], y, xposlist[i + 1], y, fill="gray")
+
+    # Draw vertical lines
+    for x in xposlist:
+        for i in range(len(yposlist) - 1):
+            Canvas.create_line(x, yposlist[i], x, yposlist[i + 1], fill="gray")
+
+    for xpos in xposlist:
+        for ypos in yposlist:
+            draw_circle(Canvas, xpos, ypos, 5, color="black")
+
+
+
+draw_lager()
+
+>>>>>>> 51e6d6a26ad4257dc2b570273c939ff8344f5e83
 
 window.protocol("WM_DELETE_WINDOW", windowclosed)
 window.mainloop()
-
-
