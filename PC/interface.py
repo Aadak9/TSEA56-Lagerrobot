@@ -87,7 +87,18 @@ def decrease_lager_height():
     draw_lager()
     
 
+def get_sensordata(): #hämta sensordata från IR och uppdatera i GUI
 
+    global ir_data
+    #ir_data += 1
+    ir_data = bt.sendbyte(0x00)  #IR
+    text4.config(text=f"Avstånd till hinder: {ir_data}")
+   # bt.sendbyte(0x01)  #Reflex
+    # bt.sendbyte(0x02)  #Gyro
+
+    window.after(100, get_sensordata)
+
+ir_data = 0
 
 
 bt.bluetoothinit()
@@ -145,7 +156,8 @@ text2.grid(column= 0, row = 1, sticky="nsw")
 text3 = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
 text3.grid(column= 0, row = 2, sticky="nsw")
 
-text4 = tk.Label(Data, text="Avstånd till hinder: ", font=("Arial", 15))
+
+text4 = tk.Label(Data, text=f"Avstånd till hinder: {ir_data}", font=("Arial", 15))
 text4.grid(column= 1, row = 0, sticky="nsw")
 
 text5 = tk.Label(Data, text="Rotation platta: ", font=("Arial", 15))
@@ -289,18 +301,12 @@ def windowclosed():
     except:
         pass
     
+    bt.s.close()
     window.destroy()
     return
 
 
 
-
-
-def draw_map()
-#
-#
-#
-    window.after(100, draw_map)
 
 
 
@@ -312,12 +318,10 @@ def draw_map()
 #forwardbutton.place(x=200, y= 200)
 
 
-<<<<<<< HEAD
 window.update()
 window.update_idletasks()
-draw_map()
+get_sensordata()
 
-=======
 
 
 
@@ -380,7 +384,6 @@ def draw_lager():
 
 draw_lager()
 
->>>>>>> 51e6d6a26ad4257dc2b570273c939ff8344f5e83
 
 window.protocol("WM_DELETE_WINDOW", windowclosed)
 window.mainloop()
