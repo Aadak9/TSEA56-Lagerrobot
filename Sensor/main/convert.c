@@ -27,7 +27,7 @@ uint8_t AD_convert()
 
 float digital_to_volt(int digital_out)
 {
-	volatile float volt_convert = digital_out*5.0/1023.0;				// Kalibrera intern spänning
+	volatile float volt_convert = digital_out*5.1/1023.0;				// Kalibrera intern spänning
 	return volt_convert;
 }
 
@@ -59,7 +59,7 @@ int is_active_reflex()
 	volatile int indata_int = convert_uint8_t(indata_t);
 	volatile int indata_volt = digital_to_volt(indata_int);
 	
-	if (indata_volt > 2) {								// Ändra 2 till ett värde som kalibreras
+	if (indata_volt >= 4) {								// Ändra 2 till ett värde som kalibreras
 		return 1;
 	} else {
 		return 0;
