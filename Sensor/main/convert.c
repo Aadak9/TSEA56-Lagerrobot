@@ -75,26 +75,6 @@ int volt_to_dist(int indata)
 }
 
 
-int is_roadmarkLeft(int sum)
-{
-	if (25 > sum > 15) {									// Placeholder värde
-		return 1;
-		} else {
-		return 0;
-	}
-}
-
-
-int is_roadmarkRight(int sum)
-{
-	if (sum > 25) {									// Placeholder värde
-		return 1;
-		} else {
-		return 0;
-	}
-}
-
-
 int dist_table(int indata)
 {
 	if (indata <= 225) {

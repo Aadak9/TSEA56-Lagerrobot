@@ -719,8 +719,8 @@ int8_t read_reflex()
  3bc:	0b 30       	cpi	r16, 0x0B	; 11
  3be:	11 05       	cpc	r17, r1
  3c0:	d4 f2       	brlt	.-76     	; 0x376 <read_reflex+0x38>
-			
-//		} 
+//			left = 1;
+//		} elseif ()
 		
 	}
 	

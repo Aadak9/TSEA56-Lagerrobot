@@ -29,15 +29,16 @@ int8_t read_reflex()
 		sum += indata;
 		sum_index += i*indata;
 		
-//		if (i == 0 && ) {
-			
-//		} 
+		if ((i == 0) && (indata == 1)) {
+			roadmarkLeft = 1;
+		}
 		
-	}
+		if ((i == 10) && (indata == 1)) {
+			roadmarkRight = 1;
+		}
+	}					
 	
-	roadmarkLeft = is_roadmarkLeft(sum_index);
-	roadmarkRight = is_roadmarkRight(sum_index);						
-	
+	funktion = 
 	pivot = sum_index/sum;
 	offset = (6 - pivot);
 								
