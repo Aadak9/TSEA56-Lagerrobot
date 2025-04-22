@@ -68,6 +68,23 @@ def increase_lager_width():
     global lagerbredd
     lagerbredd += 1
     draw_lager()
+
+def decrease_lager_width():
+    global lagerbredd
+    if(lagerbredd > 1):
+        lagerbredd -= 1
+    draw_lager()
+
+def increase_lager_height():
+    global lagerhöjd
+    lagerbredd += 1
+    draw_lager()
+
+def decrease_lager_height():
+    global lagerhöjd
+    if(lagerhöjd > 1):
+        lagerhöjd -= 1
+    draw_lager()
     
 
 
@@ -192,7 +209,10 @@ for i in range(2):  # 2 rader
 buttonq = tk.Button(ruta1, text="Q", width =8, height=4, command=lambda: increase_lager_width())
 buttonq.grid(row = 1, column=0, padx=5, pady= 5)
 
-buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: buttonpressed("E"))
+#buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: buttonpressed("E"))
+#buttone.grid(row = 1, column=2, padx=5, pady= 5)
+
+buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: decrease_lager_width())
 buttone.grid(row = 1, column=2, padx=5, pady= 5)
 
 buttonw = tk.Button(ruta1, text= "W", width =8, height=4, command=lambda: buttonpressed("W"))
