@@ -16,16 +16,17 @@ def bluetoothinit():
 
 def sendbyte(byte):
     s.send(byte.to_bytes(1, 'big'))
-    return
+    data = s.recv(size)
+    return data[0]
 
-bluetoothinit()
-time.sleep(1)
+#bluetoothinit()
+#time.sleep(1)
 size = 1024
 
-while True:
-  sendbyte(0x00)
-  data = s.recv(size)
-  print(data)
+#while True:
+#  sendbyte(0x00)
+#  data = s.recv(size)
+#  print(data)
   
 
 

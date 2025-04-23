@@ -9,6 +9,7 @@
 #include <avr/interrupt.h>
 #include "init.h"
 
+
 void init_IR()
 {
 	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(0<<MUX0);
