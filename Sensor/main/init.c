@@ -27,7 +27,7 @@ void init_gyro()
 void init_reflex()
 {
 	DDRA |= 0x1F;
-	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(0<<MUX1)|(1<<MUX0); 
+	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(0<<MUX1)|(1<<MUX0);
 	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
 
@@ -43,7 +43,7 @@ void init_SPI()
 {
 	//DDRB &= ~((1<<PORTB5)|(1<<PORTB7)|(1<<PORTB4));
 	DDRB = (1 << DDB6);
-	SPCR = (1 << SPIE) | (1 << SPE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA); 
+	SPCR = (1 << SPIE) | (1 << SPE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA);
 }
 
 

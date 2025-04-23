@@ -4,5 +4,6 @@
 int8_t read_reflex();
 uint8_t read_IR();
 int8_t read_gyro();
+void reset_w();
 
 #endif
