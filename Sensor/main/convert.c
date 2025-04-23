@@ -27,11 +27,11 @@ uint8_t AD_convert()
 
 float digital_to_volt(int digital_out)
 {
-	volatile float volt_convert = digital_out*5.1/1023.0;				// Kalibrera intern spänning
+	volatile float volt_convert = digital_out*5.1/255.0;				// Kalibrera intern spänning
 	return volt_convert;
 }
 
-
+/*
 int convert_uint8_t(uint8_t num)
 {
 	//return (int)num;
@@ -53,16 +53,16 @@ int convert_uint8_t(uint8_t num)
 	
 	return conversion;
 }
-
+*/
 
 int is_active_reflex()
 {
-	volatile uint8_t indata_t = AD_convert();
-	volatile int indata_int = convert_uint8_t(indata_t);
-	volatile int indata_volt = digital_to_volt(indata_int);
+	volatile uint8_t indata_t = AD_convert();					//Första sensorläsning blir alltid 247
+	//volatile int indata_int = convert_uint8_t(indata_t);
+	volatile int indata_volt = digital_to_volt(indata_t);
 	
-	if (indata_volt >= 4) {								// Ändra 2 till ett värde som kalibreras
-		return 1;
+	if (indata_volt >= 3) {																						
+		return 1;										
 	} else {
 		return 0;
 	}
