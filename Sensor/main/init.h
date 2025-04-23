@@ -6,6 +6,6 @@ void init_gyro();
 void init_reflex();
 void init_interrupt();
 void init_SPI();
-
+void init_timer();
 
 #endif

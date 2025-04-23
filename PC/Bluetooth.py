@@ -1,4 +1,5 @@
 import socket
+import time
 
 def bluetoothinit():
     global s
@@ -15,15 +16,18 @@ def bluetoothinit():
 
 def sendbyte(byte):
     s.send(byte.to_bytes(1, 'big'))
-    return
+    data = s.recv(size)
+    return data[0]
 
 #bluetoothinit()
-#size = 1024
+#time.sleep(1)
+size = 1024
 
-#while 1:
-#  sendbyte(0xFF)
+#while True:
+#  sendbyte(0x00)
 #  data = s.recv(size)
-#   print(data)
+#  print(data)
+  
 
 
 

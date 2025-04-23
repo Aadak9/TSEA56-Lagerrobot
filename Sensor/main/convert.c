@@ -27,13 +27,15 @@ uint8_t AD_convert()
 
 float digital_to_volt(int digital_out)
 {
-	volatile float volt_convert = digital_out*5.0/1023.0;				// Kalibrera intern spänning
+	volatile float volt_convert = digital_out*5.1/255.0;				// Kalibrera intern spänning
 	return volt_convert;
 }
 
-
+/*
 int convert_uint8_t(uint8_t num)
 {
+	//return (int)num;
+
 	// Konverterar en uint8_t variabel till int
 	
 	int array[8];
@@ -51,16 +53,16 @@ int convert_uint8_t(uint8_t num)
 	
 	return conversion;
 }
-
+*/
 
 int is_active_reflex()
 {
-	volatile uint8_t indata_t = AD_convert();
-	volatile int indata_int = convert_uint8_t(indata_t);
-	volatile int indata_volt = digital_to_volt(indata_int);
+	volatile uint8_t indata_t = AD_convert();					//Första sensorläsning blir alltid 247
+	//volatile int indata_int = convert_uint8_t(indata_t);
+	volatile int indata_volt = digital_to_volt(indata_t);
 	
-	if (indata_volt > 2) {								// Ändra 2 till ett värde som kalibreras
-		return 1;
+	if (indata_volt >= 3) {																						
+		return 1;										
 	} else {
 		return 0;
 	}
@@ -74,7 +76,7 @@ int volt_to_dist(int indata)
 	return distance;
 }
 
-
+/*
 int dist_table(int indata)
 {
 	if (indata <= 225) {
@@ -84,51 +86,56 @@ int dist_table(int indata)
 	}
 }
 
-int w_table(int indata)
+
+int dist_table(int indata)
 {
-	/*
-	volatile int array_indata[11] = {936,851,766,681,596,511,426,341,256,171,86};
-	volatile int array_output[11] = {63,50,38,25,12,0,-12,-25,-37,-50-63};
-	
-	for (int i = 0; i < 11; i++ )
-	{
-		if (indata > array_indata[i]){
-			linear_interpolation(int indata,)
-			return 0;
-		}
-	}
-		
-		
-	if (indata >= 936) {
-		return 63;
-	} else if (indata >= 851) {
-		return 37;
-	} else if (indata >= 766) {
-		return 38;
-	} else if (indata >= 681) {
+	if (indata >= 600){
+		return 10;
+		} else if (indata >= 470) {
+		return 15;
+		} else if (indata >= 390) {
+		return 20;
+		} else if (indata >= 307) {
 		return 25;
-	} else if (indata >= 596) {
-		return 12;
-	} else if (indata >= 511) {
-		return 0;
-	} else if (indata >= 426) {
-		return -12;
-	} else if (indata >= 341) {
-		return -25;
-	} else if (indata >= 256) {
-		return -37;
-	} else if (indata >= 171) {
-		return -50;
-	} else if (indata >= 86) {
-		return -62;
+		} else if (indata >= 256) {
+		return 30;
+		} else if (indata >= 225) {
+		return 35;
+		} else if (indata >= 200) {
+		return 40;
+		} else if (indata >= 163) {
+		return 50;
+		} else if (indata >= 133) {
+		return 60;
+		} else if (indata >= 112) {
+		return 70;
+		} else {
+		return 80;
 	}
-	*/
-	
-	return 0;
 
 }
+*/
 
 int linear_interpolation(int indata)
 {
+	int distances[] = {10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80};
+	float voltages[] = {2.3, 1.65, 1.3, 0.98 , 0.9, 0.85, 0.73, 0.68, 0.6, 0.56, 0.5, 0.48, 0.45, 0.43, 0.4};
 	
+	float voltage = digital_to_volt(indata);
+	
+	for (int i = 0; i < 14; i++)
+	{
+		if (voltage <= voltages[i] && voltage >= voltages[i+1])
+		{
+			return distances[i] + (voltage - voltages[i]) * (distances[i+1] - distances[i]) / (voltages[i+1] - voltages[i]);
+		}
+	}
+	if (voltage > voltages[0])
+	{
+		return  distances[0];
+	}
+	if (voltage < voltages[14])
+	{
+		return distances[14];
+	}	
 }
