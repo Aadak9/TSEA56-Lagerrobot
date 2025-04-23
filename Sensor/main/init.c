@@ -3,7 +3,7 @@
  *
  * Created: 2025-04-02 15:58:02
  * Author : andno773, sigry751
- */ 
+ */
 
 #include <avr/io.h>
 #include <avr/interrupt.h>

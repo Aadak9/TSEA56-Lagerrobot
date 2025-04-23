@@ -15,7 +15,7 @@
 
 
 volatile uint8_t IR_send;
-volatile int8_t gyro_send;
+volatile uint8_t gyro_send;
 volatile int8_t reflex;
 volatile int8_t reflex_send;
 volatile int8_t roadmark_send;
@@ -38,7 +38,7 @@ int main()
 	
 	sei();
 	
-	TCCR1B |= (1 << CS11) | (1 << CS10);
+//	TCCR1B |= (1 << CS11) | (1 << CS10);
 	
 	while (1)
 	{
@@ -47,9 +47,8 @@ int main()
 
 		init_reflex();
 		reflex = read_reflex();
-//		roadmark_send = reflex >> 6;
-//		reflex_send = reflex & (0x7F);
-		reflex_send = reflex;
+		roadmark_send = reflex >> 6;
+		reflex_send = reflex & (0x7F);
 	}
 }
 

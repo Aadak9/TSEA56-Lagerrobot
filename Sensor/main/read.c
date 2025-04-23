@@ -3,9 +3,9 @@
  *
  * Created: 2025-04-03 11:25:46
  * Author : andno773, sigry751
- */ 
+ */
 
-#define F_CPU 1000000UL
+#define F_CPU 16000000UL
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <math.h>
@@ -14,6 +14,7 @@
 #include "convert.h"
 
 volatile int w_int;
+volatile int w_send;
 
 int8_t read_reflex()
 {
@@ -59,8 +60,7 @@ int8_t read_reflex()
 		pivot = sum_index/sum;
 	}
 
-	return data = (int8_t)(pivot)
-	// + roadmarkLeft*128 + roadmarkRight*64);
+	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);
 }
 
 
@@ -72,11 +72,12 @@ uint8_t read_IR()
 }
 
 
-int8_t read_gyro()
+uint8_t read_gyro()
 {		
-	volatile uint8_t indata = AD_convert();
-	w_int += indata;
-	volatile int8_t w = (int8_t)w_int;
+	volatile int8_t indata = AD_convert() - 129;							// värdet 125 måste kalibreras
+	w_int += indata*4;
+	w_send = abs(w_int/100);
+ 	volatile uint8_t w = (uint8_t)w_send;
 	return w;
 }
 
