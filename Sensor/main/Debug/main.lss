@@ -19,15 +19,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   7 .debug_abbrev 00000aa1  00000000  00000000  00001d79  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   0000089d  00000000  00000000  0000281a  2**0
+  8 .debug_line   000008a3  00000000  00000000  0000281a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000002ec  00000000  00000000  000030b8  2**2
+  9 .debug_frame  000002ec  00000000  00000000  000030c0  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000005f0  00000000  00000000  000033a4  2**0
+ 10 .debug_str    000005f0  00000000  00000000  000033ac  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000643  00000000  00000000  00003994  2**0
+ 11 .debug_loc    00000643  00000000  00000000  0000399c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000000b0  00000000  00000000  00003fd7  2**0
+ 12 .debug_ranges 000000b0  00000000  00000000  00003fdf  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -659,7 +659,7 @@ int main()
  3d2:	be df       	rcall	.-132    	; 0x350 <init_reflex>
 
 		init_reflex();
- 3d4:	98 d0       	rcall	.+304    	; 0x506 <read_reflex>
+ 3d4:	9a d0       	rcall	.+308    	; 0x50a <read_reflex>
  3d6:	80 93 60 01 	sts	0x0160, r24	; 0x800160 <reflex>
 		reflex = read_reflex();
  3da:	80 91 60 01 	lds	r24, 0x0160	; 0x800160 <reflex>
@@ -670,8 +670,8 @@ int main()
  3e4:	80 f9       	bld	r24, 0
  3e6:	80 93 5a 01 	sts	0x015A, r24	; 0x80015a <__data_end>
  3ea:	80 91 60 01 	lds	r24, 0x0160	; 0x800160 <reflex>
- 3ee:	8f 77       	andi	r24, 0x7F	; 127
-		reflex_send = reflex & (0x7F);
+ 3ee:	8f 73       	andi	r24, 0x3F	; 63
+		reflex_send = reflex & (0x3F);
  3f0:	80 93 5b 01 	sts	0x015B, r24	; 0x80015b <reflex_send>
  3f4:	ea cf       	rjmp	.-44     	; 0x3ca <main+0x28>
 
@@ -767,7 +767,7 @@ ISR(SPI_STC_vect)
 		SPDR = IR_send;
  484:	80 91 5d 01 	lds	r24, 0x015D	; 0x80015d <IR_send>
  488:	8e bd       	out	0x2e, r24	; 46
- 48a:	27 c0       	rjmp	.+78     	; 0x4da <__vector_19+0x90>
+ 48a:	29 c0       	rjmp	.+82     	; 0x4de <__vector_19+0x94>
 	} else if(choose_sensor == 1) {
  48c:	89 81       	ldd	r24, Y+1	; 0x01
  48e:	81 30       	cpi	r24, 0x01	; 1
@@ -775,239 +775,240 @@ ISR(SPI_STC_vect)
 		SPDR = reflex_send;
  492:	80 91 5b 01 	lds	r24, 0x015B	; 0x80015b <reflex_send>
  496:	8e bd       	out	0x2e, r24	; 46
- 498:	20 c0       	rjmp	.+64     	; 0x4da <__vector_19+0x90>
+ 498:	22 c0       	rjmp	.+68     	; 0x4de <__vector_19+0x94>
 	} else if(choose_sensor == 2) {
  49a:	89 81       	ldd	r24, Y+1	; 0x01
  49c:	82 30       	cpi	r24, 0x02	; 2
- 49e:	21 f4       	brne	.+8      	; 0x4a8 <__vector_19+0x5e>
-		SPDR = gyro_send;
- 4a0:	80 91 5c 01 	lds	r24, 0x015C	; 0x80015c <gyro_send>
- 4a4:	8e bd       	out	0x2e, r24	; 46
- 4a6:	19 c0       	rjmp	.+50     	; 0x4da <__vector_19+0x90>
-	} else if(choose_sensor == 4) {
- 4a8:	89 81       	ldd	r24, Y+1	; 0x01
- 4aa:	84 30       	cpi	r24, 0x04	; 4
- 4ac:	31 f4       	brne	.+12     	; 0x4ba <__vector_19+0x70>
-		TCCR1B |= (1 << CS11) | (1 << CS10);		// Sätter på timern och gyrot
- 4ae:	e1 e8       	ldi	r30, 0x81	; 129
- 4b0:	f0 e0       	ldi	r31, 0x00	; 0
- 4b2:	80 81       	ld	r24, Z
- 4b4:	83 60       	ori	r24, 0x03	; 3
- 4b6:	80 83       	st	Z, r24
- 4b8:	10 c0       	rjmp	.+32     	; 0x4da <__vector_19+0x90>
-	} else if(choose_sensor == 5) {
- 4ba:	89 81       	ldd	r24, Y+1	; 0x01
- 4bc:	85 30       	cpi	r24, 0x05	; 5
- 4be:	39 f4       	brne	.+14     	; 0x4ce <__vector_19+0x84>
+ 49e:	49 f4       	brne	.+18     	; 0x4b2 <__vector_19+0x68>
+		cli();
+ 4a0:	f8 94       	cli
 		TCCR1B &= ~(1 << CS11) | (1 << CS10);		// Stänger av timern och gyrot
- 4c0:	e1 e8       	ldi	r30, 0x81	; 129
- 4c2:	f0 e0       	ldi	r31, 0x00	; 0
- 4c4:	80 81       	ld	r24, Z
- 4c6:	8d 7f       	andi	r24, 0xFD	; 253
- 4c8:	80 83       	st	Z, r24
+ 4a2:	e1 e8       	ldi	r30, 0x81	; 129
+ 4a4:	f0 e0       	ldi	r31, 0x00	; 0
+ 4a6:	80 81       	ld	r24, Z
+ 4a8:	8d 7f       	andi	r24, 0xFD	; 253
+ 4aa:	80 83       	st	Z, r24
 		reset_w();
- 4ca:	ee d0       	rcall	.+476    	; 0x6a8 <reset_w>
- 4cc:	06 c0       	rjmp	.+12     	; 0x4da <__vector_19+0x90>
-	} else if(choose_sensor == 6) {
- 4ce:	89 81       	ldd	r24, Y+1	; 0x01
- 4d0:	86 30       	cpi	r24, 0x06	; 6
- 4d2:	19 f4       	brne	.+6      	; 0x4da <__vector_19+0x90>
-		SPDR = roadmark_send;						// Roadmark är på formen 000000LR
- 4d4:	80 91 5a 01 	lds	r24, 0x015A	; 0x80015a <__data_end>
- 4d8:	8e bd       	out	0x2e, r24	; 46
+ 4ac:	fd d0       	rcall	.+506    	; 0x6a8 <reset_w>
+		sei();
+ 4ae:	78 94       	sei
+ 4b0:	16 c0       	rjmp	.+44     	; 0x4de <__vector_19+0x94>
+	} else if(choose_sensor == 3) {
+ 4b2:	89 81       	ldd	r24, Y+1	; 0x01
+ 4b4:	83 30       	cpi	r24, 0x03	; 3
+ 4b6:	31 f4       	brne	.+12     	; 0x4c4 <__vector_19+0x7a>
+		TCCR1B |= (1 << CS11) | (1 << CS10);		// Sätter på timern och gyrot
+ 4b8:	e1 e8       	ldi	r30, 0x81	; 129
+ 4ba:	f0 e0       	ldi	r31, 0x00	; 0
+ 4bc:	80 81       	ld	r24, Z
+ 4be:	83 60       	ori	r24, 0x03	; 3
+ 4c0:	80 83       	st	Z, r24
+ 4c2:	0d c0       	rjmp	.+26     	; 0x4de <__vector_19+0x94>
+	} else if(choose_sensor == 4) {
+ 4c4:	89 81       	ldd	r24, Y+1	; 0x01
+ 4c6:	84 30       	cpi	r24, 0x04	; 4
+ 4c8:	21 f4       	brne	.+8      	; 0x4d2 <__vector_19+0x88>
+		SPDR = gyro_send;
+ 4ca:	80 91 5c 01 	lds	r24, 0x015C	; 0x80015c <gyro_send>
+ 4ce:	8e bd       	out	0x2e, r24	; 46
+ 4d0:	06 c0       	rjmp	.+12     	; 0x4de <__vector_19+0x94>
+	} else if(choose_sensor == 5) {
+ 4d2:	89 81       	ldd	r24, Y+1	; 0x01
+ 4d4:	85 30       	cpi	r24, 0x05	; 5
+ 4d6:	19 f4       	brne	.+6      	; 0x4de <__vector_19+0x94>
+		SPDR = roadmark_send;						// Roadmark är på formen 0b000000LR
+ 4d8:	80 91 5a 01 	lds	r24, 0x015A	; 0x80015a <__data_end>
+ 4dc:	8e bd       	out	0x2e, r24	; 46
 	}
- 4da:	0f 90       	pop	r0
- 4dc:	df 91       	pop	r29
- 4de:	cf 91       	pop	r28
- 4e0:	ff 91       	pop	r31
- 4e2:	ef 91       	pop	r30
- 4e4:	bf 91       	pop	r27
- 4e6:	af 91       	pop	r26
- 4e8:	9f 91       	pop	r25
- 4ea:	8f 91       	pop	r24
- 4ec:	7f 91       	pop	r23
- 4ee:	6f 91       	pop	r22
- 4f0:	5f 91       	pop	r21
- 4f2:	4f 91       	pop	r20
- 4f4:	3f 91       	pop	r19
- 4f6:	2f 91       	pop	r18
- 4f8:	0f 90       	pop	r0
- 4fa:	0b be       	out	0x3b, r0	; 59
+ 4de:	0f 90       	pop	r0
+ 4e0:	df 91       	pop	r29
+ 4e2:	cf 91       	pop	r28
+ 4e4:	ff 91       	pop	r31
+ 4e6:	ef 91       	pop	r30
+ 4e8:	bf 91       	pop	r27
+ 4ea:	af 91       	pop	r26
+ 4ec:	9f 91       	pop	r25
+ 4ee:	8f 91       	pop	r24
+ 4f0:	7f 91       	pop	r23
+ 4f2:	6f 91       	pop	r22
+ 4f4:	5f 91       	pop	r21
+ 4f6:	4f 91       	pop	r20
+ 4f8:	3f 91       	pop	r19
+ 4fa:	2f 91       	pop	r18
  4fc:	0f 90       	pop	r0
- 4fe:	0f be       	out	0x3f, r0	; 63
+ 4fe:	0b be       	out	0x3b, r0	; 59
  500:	0f 90       	pop	r0
- 502:	1f 90       	pop	r1
- 504:	18 95       	reti
+ 502:	0f be       	out	0x3f, r0	; 63
+ 504:	0f 90       	pop	r0
+ 506:	1f 90       	pop	r1
+ 508:	18 95       	reti
 
-00000506 <read_reflex>:
+0000050a <read_reflex>:
 
 volatile int w_int;
 volatile int w_send;
 
 int8_t read_reflex()
 {
- 506:	0f 93       	push	r16
- 508:	1f 93       	push	r17
- 50a:	cf 93       	push	r28
- 50c:	df 93       	push	r29
- 50e:	cd b7       	in	r28, 0x3d	; 61
- 510:	de b7       	in	r29, 0x3e	; 62
- 512:	2c 97       	sbiw	r28, 0x0c	; 12
- 514:	0f b6       	in	r0, 0x3f	; 63
- 516:	f8 94       	cli
- 518:	de bf       	out	0x3e, r29	; 62
- 51a:	0f be       	out	0x3f, r0	; 63
- 51c:	cd bf       	out	0x3d, r28	; 61
+ 50a:	0f 93       	push	r16
+ 50c:	1f 93       	push	r17
+ 50e:	cf 93       	push	r28
+ 510:	df 93       	push	r29
+ 512:	cd b7       	in	r28, 0x3d	; 61
+ 514:	de b7       	in	r29, 0x3e	; 62
+ 516:	2c 97       	sbiw	r28, 0x0c	; 12
+ 518:	0f b6       	in	r0, 0x3f	; 63
+ 51a:	f8 94       	cli
+ 51c:	de bf       	out	0x3e, r29	; 62
+ 51e:	0f be       	out	0x3f, r0	; 63
+ 520:	cd bf       	out	0x3d, r28	; 61
 	int i;
 	volatile int8_t data;
 	volatile uint8_t indata = 0;
- 51e:	1a 82       	std	Y+2, r1	; 0x02
+ 522:	1a 82       	std	Y+2, r1	; 0x02
 	volatile int sum = 0;
- 520:	1c 82       	std	Y+4, r1	; 0x04
- 522:	1b 82       	std	Y+3, r1	; 0x03
+ 524:	1c 82       	std	Y+4, r1	; 0x04
+ 526:	1b 82       	std	Y+3, r1	; 0x03
 	volatile int sum_index = 0;
- 524:	1e 82       	std	Y+6, r1	; 0x06
- 526:	1d 82       	std	Y+5, r1	; 0x05
+ 528:	1e 82       	std	Y+6, r1	; 0x06
+ 52a:	1d 82       	std	Y+5, r1	; 0x05
 	volatile int roadmarkLeft = 0;
- 528:	18 86       	std	Y+8, r1	; 0x08
- 52a:	1f 82       	std	Y+7, r1	; 0x07
+ 52c:	18 86       	std	Y+8, r1	; 0x08
+ 52e:	1f 82       	std	Y+7, r1	; 0x07
 	volatile int roadmarkRight = 0;
- 52c:	1a 86       	std	Y+10, r1	; 0x0a
- 52e:	19 86       	std	Y+9, r1	; 0x09
+ 530:	1a 86       	std	Y+10, r1	; 0x0a
+ 532:	19 86       	std	Y+9, r1	; 0x09
 	volatile int pivot = 0;	
- 530:	1c 86       	std	Y+12, r1	; 0x0c
- 532:	1b 86       	std	Y+11, r1	; 0x0b
+ 534:	1c 86       	std	Y+12, r1	; 0x0c
+ 536:	1b 86       	std	Y+11, r1	; 0x0b
 	
-	for(i = 0; i < 11; i++)
- 534:	00 e0       	ldi	r16, 0x00	; 0
- 536:	10 e0       	ldi	r17, 0x00	; 0
- 538:	43 c0       	rjmp	.+134    	; 0x5c0 <read_reflex+0xba>
+	for(i = 1; i < 12; i++)
+ 538:	01 e0       	ldi	r16, 0x01	; 1
+ 53a:	10 e0       	ldi	r17, 0x00	; 0
+ 53c:	3f c0       	rjmp	.+126    	; 0x5bc <read_reflex+0xb2>
 	{
 		PORTA &= 0xF0;									// Nollställer de fyra LSB bitarna i PORT A
- 53a:	82 b1       	in	r24, 0x02	; 2
- 53c:	80 7f       	andi	r24, 0xF0	; 240
- 53e:	82 b9       	out	0x02, r24	; 2
+ 53e:	82 b1       	in	r24, 0x02	; 2
+ 540:	80 7f       	andi	r24, 0xF0	; 240
+ 542:	82 b9       	out	0x02, r24	; 2
 		PORTA |= i;										// Sätter Muxen till index i
- 540:	82 b1       	in	r24, 0x02	; 2
- 542:	80 2b       	or	r24, r16
- 544:	82 b9       	out	0x02, r24	; 2
+ 544:	82 b1       	in	r24, 0x02	; 2
+ 546:	80 2b       	or	r24, r16
+ 548:	82 b9       	out	0x02, r24	; 2
 		PORTA |= 0x10;									// Startar sensorn
- 546:	82 b1       	in	r24, 0x02	; 2
- 548:	80 61       	ori	r24, 0x10	; 16
- 54a:	82 b9       	out	0x02, r24	; 2
+ 54a:	82 b1       	in	r24, 0x02	; 2
+ 54c:	80 61       	ori	r24, 0x10	; 16
+ 54e:	82 b9       	out	0x02, r24	; 2
 		
-		 if (i == 0) {
- 54c:	01 15       	cp	r16, r1
- 54e:	11 05       	cpc	r17, r1
- 550:	31 f4       	brne	.+12     	; 0x55e <read_reflex+0x58>
+		 if (i == 1) {
+ 550:	01 30       	cpi	r16, 0x01	; 1
+ 552:	11 05       	cpc	r17, r1
+ 554:	29 f4       	brne	.+10     	; 0x560 <read_reflex+0x56>
 			 is_active_reflex();						// Läs men kasta resultatet
- 552:	f6 dd       	rcall	.-1044   	; 0x140 <is_active_reflex>
+ 556:	f4 dd       	rcall	.-1048   	; 0x140 <is_active_reflex>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 554:	3a e6       	ldi	r19, 0x6A	; 106
- 556:	3a 95       	dec	r19
- 558:	f1 f7       	brne	.-4      	; 0x556 <read_reflex+0x50>
- 55a:	00 c0       	rjmp	.+0      	; 0x55c <read_reflex+0x56>
+ 558:	3a e6       	ldi	r19, 0x6A	; 106
+ 55a:	3a 95       	dec	r19
+ 55c:	f1 f7       	brne	.-4      	; 0x55a <read_reflex+0x50>
 			 _delay_us(20);								//Första läsningen från i = 0 ger fel värde
-			 continue;
 		 }
-		
+
 		indata = is_active_reflex();
- 55c:	2f c0       	rjmp	.+94     	; 0x5bc <read_reflex+0xb6>
- 55e:	f0 dd       	rcall	.-1056   	; 0x140 <is_active_reflex>
- 560:	8a 83       	std	Y+2, r24	; 0x02
+ 55e:	00 c0       	rjmp	.+0      	; 0x560 <read_reflex+0x56>
+ 560:	ef dd       	rcall	.-1058   	; 0x140 <is_active_reflex>
+ 562:	8a 83       	std	Y+2, r24	; 0x02
 		PORTA &= 0xEF;									// Stänger av sensorn
- 562:	82 b1       	in	r24, 0x02	; 2
- 564:	8f 7e       	andi	r24, 0xEF	; 239
- 566:	82 b9       	out	0x02, r24	; 2
+ 564:	82 b1       	in	r24, 0x02	; 2
+ 566:	8f 7e       	andi	r24, 0xEF	; 239
+ 568:	82 b9       	out	0x02, r24	; 2
 		
 		sum += indata;									// 1 eller 0
- 568:	2a 81       	ldd	r18, Y+2	; 0x02
- 56a:	8b 81       	ldd	r24, Y+3	; 0x03
- 56c:	9c 81       	ldd	r25, Y+4	; 0x04
- 56e:	82 0f       	add	r24, r18
- 570:	91 1d       	adc	r25, r1
- 572:	9c 83       	std	Y+4, r25	; 0x04
- 574:	8b 83       	std	Y+3, r24	; 0x03
-		sum_index += (i+1)*indata;
- 576:	8a 81       	ldd	r24, Y+2	; 0x02
- 578:	98 01       	movw	r18, r16
- 57a:	2f 5f       	subi	r18, 0xFF	; 255
- 57c:	3f 4f       	sbci	r19, 0xFF	; 255
- 57e:	82 9f       	mul	r24, r18
- 580:	a0 01       	movw	r20, r0
- 582:	83 9f       	mul	r24, r19
- 584:	50 0d       	add	r21, r0
- 586:	11 24       	eor	r1, r1
- 588:	8d 81       	ldd	r24, Y+5	; 0x05
- 58a:	9e 81       	ldd	r25, Y+6	; 0x06
- 58c:	84 0f       	add	r24, r20
- 58e:	95 1f       	adc	r25, r21
- 590:	9e 83       	std	Y+6, r25	; 0x06
- 592:	8d 83       	std	Y+5, r24	; 0x05
-		
+ 56a:	2a 81       	ldd	r18, Y+2	; 0x02
+ 56c:	8b 81       	ldd	r24, Y+3	; 0x03
+ 56e:	9c 81       	ldd	r25, Y+4	; 0x04
+ 570:	82 0f       	add	r24, r18
+ 572:	91 1d       	adc	r25, r1
+ 574:	9c 83       	std	Y+4, r25	; 0x04
+ 576:	8b 83       	std	Y+3, r24	; 0x03
+		sum_index += (i)*indata;
+ 578:	8a 81       	ldd	r24, Y+2	; 0x02
+ 57a:	80 9f       	mul	r24, r16
+ 57c:	90 01       	movw	r18, r0
+ 57e:	81 9f       	mul	r24, r17
+ 580:	30 0d       	add	r19, r0
+ 582:	11 24       	eor	r1, r1
+ 584:	8d 81       	ldd	r24, Y+5	; 0x05
+ 586:	9e 81       	ldd	r25, Y+6	; 0x06
+ 588:	82 0f       	add	r24, r18
+ 58a:	93 1f       	adc	r25, r19
+ 58c:	9e 83       	std	Y+6, r25	; 0x06
+ 58e:	8d 83       	std	Y+5, r24	; 0x05
+
 		if ((i == 0) && (indata == 1)) {
- 594:	01 15       	cp	r16, r1
- 596:	11 05       	cpc	r17, r1
- 598:	39 f4       	brne	.+14     	; 0x5a8 <read_reflex+0xa2>
- 59a:	8a 81       	ldd	r24, Y+2	; 0x02
- 59c:	81 30       	cpi	r24, 0x01	; 1
- 59e:	21 f4       	brne	.+8      	; 0x5a8 <read_reflex+0xa2>
+ 590:	01 15       	cp	r16, r1
+ 592:	11 05       	cpc	r17, r1
+ 594:	39 f4       	brne	.+14     	; 0x5a4 <read_reflex+0x9a>
+ 596:	8a 81       	ldd	r24, Y+2	; 0x02
+ 598:	81 30       	cpi	r24, 0x01	; 1
+ 59a:	21 f4       	brne	.+8      	; 0x5a4 <read_reflex+0x9a>
 			roadmarkLeft = 1;
- 5a0:	81 e0       	ldi	r24, 0x01	; 1
- 5a2:	90 e0       	ldi	r25, 0x00	; 0
- 5a4:	98 87       	std	Y+8, r25	; 0x08
- 5a6:	8f 83       	std	Y+7, r24	; 0x07
+ 59c:	81 e0       	ldi	r24, 0x01	; 1
+ 59e:	90 e0       	ldi	r25, 0x00	; 0
+ 5a0:	98 87       	std	Y+8, r25	; 0x08
+ 5a2:	8f 83       	std	Y+7, r24	; 0x07
 		}
 		if ((i == 10) && (indata == 1)) {
- 5a8:	0a 30       	cpi	r16, 0x0A	; 10
- 5aa:	11 05       	cpc	r17, r1
- 5ac:	39 f4       	brne	.+14     	; 0x5bc <read_reflex+0xb6>
- 5ae:	8a 81       	ldd	r24, Y+2	; 0x02
- 5b0:	81 30       	cpi	r24, 0x01	; 1
- 5b2:	21 f4       	brne	.+8      	; 0x5bc <read_reflex+0xb6>
+ 5a4:	0a 30       	cpi	r16, 0x0A	; 10
+ 5a6:	11 05       	cpc	r17, r1
+ 5a8:	39 f4       	brne	.+14     	; 0x5b8 <read_reflex+0xae>
+ 5aa:	8a 81       	ldd	r24, Y+2	; 0x02
+ 5ac:	81 30       	cpi	r24, 0x01	; 1
+ 5ae:	21 f4       	brne	.+8      	; 0x5b8 <read_reflex+0xae>
 			roadmarkRight = 1;
- 5b4:	81 e0       	ldi	r24, 0x01	; 1
- 5b6:	90 e0       	ldi	r25, 0x00	; 0
- 5b8:	9a 87       	std	Y+10, r25	; 0x0a
- 5ba:	89 87       	std	Y+9, r24	; 0x09
+ 5b0:	81 e0       	ldi	r24, 0x01	; 1
+ 5b2:	90 e0       	ldi	r25, 0x00	; 0
+ 5b4:	9a 87       	std	Y+10, r25	; 0x0a
+ 5b6:	89 87       	std	Y+9, r24	; 0x09
 	volatile int sum_index = 0;
 	volatile int roadmarkLeft = 0;
 	volatile int roadmarkRight = 0;
 	volatile int pivot = 0;	
 	
-	for(i = 0; i < 11; i++)
- 5bc:	0f 5f       	subi	r16, 0xFF	; 255
- 5be:	1f 4f       	sbci	r17, 0xFF	; 255
- 5c0:	0b 30       	cpi	r16, 0x0B	; 11
- 5c2:	11 05       	cpc	r17, r1
- 5c4:	0c f4       	brge	.+2      	; 0x5c8 <read_reflex+0xc2>
- 5c6:	b9 cf       	rjmp	.-142    	; 0x53a <read_reflex+0x34>
+	for(i = 1; i < 12; i++)
+ 5b8:	0f 5f       	subi	r16, 0xFF	; 255
+ 5ba:	1f 4f       	sbci	r17, 0xFF	; 255
+ 5bc:	0c 30       	cpi	r16, 0x0C	; 12
+ 5be:	11 05       	cpc	r17, r1
+ 5c0:	0c f4       	brge	.+2      	; 0x5c4 <read_reflex+0xba>
+ 5c2:	bd cf       	rjmp	.-134    	; 0x53e <read_reflex+0x34>
 		if ((i == 10) && (indata == 1)) {
 			roadmarkRight = 1;
 		}
 	}
-	
+
 	if (sum == 0)
- 5c8:	8b 81       	ldd	r24, Y+3	; 0x03
- 5ca:	9c 81       	ldd	r25, Y+4	; 0x04
- 5cc:	89 2b       	or	r24, r25
- 5ce:	29 f4       	brne	.+10     	; 0x5da <read_reflex+0xd4>
+ 5c4:	8b 81       	ldd	r24, Y+3	; 0x03
+ 5c6:	9c 81       	ldd	r25, Y+4	; 0x04
+ 5c8:	89 2b       	or	r24, r25
+ 5ca:	29 f4       	brne	.+10     	; 0x5d6 <read_reflex+0xcc>
 	{
-		pivot = 6;
- 5d0:	86 e0       	ldi	r24, 0x06	; 6
- 5d2:	90 e0       	ldi	r25, 0x00	; 0
- 5d4:	9c 87       	std	Y+12, r25	; 0x0c
- 5d6:	8b 87       	std	Y+11, r24	; 0x0b
- 5d8:	07 c0       	rjmp	.+14     	; 0x5e8 <read_reflex+0xe2>
+		pivot = 12;
+ 5cc:	8c e0       	ldi	r24, 0x0C	; 12
+ 5ce:	90 e0       	ldi	r25, 0x00	; 0
+ 5d0:	9c 87       	std	Y+12, r25	; 0x0c
+ 5d2:	8b 87       	std	Y+11, r24	; 0x0b
+ 5d4:	09 c0       	rjmp	.+18     	; 0x5e8 <read_reflex+0xde>
 	} else {
-		pivot = sum_index/sum;
- 5da:	8d 81       	ldd	r24, Y+5	; 0x05
- 5dc:	9e 81       	ldd	r25, Y+6	; 0x06
+		pivot = (sum_index*2)/sum;
+ 5d6:	8d 81       	ldd	r24, Y+5	; 0x05
+ 5d8:	9e 81       	ldd	r25, Y+6	; 0x06
+ 5da:	88 0f       	add	r24, r24
+ 5dc:	99 1f       	adc	r25, r25
  5de:	6b 81       	ldd	r22, Y+3	; 0x03
  5e0:	7c 81       	ldd	r23, Y+4	; 0x04
  5e2:	82 d2       	rcall	.+1284   	; 0xae8 <__divmodhi4>

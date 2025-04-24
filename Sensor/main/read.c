@@ -27,24 +27,23 @@ int8_t read_reflex()
 	volatile int roadmarkRight = 0;
 	volatile int pivot = 0;	
 	
-	for(i = 0; i < 11; i++)
+	for(i = 1; i < 12; i++)
 	{
 		PORTA &= 0xF0;									// Nollställer de fyra LSB bitarna i PORT A
 		PORTA |= i;										// Sätter Muxen till index i
 		PORTA |= 0x10;									// Startar sensorn
 		
-		 if (i == 0) {
+		 if (i == 1) {
 			 is_active_reflex();						// Läs men kasta resultatet
 			 _delay_us(20);								//Första läsningen från i = 0 ger fel värde
-			 continue;
 		 }
-		
+
 		indata = is_active_reflex();
 		PORTA &= 0xEF;									// Stänger av sensorn
 		
 		sum += indata;									// 1 eller 0
-		sum_index += (i+1)*indata;
-		
+		sum_index += (i)*indata;
+
 		if ((i == 0) && (indata == 1)) {
 			roadmarkLeft = 1;
 		}
@@ -52,12 +51,12 @@ int8_t read_reflex()
 			roadmarkRight = 1;
 		}
 	}
-	
+
 	if (sum == 0)
 	{
-		pivot = 6;
+		pivot = 12;
 	} else {
-		pivot = sum_index/sum;
+		pivot = (sum_index*2)/sum;
 	}
 
 	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);

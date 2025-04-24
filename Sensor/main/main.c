@@ -48,7 +48,7 @@ int main()
 		init_reflex();
 		reflex = read_reflex();
 		roadmark_send = reflex >> 6;
-		reflex_send = reflex & (0x7F);
+		reflex_send = reflex & (0x3F);
 	}
 }
 
@@ -69,13 +69,15 @@ ISR(SPI_STC_vect)
 	} else if(choose_sensor == 1) {
 		SPDR = reflex_send;
 	} else if(choose_sensor == 2) {
-		SPDR = gyro_send;
-	} else if(choose_sensor == 4) {
-		TCCR1B |= (1 << CS11) | (1 << CS10);		// Sätter på timern och gyrot
-	} else if(choose_sensor == 5) {
+		cli();
 		TCCR1B &= ~(1 << CS11) | (1 << CS10);		// Stänger av timern och gyrot
 		reset_w();
-	} else if(choose_sensor == 6) {
-		SPDR = roadmark_send;						// Roadmark är på formen 000000LR
+		sei();
+	} else if(choose_sensor == 3) {
+		TCCR1B |= (1 << CS11) | (1 << CS10);		// Sätter på timern och gyrot
+	} else if(choose_sensor == 4) {
+		SPDR = gyro_send;
+	} else if(choose_sensor == 5) {
+		SPDR = roadmark_send;						// Roadmark är på formen 0b000000LR
 	}
 }

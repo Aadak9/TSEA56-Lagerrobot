@@ -531,11 +531,11 @@ END GROUP
                 0x000003f6       0x54 main.o
                 0x000003f6                __vector_13
  .text.__vector_19
-                0x0000044a       0xbc main.o
+                0x0000044a       0xc0 main.o
                 0x0000044a                __vector_19
  .text.read_reflex
-                0x00000506      0x112 read.o
-                0x00000506                read_reflex
+                0x0000050a      0x10e read.o
+                0x0000050a                read_reflex
  .text.read_IR  0x00000618       0x2a read.o
                 0x00000618                read_IR
  .text.read_gyro
@@ -779,13 +779,13 @@ END GROUP
  .debug_abbrev  0x000008a2       0xb4 main.o
  .debug_abbrev  0x00000956      0x14b read.o
 
-.debug_line     0x00000000      0x89d
+.debug_line     0x00000000      0x8a3
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x16a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega1284p/avr51/crtatmega1284p.o
  .debug_line    0x0000016a      0x1ce convert.o
  .debug_line    0x00000338      0x145 init.o
- .debug_line    0x0000047d      0x1b9 main.o
- .debug_line    0x00000636      0x267 read.o
+ .debug_line    0x0000047d      0x1c5 main.o
+ .debug_line    0x00000642      0x261 read.o
 
 .debug_frame    0x00000000      0x2ec
  *(.debug_frame)
