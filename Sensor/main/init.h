@@ -7,5 +7,6 @@ void init_reflex();
 void init_interrupt();
 void init_SPI();
 void init_timer();
+int init_reflex_calibrate();
 
 #endif

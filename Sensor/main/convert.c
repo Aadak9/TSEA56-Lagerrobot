@@ -32,12 +32,12 @@ float digital_to_volt(int digital_out)
 }
 
 
-int is_active_reflex()
+int is_active_reflex(int reflex_high)
 {
 	volatile uint8_t indata_t = AD_convert();					//Första sensorläsning blir alltid 247
 	volatile int indata_volt = digital_to_volt(indata_t);
 	
-	if (indata_volt >= 3) {																						
+	if (indata_volt >= reflex_high) {																						
 		return 1;										
 	} else {
 		return 0;

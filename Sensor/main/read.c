@@ -16,7 +16,7 @@
 volatile int w_int;
 volatile int w_send;
 
-int8_t read_reflex()
+int8_t read_reflex(int reflex_high)
 {
 	int i;
 	volatile int8_t data;
@@ -34,11 +34,11 @@ int8_t read_reflex()
 		PORTA |= 0x10;									// Startar sensorn
 		
 		 if (i == 1) {
-			 is_active_reflex();						// Läs men kasta resultatet
+			 is_active_reflex(reflex_high);						// Läs men kasta resultatet
 			 _delay_us(20);								//Första läsningen från i = 0 ger fel värde
 		 }
 
-		indata = is_active_reflex();
+		indata = is_active_reflex(reflex_high);
 		PORTA &= 0xEF;									// Stänger av sensorn
 		
 		sum += indata;									// 1 eller 0

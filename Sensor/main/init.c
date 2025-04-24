@@ -5,9 +5,12 @@
  * Author : andno773, sigry751
  */
 
+#define F_CPU 16000000UL
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include "init.h"
+#include "convert.h"
 
 
 void init_IR()
@@ -53,4 +56,36 @@ void init_timer()
 	TIMSK1 = (1 << OCIE1A);
 	TCNT1 = 0;
 	OCR1A = 2499;
+}
+
+
+int init_reflex_calibrate()
+{
+	PORTA &= 0xF0;									// Nollställer de fyra LSB bitarna i PORT A
+	PORTA |= 2;										// Sätter Muxen till index i
+	PORTA |= 0x10;									// Startar sensorn
+	
+	is_active_reflex(3);						// Läs men kasta resultatet
+	 _delay_us(20);								//Första läsningen från i = 0 ger fel värde
+	
+	volatile uint8_t indata_t = AD_convert();
+	
+	PORTA &= 0xEF;									// Stänger av sensorn
+	
+	if (indata_t >= 200)
+	{
+		return 4;
+	}
+	else if (indata_t >= 140)
+	{
+		return 3;
+	}
+	else if (indata_t >= 100)
+	{
+		return 2;
+	}
+	else
+	{
+		return 1;
+	}
 }
