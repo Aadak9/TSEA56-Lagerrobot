@@ -16,7 +16,7 @@
 volatile int w_int;
 volatile int w_send;
 
-int8_t read_reflex()
+int8_t read_reflex(int reflex_high)
 {
 	int i;
 	volatile int8_t data;
@@ -29,37 +29,37 @@ int8_t read_reflex()
 	
 	for(i = 1; i < 12; i++)
 	{
-		PORTA &= 0xF0;									// Nollställer de fyra LSB bitarna i PORT A
-		PORTA |= i;										// Sätter Muxen till index i
-		PORTA |= 0x10;									// Startar sensorn
+		PORTA &= 0xF0;														// Nollställer de fyra LSB bitarna i PORT A.
+		PORTA |= i;															// Sätter Muxen till index i.
+		PORTA |= 0x10;														// Startar sensorn.
 		
 		 if (i == 1) {
-			 is_active_reflex();						// Läs men kasta resultatet
-			 _delay_us(20);								//Första läsningen från i = 0 ger fel värde
+			 is_active_reflex(reflex_high);									// Läs men kasta resultatet.
+			 _delay_us(20);													// Första läsningen från i = 0 ger fel värde.
 		 }
 
-		indata = is_active_reflex();
-		PORTA &= 0xEF;									// Stänger av sensorn
+		indata = is_active_reflex(reflex_high);								// 1 om aktuell sensor ser tejp, 0 annars.
+		PORTA &= 0xEF;														// Stänger av sensorn.
 		
-		sum += indata;									// 1 eller 0
+		sum += indata;									
 		sum_index += (i)*indata;
 
-		if ((i == 0) && (indata == 1)) {
+		if ((i == 0) && (indata == 1)) {									// Ser vänstersväng.
 			roadmarkLeft = 1;
 		}
-		if ((i == 10) && (indata == 1)) {
+		if ((i == 10) && (indata == 1)) {									// Ser högersväng.
 			roadmarkRight = 1;
 		}
 	}
 
-	if (sum == 0)
+	if (sum == 0)															//Ser ingen tejp.
 	{
 		pivot = 12;
 	} else {
-		pivot = (sum_index*2)/sum;
+		pivot = (sum_index*2)/sum;											//Tyngdpunktsberäkning, multiplicerar med två för att få decimaler.
 	}
 
-	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);
+	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);	// Tygndpunktberäkning på bit 0-6, 7 bit för höger, 8 bit för vänster.
 }
 
 
@@ -73,9 +73,9 @@ uint8_t read_IR()
 
 uint8_t read_gyro()
 {		
-	volatile int8_t indata = AD_convert() - 129;							// värdet 125 måste kalibreras
-	w_int += indata*4;
-	w_send = abs(w_int/100);
+	volatile int8_t indata = AD_convert() - 129;							// 129 är digitala spänningen vid noll rotation.
+	w_int += indata*4;														// Tappar de två minst signifikanta bitar, multiplicerar med 4.
+	w_send = abs(w_int/100);												// Absolutbelopp så vi slipper att skicka negativa tal över bussen, delar med 100 för att talet är stort.
  	volatile uint8_t w = (uint8_t)w_send;
 	return w;
 }
@@ -83,5 +83,5 @@ uint8_t read_gyro()
 
 void reset_w()
 {
-	w_int = 0;
+	w_int = 0;																// Återställer w_int efter att gyrot är klar.
 }
