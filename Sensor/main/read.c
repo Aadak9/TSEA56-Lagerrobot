@@ -29,37 +29,37 @@ int8_t read_reflex(int reflex_high)
 	
 	for(i = 1; i < 12; i++)
 	{
-		PORTA &= 0xF0;														// Nollställer de fyra LSB bitarna i PORT A.
-		PORTA |= i;															// Sätter Muxen till index i.
-		PORTA |= 0x10;														// Startar sensorn.
+		PORTA &= 0xF0;														// Resets the 4 LSB bits in PORT A.
+		PORTA |= i;															// Set Mux to index i.
+		PORTA |= 0x10;														// Start sensor.
 		
 		 if (i == 1) {
-			 is_active_reflex(reflex_high);									// Läs men kasta resultatet.
-			 _delay_us(20);													// Första läsningen från i = 0 ger fel värde.
+			 is_active_reflex(reflex_high);									// Read but throwaway the result.
+			 _delay_us(20);													// First reading from i = 0 gives faulty value.
 		 }
 
-		indata = is_active_reflex(reflex_high);								// 1 om aktuell sensor ser tejp, 0 annars.
-		PORTA &= 0xEF;														// Stänger av sensorn.
+		indata = is_active_reflex(reflex_high);								// 1 if current sensor sees tape, 0 otherwise.
+		PORTA &= 0xEF;														// Turn off sensor.
 		
 		sum += indata;									
 		sum_index += (i)*indata;
 
-		if ((i == 0) && (indata == 1)) {									// Ser vänstersväng.
+		if ((i == 0) && (indata == 1)) {									// Sees left turn.
 			roadmarkLeft = 1;
 		}
-		if ((i == 10) && (indata == 1)) {									// Ser högersväng.
+		if ((i == 10) && (indata == 1)) {									// Sees right turn.
 			roadmarkRight = 1;
 		}
 	}
 
-	if (sum == 0)															//Ser ingen tejp.
+	if (sum == 0)															//Sees no tape.
 	{
 		pivot = 12;
 	} else {
-		pivot = (sum_index*2)/sum;											//Tyngdpunktsberäkning, multiplicerar med två för att få decimaler.
+		pivot = (sum_index*2)/sum;											//Center of mass calculation, multiply with 2 to get decimals.
 	}
 
-	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);	// Tygndpunktberäkning på bit 0-6, 7 bit för höger, 8 bit för vänster.
+	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);	// Center of mass calculation on bit 0-6, 7 bit for right turn, 8 bit for left turn.
 }
 
 
@@ -73,9 +73,9 @@ uint8_t read_IR()
 
 uint8_t read_gyro()
 {		
-	volatile int8_t indata = AD_convert() - 129;							// 129 är digitala spänningen vid noll rotation.
-	w_int += indata*4;														// Tappar de två minst signifikanta bitar, multiplicerar med 4.
-	w_send = abs(w_int/100);												// Absolutbelopp så vi slipper att skicka negativa tal över bussen, delar med 100 för att talet är stort.
+	volatile int8_t indata = AD_convert() - 129;							// 129 is digital voltage with 0 rotation.
+	w_int += indata*4;														// Looses the two MSB, multiply with 4.
+	w_send = abs(w_int/100);												// Absolute value to avoid negative numbers over bus, divide by 100 since the value is big.
  	volatile uint8_t w = (uint8_t)w_send;
 	return w;
 }
@@ -83,5 +83,5 @@ uint8_t read_gyro()
 
 void reset_w()
 {
-	w_int = 0;																// Återställer w_int efter att gyrot är klar.
+	w_int = 0;																// Resets w_int after gyro is done.
 }

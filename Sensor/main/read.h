@@ -8,9 +8,9 @@
 #ifndef READ_H
 #define READ_H
 
-int8_t read_reflex(int reflex_high);			// Läser av 11 sensorer och returnerar tyngdpunkt för reglering.
-uint8_t read_IR();								// Returnerar avstånd.
-uint8_t read_gyro();							// Returnerar digitalt värde på vinkelhastigheten.
-void reset_w();									// Nollställer w_int.
+int8_t read_reflex(int reflex_high);			// Reads 11 sensors and returns the center of mass for control.
+uint8_t read_IR();								// Return distance in cm.
+uint8_t read_gyro();							// Return digital value from angle velocity.
+void reset_w();									// Resets w_int.
 
 #endif

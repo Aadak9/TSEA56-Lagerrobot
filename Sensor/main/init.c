@@ -15,64 +15,64 @@
 
 void init_IR()
 {
-	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(0<<MUX0);							// AREF, vänsterskift, ADC6.
-	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Aktiverar ADC, Prescaler 128.
+	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(0<<MUX0);							// AREF, left-shift, ADC6.
+	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Activate ADC, Prescaler 128.
 }
 
 
 void init_gyro()
 {
-	ADMUX = (0 << REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);						// AREF, vänsterskift, ADC7.
-	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Aktiverar ADC, Prescaler 128.
+	ADMUX = (0 << REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0);						// AREF, left-shift, ADC7.
+	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Activate ADC, Prescaler 128.
 }
 
 
 void init_reflex()
 {
-	DDRA |= 0x1F;																					// Portar för enable och val av sensor.
-	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(0<<MUX1)|(1<<MUX0);							// AREF, vänsterskift, ADC5.
-	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Aktiverar ADC, Prescaler 128.
+	DDRA |= 0x1F;																					// Ports for enable and choice of sensor.
+	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(0<<MUX1)|(1<<MUX0);							// AREF, left-shift, ADC5.
+	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Activate ADC, Prescaler 128.
 }
 
 
 void init_interrupt()
 {
-	EICRA |=(1<<ISC01)|(1<<ISC00);																	// Avbrott på stigande flank.
-	EIMSK |= (1<<INT0);																				// Aktivera INT0.
+	EICRA |=(1<<ISC01)|(1<<ISC00);																	// Interrupt on rising edge.
+	EIMSK |= (1<<INT0);																				// ACtivate INT0.
 }
 
 
 void init_SPI()
 {
 	
-	DDRB = (1 << DDB6);																				// Pinne 7 (MISO) till utdata.
-	SPCR = (1 << SPIE) | (1 << SPE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA);						// Aktivera SPI-buss.
+	DDRB = (1 << DDB6);																				// Pin 7 (MISO) to output.
+	SPCR = (1 << SPIE) | (1 << SPE) | (0 << DORD) | (0 << CPOL) | (0 << CPHA);						// Activate SPI-buss.
 }
 
 
 void init_timer()
 {
-	TCCR1B = (1 << WGM12);		// CTC-läge.
+	TCCR1B = (1 << WGM12);		// CTC-mode.
 	TIMSK1 = (1 << OCIE1A);		// Timer 1 Compare A match.
-	TCNT1 = 0;					// Klocka startar på noll.
-	OCR1A = 2499;				// Avbrott då klockan räknat upp till OCR1A, 10ms.
+	TCNT1 = 0;					// Timer start on 0.
+	OCR1A = 2499;				// Interrupt when TCNT1 has counted up to OCR1A, 10ms.
 }
 
 
 int init_reflex_calibrate()
 {
-	PORTA &= 0xF0;									// Nollställer de fyra LSB bitarna i PORT A.
-	PORTA |= 2;										// Sätter Muxen till index 2.
-	PORTA |= 0x10;									// Startar sensorn.
+	PORTA &= 0xF0;									// Resets the four LSB bits in PORT A.
+	PORTA |= 2;										// Set Mux to index 2.
+	PORTA |= 0x10;									// Start sensor.
 	
-	is_active_reflex(3);							// Läs men kasta resultatet.
-	 _delay_us(20);									// Första läsningen ger fel värde.
+	is_active_reflex(3);							// Read but throwaway result.
+	 _delay_us(20);									// First read gives faulty value.
 	
 	volatile uint8_t indata_t = AD_convert();
 	
-	PORTA &= 0xEF;									// Stänger av sensorn.
+	PORTA &= 0xEF;									// Turn off sensor.
 	
-	if (indata_t >= 200)							// Kalibrerar linjesensor för vad som är tejp.
+	if (indata_t >= 200)							// Calibrate line sensor for what tape.
 	{
 		return 4;
 	}

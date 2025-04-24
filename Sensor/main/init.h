@@ -8,12 +8,12 @@
 #ifndef INIT_H
 #define INIT_H
 
-void init_IR();							//	Initierar ir-sensor.
-void init_gyro();						//	Initierar gyro.	
-void init_reflex();						//	Initierar linjesensor.
-void init_interrupt();					//	Initierar avbrott.	
-void init_SPI();						//	Initierar SPI-bussen.
-void init_timer();						//	Initierar gyro-timer.
-int init_reflex_calibrate();			//	Initierar kalibreringsfunktion för linjesensor.
+void init_IR();							//	Initializing IR-sensor.
+void init_gyro();						//	Initializing gyro.	
+void init_reflex();						//	Initializing line sensor.
+void init_interrupt();					//	Initializing interrupt.	
+void init_SPI();						//	Initializing SPI-bus.
+void init_timer();						//	Initializing gyro-timer.
+int init_reflex_calibrate();			//	Initializing Calibrating tape value for line sensor.
 
 #endif
