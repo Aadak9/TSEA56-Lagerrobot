@@ -1,8 +1,9 @@
 #ifndef READ_H
 #define READ_H
 
-int8_t read_reflex();
+int8_t read_reflex(int reflex_high);
 uint8_t read_IR();
-int8_t read_gyro();
+uint8_t read_gyro();
+void reset_w();
 
 #endif
