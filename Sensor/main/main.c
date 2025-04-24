@@ -31,7 +31,7 @@ int main()
 	reflex = 0;
 	roadmark_send = 0;
 	reflex_high = 3;
-	TCCR1B &= ~(1 << CS11) | (1 << CS10);				// Stänger av timern och gyrot		
+	TCCR1B &= ~(1 << CS11) | (1 << CS10);				// Stänger av timern och gyrot.		
 	reset_w();
 	
 	init_interrupt();
@@ -50,19 +50,19 @@ int main()
 		init_reflex();
 		reflex = read_reflex(reflex_high);
 		
-		roadmark_send = reflex >> 6;
-		reflex_send = reflex & (0x3F);
+		roadmark_send = reflex >> 6;				// Lägger de två roadmarkbitarna längst åt höger.
+		reflex_send = reflex & (0x3F);				// Sätter de mest signifikanta bitar till noll. 
 	}
 }
 
-
+// Avbrottsrutin för gyroskopet när roboten svänger.
 ISR(TIMER1_COMPA_vect)
 {
 	init_gyro();
 	gyro_send = read_gyro();
 }
 
-
+// Avbrottsrutin för SPI-avbrott. Choose sensor väljs av Rasperryn.
 ISR(SPI_STC_vect)
 {
 	uint8_t volatile choose_sensor = SPDR;
@@ -91,7 +91,7 @@ ISR(SPI_STC_vect)
 	} 
 	else if(choose_sensor == 5) 
 	{
-		SPDR = roadmark_send;						// Roadmark är på formen 0b000000LR
+		SPDR = roadmark_send;						// Roadmark är på formen 0b000000LR. L = left, R = right.
 	}
 	else if(choose_sensor == 6)
 	{
