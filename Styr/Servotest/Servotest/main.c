@@ -75,14 +75,16 @@ volatile unsigned long timertime = 8000;
 	
 		if(current_action == 0x1)
 		{
-			//drive_fwd();
+			drive_fwd();
 			//move_servo(3,300);
+			/*
 			counter += 1;
 			if(counter >= timertime)
 			{
 				add1degree(3);
 				counter = 0;
 			}
+			*/
 			
 		}
 		else if(current_action == 0x2)
@@ -160,7 +162,12 @@ volatile unsigned long timertime = 8000;
 		}
 		else if(current_action == 0x30)
 		{
-			drive_and_turn(reglerstyr);
+			float reglercopy;
+			cli();
+			reglercopy = reglerstyr;
+			sei();
+			
+			drive_and_turn(reglercopy);
 			
 		}
 
