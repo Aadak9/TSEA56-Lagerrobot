@@ -19,10 +19,6 @@ def buttonpressed(button):
         bt.sendbyte(3)
     elif(button=="D"):
         bt.sendbyte(4)
-    elif(button=="Q"):
-        bt.sendbyte(0x14)
-    elif(button=="E"):
-        bt.sendbyte(0x15)
     elif(button=="Y"):
         if(int(servo.cget("text")[6]) < 5):
             new_number = int(servo.cget("text")[6]) + 1
@@ -111,9 +107,38 @@ def get_sensordata(): #hämta sensordata från IR och uppdatera i GUI
    # bt.sendbyte(0x01)  #Reflex
     # bt.sendbyte(0x02)  #Gyro
 
-    window.after(100, get_sensordata)
+   # window.after(100, get_sensordata)
 
 ir_data = 0
+
+def auto_pressed():
+    #bt.sendbyte(0)
+
+    auto_active_color = buttonAuto.cget("bg")
+    if auto_active_color == "grey":
+        buttonAuto.config(bg="green")
+        buttonManuell.config(bg="grey")
+
+    elif (auto_active_color == "green"):
+        buttonAuto.config(bg="green")
+        buttonManuell.config(bg="grey")
+
+    Lager.config(highlightbackground="light green", highlightcolor ="light green")
+    
+    return
+
+def manuell_pressed():
+    #bt.sendbyte(0)
+
+    manuell_active_color = buttonManuell.cget("bg")
+    if manuell_active_color == "grey":
+        buttonAuto.config(bg="grey")
+        buttonManuell.config(bg="green")
+    elif (manuell_active_color == "green"):
+        buttonAuto.config(bg="grey")
+        buttonManuell.config(bg="green")
+    return
+
 
 
 bt.bluetoothinit()
@@ -130,9 +155,10 @@ window.update()
 winwidth = window.winfo_width()
 winheight = window.winfo_height()
 
-###############################################################
-###############################################################
 
+
+###############################################################
+###############################################################
 
 # Lagerknapp-rutan
 lagerknapp_width = winwidth * 0.45
@@ -165,9 +191,43 @@ lager_height = winheight * 0.56
 lager_x = winwidth * 0.04
 lager_y = (winheight + lagerknapp_height - lager_height) / 2
 
-Lager = tk.Frame(master=window, width=lager_width, height=lager_height, bd=1, relief="solid", padx=4, pady=4)
+Lager = tk.Frame(master=window, width=lager_width, height=lager_height, bd=1, relief="solid", padx=4, pady=4, highlightthickness=6)
 Lager.place(x=lager_x, y= lager_y)
 
+
+###############################################################
+###############################################################
+
+#autonoma start-knappen
+
+autoknapp_width = lagerknapp_width/2
+autoknapp_height = winheight*0.075
+autoknapp_x = winwidth*0.04
+autoknapp_y = winheight*0.04
+
+Autoknapp = tk.Frame(master=window, width=autoknapp_width, height=autoknapp_height, bd=0, relief="solid", padx=4, pady=4)
+Autoknapp.place(x=autoknapp_x, y=autoknapp_y)
+Autoknapp.pack_propagate(False)
+
+buttonAuto = tk.Button(Autoknapp, text="Autonomt", bg="grey", fg="white", font=("Arial", 16), command=auto_pressed)
+buttonAuto.pack(fill="both", expand=True, padx=1, pady=1)
+
+###############################################################
+###############################################################
+
+#stopp-knappen
+
+manuellknapp_width = lagerknapp_width/2
+manuellknapp_height = winheight*0.075
+manuellknapp_x = lagerknapp_width/2 + autoknapp_x
+manuellknapp_y = winheight*0.04
+
+Manuellknapp = tk.Frame(master=window, width=manuellknapp_width, height=manuellknapp_height, bd=0, relief="solid", padx=4, pady=4)
+Manuellknapp.place(x=manuellknapp_x, y=manuellknapp_y)
+Manuellknapp.pack_propagate(False)
+
+buttonManuell = tk.Button(Manuellknapp, text="Manuellt", bg="green", fg="white", font=("Arial", 16), command=manuell_pressed)
+buttonManuell.pack(fill="both", expand=True, padx=1, pady=1)
 
 ###############################################################
 ###############################################################
@@ -287,14 +347,6 @@ resetbutton.grid(row = 2, column=1, padx=5, pady= 5)
 
 # INNEHÅLL RUTA1
 
-buttonq = tk.Button(ruta1, text="Q", width =8, height=4, command=lambda: buttonpressed("Q"))
-buttonq.grid(row = 1, column=0, padx=5, pady= 5)
-
-buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: buttonpressed("E"))
-buttone.grid(row = 1, column=2, padx=5, pady= 5)
-
-buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: decrease_lager_width())
-buttone.grid(row = 1, column=2, padx=5, pady= 5)
 
 buttonw = tk.Button(ruta1, text= "W", width =8, height=4, command=lambda: buttonpressed("W"))
 buttonw.grid(row = 1, column=1, padx=5, pady= 5)
@@ -378,11 +430,11 @@ def windowclosed():
 
 
 
-def draw_map():
+#def draw_map():
 #
 #
 #
-    window.after(100, draw_map)
+ #   window.after(100, draw_map)
 
 
 
@@ -396,7 +448,7 @@ def draw_map():
 
 window.update()
 window.update_idletasks()
-get_sensordata()
+#get_sensordata()
 
 
 
