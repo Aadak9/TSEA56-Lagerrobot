@@ -1,6 +1,6 @@
 volatile unsigned int rotatespeed = 9;
 
-volatile unsigned int currentID = 1;
+volatile unsigned int current_joint = 1;
 
 
 
