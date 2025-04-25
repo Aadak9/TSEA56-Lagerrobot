@@ -9,6 +9,7 @@
 #include "Motorcontrol.h"
 #include "Servocontrol.h"
 #include "SPI.h"
+#include "Kommunikations_Definitioner.h"
 
 #define FOSC 16000000 // Clock Speed
 #define BAUD 1000000
@@ -51,82 +52,26 @@ volatile unsigned long timertime = 8000;
 	SPI_init();
 	init_pwm();
 	_delay_us(30);
-	load_servo(3,0);
-	load_servo(2, 0);
-	action();
-	_delay_ms(1000);
-	
-/*						
-	while (1)
-	{
-		counter += 1;
-		if(counter >= timertime)
-		{
-			add1degree2(2,3);
-			counter = 0;
-		}
-		
-		
-	
-	}
-*/
+
 	while (1)
 	{
 	
 		if(current_action == 0x1)
 		{
 			drive_fwd();
-			//move_servo(3,300);
-			/*
-			counter += 1;
-			if(counter >= timertime)
-			{
-				add1degree(3);
-				counter = 0;
-			}
-			*/
-			
+		
 		}
 		else if(current_action == 0x2)
 		{
 			rotate_left_maybe();
-			//move_servo(3, 0);
-			/*
-			counter += 1;
-			if(counter >= timertime)
-			{
-				add1degree2(2,3);
-				counter = 0;
-			}
-			*/
 		}
 		else if(current_action == 0x3)
 		{
 			reverse();
-			//sub1degree(3);
-			//move_servo(3,200);
-			//get_angle(2);
-			/*
-			counter += 1;
-			if(counter >= timertime)
-			{
-				sub1degree(3);
-				counter = 0;
-			}
-			*/
 		}
 		else if(current_action == 0x4 )
 		{
 			rotate_right_maybe();
-			//move_servo(3, 300);
-			/*
-			counter += 1;
-			if(counter >= timertime)
-			{
-				sub1degree2(2,3);
-				counter = 0;
-			}
-			*/
 		}
 		else if(current_action == 0)
 		{
@@ -140,6 +85,7 @@ volatile unsigned long timertime = 8000;
 		{
 			increase_speed();
 		}
+		/*
 		else if(current_action == 0x20 && current_action != last_action && current_joint < 5)
 		{
 			current_joint += 1;
@@ -148,7 +94,7 @@ volatile unsigned long timertime = 8000;
 		{
 			current_joint -= 1;
 		}
-		
+		*/
 		
 		// Reglering
 		
