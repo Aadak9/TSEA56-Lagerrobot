@@ -7,15 +7,6 @@ lagerbredd = 3
 global lagerhöjd
 lagerhöjd = 3
 
-global current_joint
-current_joint = 1
-
-try:
-    bt.sendbyte(0x20)
-    bt.sendbyte(current_joint) 
-except:
-    pass
-########## MÅSTE FIXA I RASPBERRY SÅ ATT DEN TAR EMOT OCH SKICKAR CURRENT_JOINT OCKSÅ
 
 
 def buttonpressed(button):
