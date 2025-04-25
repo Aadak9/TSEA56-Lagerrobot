@@ -16,6 +16,7 @@ try:
 except:
     pass
 ########## MÅSTE FIXA I RASPBERRY SÅ ATT DEN TAR EMOT OCH SKICKAR CURRENT_JOINT OCKSÅ
+#test
 
 
 def buttonpressed(button):
