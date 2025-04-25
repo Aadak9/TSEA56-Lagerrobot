@@ -118,12 +118,33 @@ def auto_pressed():
     if auto_active_color == "grey":
         buttonAuto.config(bg="green")
         buttonManuell.config(bg="grey")
+        Lager.config(highlightbackground="light green", highlightcolor ="light green")
+        Lagerknapp.config(highlightbackground="light green", highlightcolor ="light green")
+
+        for widget in Lager.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+        for widget in Lagerknapp.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+        for ruta in [ruta1, ruta2, ruta3]:
+            ruta.config(bg="#d3d3d3")
+            for widget in ruta.winfo_children():
+                try:
+                    widget.config(state="disabled")
+                except:
+                    pass
+
 
     elif (auto_active_color == "green"):
         buttonAuto.config(bg="green")
         buttonManuell.config(bg="grey")
-
-    Lager.config(highlightbackground="light green", highlightcolor ="light green")
     
     return
 
@@ -134,6 +155,32 @@ def manuell_pressed():
     if manuell_active_color == "grey":
         buttonAuto.config(bg="grey")
         buttonManuell.config(bg="green")
+        Lager.config(highlightbackground="grey", highlightcolor ="grey")
+        Lagerknapp.config(highlightbackground="grey", highlightcolor ="grey")
+
+        for widget in Lager.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+
+        for widget in Lagerknapp.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+
+        for ruta in [ruta1, ruta2, ruta3]:
+            ruta.config(bg="SystemButtonFace")
+            for widget in ruta.winfo_children():
+                try:
+                    widget.config(state="normal")
+                except:
+                    pass
+
+
+
+
     elif (manuell_active_color == "green"):
         buttonAuto.config(bg="grey")
         buttonManuell.config(bg="green")
@@ -166,7 +213,7 @@ lagerknapp_height = winheight*0.15
 lagerknapp_x = winwidth*0.04
 lagerknapp_y = (winheight - winheight*0.75)/2
 
-Lagerknapp = tk.Frame(master=window, width=lagerknapp_width, height=lagerknapp_height, bd=1, relief="solid", padx=4, pady=4)
+Lagerknapp = tk.Frame(master=window, width=lagerknapp_width, height=lagerknapp_height, bd=1, relief="solid", padx=4, pady=4, highlightthickness=6)
 Lagerknapp.place(x=lagerknapp_x, y=lagerknapp_y)
 Lagerknapp.grid_propagate(False)
 
@@ -211,6 +258,23 @@ Autoknapp.pack_propagate(False)
 
 buttonAuto = tk.Button(Autoknapp, text="Autonomt", bg="grey", fg="white", font=("Arial", 16), command=auto_pressed)
 buttonAuto.pack(fill="both", expand=True, padx=1, pady=1)
+
+###############################################################
+###############################################################
+
+#start-knappen
+
+startknapp_width = autoknapp_width/2
+startknapp_height = autoknapp_height
+startknapp_x = winwidth*0.835
+startknapp_y = winheight*0.04
+
+Startknapp = tk.Frame(master=window, width=startknapp_width, height=startknapp_height, bd=0, relief="solid", padx=4, pady=4)
+Startknapp.place(x=startknapp_x, y=startknapp_y)
+Startknapp.pack_propagate(False)
+
+buttonStart = tk.Button(Startknapp, text="Start", bg="grey", fg="white", font=("Arial", 16))
+buttonStart.pack(fill="both", expand=True, padx=1, pady=1)
 
 ###############################################################
 ###############################################################
