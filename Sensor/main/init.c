@@ -62,7 +62,7 @@ void init_timer()
 int init_reflex_calibrate()
 {
 	PORTA &= 0xF0;									// Resets the four LSB bits in PORT A.
-	PORTA |= 2;										// Set Mux to index 2.
+	PORTA |= 2;										// Set multiplexer to index 2. 2 is arbitrary.
 	PORTA |= 0x10;									// Start sensor.
 	
 	is_active_reflex(3);							// Read but throwaway result.

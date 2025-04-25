@@ -50,8 +50,8 @@ int main()
 		init_reflex();
 		reflex = read_reflex(reflex_high);
 		
-		roadmark_send = reflex >> 6;				// Roadmark bits to the right
-		reflex_send = reflex & (0x3F);				// MSB to 0. 
+		roadmark_send = reflex >> 6;					// Roadmark bits to the right.
+		reflex_send = reflex & (0x3F);					// MSB to 0. 
 	}
 }
 
@@ -62,7 +62,7 @@ ISR(TIMER1_COMPA_vect)
 	gyro_send = read_gyro();
 }
 
-// Interrupt for SPI-interrupt. Choose sensor comes from Rasperry PI.
+// Interrupt for SPI-interrupt. Choose sensor comes from Raspberry PI.
 ISR(SPI_STC_vect)
 {
 	uint8_t volatile choose_sensor = SPDR;
@@ -76,22 +76,22 @@ ISR(SPI_STC_vect)
 	}
 	else if(choose_sensor == 2) 
 	{
-		TCCR1B |= (1 << CS11) | (1 << CS10);		// Start timer and gyro.
+		TCCR1B |= (1 << CS11) | (1 << CS10);			// Start timer and gyro.
 	} 
 	else if(choose_sensor == 3) 
 	{
 		cli();
-		TCCR1B &= ~(1 << CS11) | (1 << CS10);		// Turn off timer and gyro
+		TCCR1B &= ~(1 << CS11) | (1 << CS10);			// Turn off timer and gyro.
 		reset_w();
 		sei();
 	} 
-	else if(choose_sensor == 4) 
+	else if(choose_sensor == 4)							// On the Raspberry PI, check for 80 which is 90 degrees or 160 which is 180 degrees.
 	{
 		SPDR = gyro_send;
 	} 
 	else if(choose_sensor == 5) 
 	{
-		SPDR = roadmark_send;						// Roadmark is in the form of 0b000000LR. L = left, R = right.
+		SPDR = roadmark_send;							// Roadmark is in the form of 0b000000LR. L = left, R = right.
 	}
 	else if(choose_sensor == 6)
 	{

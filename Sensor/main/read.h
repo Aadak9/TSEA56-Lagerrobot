@@ -10,7 +10,7 @@
 
 int8_t read_reflex(int reflex_high);			// Reads 11 sensors and returns the center of mass for control.
 uint8_t read_IR();								// Return distance in cm.
-uint8_t read_gyro();							// Return digital value from angle velocity.
+int8_t read_gyro();							// Return digital value from angle velocity.
 void reset_w();									// Resets w_int.
 
 #endif
