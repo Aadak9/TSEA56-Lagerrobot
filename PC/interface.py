@@ -114,7 +114,7 @@ def get_sensordata(): #hämta sensordata från IR och uppdatera i GUI
 
     global ir_data
     #ir_data += 1
-    ir_data = bt.sendbyte(0x00)  #IR
+    ir_data = bt.sendbyte()  #IR
     text4.config(text=f"Avstånd till hinder: {ir_data}")
    # bt.sendbyte(0x01)  #Reflex
     # bt.sendbyte(0x02)  #Gyro
@@ -124,27 +124,30 @@ def get_sensordata(): #hämta sensordata från IR och uppdatera i GUI
 ir_data = 0
 
 def auto_pressed():
-    #bt.sendbyte(0)
 
     auto_active_color = buttonAuto.cget("bg")
     if auto_active_color == "grey":
         buttonAuto.config(bg="green")
         buttonManuell.config(bg="grey")
-        Lager.config(highlightbackground="light green", highlightcolor ="light green")
-        Lagerknapp.config(highlightbackground="light green", highlightcolor ="light green")
+        Lager.config(highlightbackground="green", highlightcolor ="green")
+        Lagerknapp.config(highlightbackground="green", highlightcolor ="green")
+        Kontrollruta.config(highlightbackground="grey", highlightcolor ="grey")
+        Lager.config(bg="SystemButtonFace")
+        Canvas.config(bg="SystemButtonFace")
+        Lagerknapp.config(bg="SystemButtonFace")
 
         for widget in Lager.winfo_children():
             try:
-                widget.config(state="disabled")
+                widget.config(state="normal")
             except:
                 pass
 
         for widget in Lagerknapp.winfo_children():
             try:
-                widget.config(state="disabled")
+                widget.config(state="normal")
             except:
                 pass
-
+       
         for ruta in [ruta1, ruta2, ruta3]:
             ruta.config(bg="#d3d3d3")
             for widget in ruta.winfo_children():
@@ -152,6 +155,10 @@ def auto_pressed():
                     widget.config(state="disabled")
                 except:
                     pass
+
+        buttonStart.pack(fill="both", expand=True, padx=1, pady=1)            
+        buttonStart.lift()
+        buttonStart.config(bg="green")
 
 
     elif (auto_active_color == "green"):
@@ -161,7 +168,6 @@ def auto_pressed():
     return
 
 def manuell_pressed():
-    #bt.sendbyte(0)
 
     manuell_active_color = buttonManuell.cget("bg")
     if manuell_active_color == "grey":
@@ -169,16 +175,20 @@ def manuell_pressed():
         buttonManuell.config(bg="green")
         Lager.config(highlightbackground="grey", highlightcolor ="grey")
         Lagerknapp.config(highlightbackground="grey", highlightcolor ="grey")
+        Kontrollruta.config(highlightbackground="green", highlightcolor ="green")
+        Lager.config(bg="#d3d3d3")
+        Canvas.config(bg="#d3d3d3")
+        Lagerknapp.config(bg="#d3d3d3")
 
         for widget in Lager.winfo_children():
             try:
-                widget.config(state="normal")
+                widget.config(state="disbaled")
             except:
                 pass
 
         for widget in Lagerknapp.winfo_children():
             try:
-                widget.config(state="normal")
+                widget.config(state="disabled")
             except:
                 pass
 
@@ -191,13 +201,77 @@ def manuell_pressed():
                     pass
 
 
-
+        buttonStart.pack_forget()
 
     elif (manuell_active_color == "green"):
         buttonAuto.config(bg="grey")
         buttonManuell.config(bg="green")
     return
 
+def start_pressed():
+    start_active_color = buttonStart.cget("bg")
+
+    if start_active_color == "green":
+       # activate_auto = bt.sendbyte(0x40)
+        buttonStart.config(bg="red")
+        buttonStart.config(text="Avbryt")
+
+        Lager.config(highlightbackground="red", highlightcolor ="red")
+        Lagerknapp.config(highlightbackground="red", highlightcolor ="red")
+
+        for widget in Lager.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+        for widget in Lagerknapp.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+        for widget in Autoknapp.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+        for widget in Manuellknapp.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+
+    elif start_active_color == "red":
+        #cancel_auto = bt.sendbyte(0x41)
+        buttonStart.config(bg="green")
+        buttonStart.config(text="Start")
+        Lager.config(highlightbackground="green", highlightcolor ="green")
+        Lagerknapp.config(highlightbackground="green", highlightcolor ="green")
+
+        for widget in Lager.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+
+        for widget in Lagerknapp.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+
+        for widget in Autoknapp.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+        for widget in Manuellknapp.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
 
 
 bt.bluetoothinit()
@@ -229,7 +303,6 @@ Lagerknapp = tk.Frame(master=window, width=lagerknapp_width, height=lagerknapp_h
 Lagerknapp.place(x=lagerknapp_x, y=lagerknapp_y)
 Lagerknapp.grid_propagate(False)
 
-
 Lagerknapp.grid_rowconfigure(0, weight=1)
 Lagerknapp.grid_rowconfigure(1, weight=1)
 Lagerknapp.grid_rowconfigure(2, weight=1)
@@ -238,6 +311,7 @@ Lagerknapp.grid_columnconfigure(1, weight=1)
 Lagerknapp.grid_columnconfigure(2, weight=30)
 
 
+Lagerknapp.config(bg="#d3d3d3")
 
 
 
@@ -252,6 +326,8 @@ lager_y = (winheight + lagerknapp_height - lager_height) / 2
 
 Lager = tk.Frame(master=window, width=lager_width, height=lager_height, bd=1, relief="solid", padx=4, pady=4, highlightthickness=6)
 Lager.place(x=lager_x, y= lager_y)
+
+Lager.config(bg="#d3d3d3")
 
 
 ###############################################################
@@ -281,17 +357,19 @@ startknapp_height = autoknapp_height
 startknapp_x = winwidth*0.835
 startknapp_y = winheight*0.04
 
-Startknapp = tk.Frame(master=window, width=startknapp_width, height=startknapp_height, bd=0, relief="solid", padx=4, pady=4)
+Startknapp = tk.Frame(master=window, width=startknapp_width, height=startknapp_height, bd=0, relief="solid",bg=window.cget("bg"), padx=4, pady=4)
 Startknapp.place(x=startknapp_x, y=startknapp_y)
 Startknapp.pack_propagate(False)
 
-buttonStart = tk.Button(Startknapp, text="Start", bg="grey", fg="white", font=("Arial", 16))
+buttonStart = tk.Button(Startknapp, text="Start", bg="grey", fg="white", font=("Arial", 16), command=start_pressed)
 buttonStart.pack(fill="both", expand=True, padx=1, pady=1)
 
+buttonStart.pack_forget()
+
 ###############################################################
 ###############################################################
 
-#stopp-knappen
+#manuell-knappen
 
 manuellknapp_width = lagerknapp_width/2
 manuellknapp_height = winheight*0.075
@@ -333,12 +411,14 @@ text2.grid(column= 0, row = 1, sticky="nsw")
 text3 = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
 text3.grid(column= 0, row = 2, sticky="nsw")
 
-
 text4 = tk.Label(Data, text=f"Avstånd till hinder: {ir_data}", font=("Arial", 15))
 text4.grid(column= 1, row = 0, sticky="nsw")
 
 text5 = tk.Label(Data, text="Rotation platta: ", font=("Arial", 15))
 text5.grid(column= 1, row = 1, sticky="nsw")
+
+text6 = tk.Label(Data, text="Total körningstid: ", font=("Arial", 15))
+text6.grid(column= 1, row = 2, sticky="nsw")
 
 
 ###############################################################
@@ -351,8 +431,9 @@ kontroll_height = winheight * 0.53
 kontroll_x = winwidth * 0.51
 kontroll_y = ((winheight - winheight*0.75) / 2 + winheight*0.75 - kontroll_height)
 
-Kontrollruta = tk.Frame(master=window, width=kontroll_width, height=kontroll_height, bd=1, relief="solid", padx=4, pady=4)
+Kontrollruta = tk.Frame(master=window, width=kontroll_width, height=kontroll_height, bd=1, relief="solid", highlightthickness=6, padx=4, pady=4)
 Kontrollruta.grid_propagate(False)
+Kontrollruta.config(highlightbackground="green", highlightcolor="green")
 
 Kontrollruta.place(x=kontroll_x, y=kontroll_y)
 
@@ -420,6 +501,11 @@ buttonsubH.grid(row = 1, column=0, padx=5, pady= 5)
 resetbutton = tk.Button(Lagerknapp, text="Reset", width =8, height=4, command=lambda: reset_lager())
 resetbutton.grid(row = 2, column=1, padx=5, pady= 5)
 
+for widget in Lagerknapp.winfo_children():
+    try:
+        widget.config(state="disabled")
+    except:
+        pass
 
 # INNEHÅLL RUTA1
 
@@ -538,6 +624,14 @@ window.update_idletasks()
 Lager.update()
 Canvas = tk.Canvas(Lager, height=str(Lager.winfo_height()), width=str(Lager.winfo_width()) ,bg="white")
 Canvas.pack()
+
+Canvas.config(bg="#d3d3d3")
+
+for widget in Lager.winfo_children():
+    try:
+        widget.config(state="disabled")
+    except:
+        pass
 
 
 def draw_circle(canvas, x, y, r, color="blue"):
