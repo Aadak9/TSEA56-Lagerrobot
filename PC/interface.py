@@ -1,16 +1,26 @@
 import tkinter as tk
 import Bluetooth as bt
 
-
 global lagerbredd
 lagerbredd = 3
 
 global lagerhöjd
 lagerhöjd = 3
 
+global current_joint
+current_joint = 1
+
+try:
+    bt.sendbyte(0x20)
+    bt.sendbyte(current_joint) 
+except:
+    pass
+########## MÅSTE FIXA I RASPBERRY SÅ ATT DEN TAR EMOT OCH SKICKAR CURRENT_JOINT OCKSÅ
 
 
 def buttonpressed(button):
+    global current_joint
+    
     if(button=="W"):
         bt.sendbyte(1)
     elif(button=="A"):
@@ -20,17 +30,19 @@ def buttonpressed(button):
     elif(button=="D"):
         bt.sendbyte(4)
     elif(button=="Y"):
-        if(int(servo.cget("text")[6]) < 5):
-            new_number = int(servo.cget("text")[6]) + 1
-            servo.config(text="Servo " + str(new_number))
+        if(current_joint < 6):
+            current_joint += 1
+            servo.config(text="Servo " + str(current_joint))
             servo.update()
             bt.sendbyte(0x20)
+            bt.sendbyte(current_joint)
     elif(button=="H"):
-        if(int(servo.cget("text")[6]) > 1):
-            new_number = int(servo.cget("text")[6]) - 1
-            servo.config(text="Servo " + str(new_number))
+        if(current_joint > 1):
+            current_joint -= 1
+            servo.config(text="Servo " + str(current_joint))
             servo.update()
-            bt.sendbyte(0x21)
+            bt.sendbyte(0x20)
+            bt.sendbyte(current_joint)
     elif(button=="Z"):
         bt.sendbyte(0x31)
     elif(button=="C"):
@@ -451,10 +463,10 @@ button_turnleft.pack(padx=30, pady=25)
 
 # INNEHÅLL RUTA3
 
-button_minus = tk.Button(ruta3, text="-", font=("Arial", 20), width =3, height=1, command=lambda: buttonpressed("-"))
+button_minus = tk.Button(ruta3, text="- \n (Y)", font=("Arial", 20), width =3, height=1, command=lambda: buttonpressed("-"))
 button_minus.grid(row = 1, column=0, padx=5, pady= 5)
 
-servo = tk.Label(ruta3, text="Servo 1", font=("Arial", 15))
+servo = tk.Label(ruta3, text="Servo " + str(current_joint), font=("Arial", 15))
 servo.grid(row=1, column=1)
 
 button_plus = tk.Button(ruta3, text="+", font=("Arial", 20), width =3, height=1, command=lambda: buttonpressed("+"))
