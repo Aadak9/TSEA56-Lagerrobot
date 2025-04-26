@@ -27,10 +27,19 @@ void init_gyro()
 }
 
 
-void init_reflex()
+void init_line_front()
 {
-	DDRA |= 0x1F;																					// Ports for enable and choice of sensor.
+	DDRA |= 0x0F;																					// Ports choice of sensor. Might change
+	DDRD |= 0x20;																					// Port for enable
+
 	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(0<<MUX1)|(1<<MUX0);							// AREF, left-shift, ADC5.
+	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Activate ADC, Prescaler 128.
+}
+
+void init_line_back()
+{
+	DDRD |= 0x1F;																					// Ports for enable and choice of sensor.
+	ADMUX = (0<<REFS1)|(0<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(0<<MUX1)|(0<<MUX0);							// AREF, left-shift, ADC4. VIRA TILL 36
 	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Activate ADC, Prescaler 128.
 }
 
