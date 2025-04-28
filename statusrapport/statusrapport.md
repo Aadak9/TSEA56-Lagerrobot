@@ -36,9 +36,9 @@ Glöm inte att även uppdatera tidplanen.
 3. Kommande vecka tänker vi fortsätta så att kommunikationen mellan samtliga enheter fungerar. Se till att lösa de problem som finns, dvs gyrot och servona. 
 
 ## Vecka 17 (Grupp XX)(rapporteras måndag v 18)
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+1. Den gångna veckan har vi utvecklat gui:n så att dess design är nästintill klar. Linjeföljning fungerar för första gången. Kortaste väg algoritm klar men utan hinder. Vi har suttit mycket med testning inom reglering.
+2. Just nu har vi problem med att få linjeföljningen att bli helt korrekt. Det finns mycket förbättringspotential. Behöver kolla en sista gång på gyrot. 
+3. Kommande vecka tänker vi få klart alla baskrav inför bp5a och få ut armen och se till att den kan styras manuellt från pc.
 
 ## Vecka 18 Utökad statusrapport (Grupp XX)(rapporteras måndag v 19)
 
