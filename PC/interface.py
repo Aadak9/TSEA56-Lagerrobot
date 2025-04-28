@@ -1,5 +1,7 @@
 import tkinter as tk
 import Bluetooth as bt
+import threading
+import receive_data as rd
 
 global lagerbredd
 lagerbredd = 3
@@ -60,7 +62,7 @@ def on_key_press(event):
         pressed_keys.add(key)
         buttonpressed(key.upper()) 
 
-def on_key_release(event):
+def on_key_release(event): #Manuell styrning höger+framåt osv löses säkert här
     key = event.keysym.lower()
     if key in pressed_keys:
         pressed_keys.remove(key)
@@ -213,6 +215,7 @@ def start_pressed():
     start_active_color = buttonStart.cget("bg")
 
     if start_active_color == "green":
+        start_receive_data()
        # activate_auto = bt.sendbyte(0x40)
         buttonStart.config(bg="red")
         buttonStart.config(text="Avbryt")
@@ -245,6 +248,7 @@ def start_pressed():
 
 
     elif start_active_color == "red":
+        stop_receive_data()
         #cancel_auto = bt.sendbyte(0x41)
         buttonStart.config(bg="green")
         buttonStart.config(text="Start")
@@ -273,6 +277,14 @@ def start_pressed():
                 widget.config(state="normal")
             except:
                 pass
+
+def start_receive_data():
+    thread = threading.Thread(target=rd.start_data_collection)
+    thread.daemon = True
+    thread.start()
+
+def stop_receive_data():
+    rd.stop_data_collection()
 
 
 bt.bluetoothinit()
