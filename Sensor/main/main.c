@@ -29,13 +29,14 @@ int main()
 	IR_send = 0;
 	gyro_send = 0;
 	line_front_send = 0;
+	line_back_send = 0;
 	line_front = 0;
 	roadmark_send = 0;
 	reflex_high = 3;
 	TCCR1B &= ~(1 << CS11) | (1 << CS10);				// Turn off timer and gyro.		
 	reset_w();
 	
-	init_interrupt();
+//	init_interrupt();
 	init_SPI();
 	init_timer();
 	

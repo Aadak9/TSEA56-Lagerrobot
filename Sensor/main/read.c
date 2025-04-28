@@ -35,15 +35,15 @@ int8_t read_line_front(int reflex_high)
 		
 
 		indata = is_active_reflex(reflex_high);								// 1 if current sensor sees tape, 0 otherwise.
-		PORTA &= 0xDF;														// Turn off sensor.
+		PORTD &= 0xDF;														// Turn off sensor.
 		
 		sum += indata;									
 		sum_index += (i)*indata;
 
-		if ((i == 0) && (indata == 1)) {									// Sees left turn.
+		if ((i == 1) && (indata == 1)) {									// Sees left turn.
 			roadmarkLeft = 1;
 		}
-		if ((i == 10) && (indata == 1)) {									// Sees right turn.
+		if ((i == 11) && (indata == 1)) {									// Sees right turn.
 			roadmarkRight = 1;
 		}
 	}
@@ -100,21 +100,12 @@ uint8_t read_IR()
 
 
 int8_t read_gyro()
-{		
-	volatile int8_t indata = AD_convert() - 124;							// 129 is digital voltage with 0 rotation.
-	w_int += indata*9;														// Looses the two MSB, multiply with 4.
-	w_send = w_int/100;														// Absolute value to avoid negative numbers over bus, divide by 100 since the value is big.
- 	
-	 if (w_send >= 125){													// Prevents integer overflow.
-		 volatile int8_t w = (int8_t)0x7F;
-		 return w;
-	 } else if (w_send <= -125) {
-		 volatile int8_t w = (int8_t)0x80;
-		 return w;
-	 } else {
-		 volatile int8_t w = (int8_t)w_send;
-		 return w;
-	 }
+{			
+		volatile int8_t indata = AD_convert() - 129;						// 129 is digital voltage with 0 rotation.
+		w_int += indata*4;													// Looses the two MSB, multiply with 4.
+		w_send = abs(w_int/100);											// Absolute value to avoid negative numbers over bus, divide by 100 since the value is big.
+		volatile uint8_t w = (uint8_t)w_send;
+		return w;
 }
 
 
