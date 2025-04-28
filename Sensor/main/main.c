@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <math.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include "init.h"
 #include "read.h"
 #include "convert.h"

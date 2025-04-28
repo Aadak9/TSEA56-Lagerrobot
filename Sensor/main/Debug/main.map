@@ -706,13 +706,13 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x10e1
+.debug_info     0x00000000     0x10da
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x792 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega1284p/avr51/crtatmega1284p.o
  .debug_info    0x00000792      0x1f4 convert.o
  .debug_info    0x00000986      0x1e9 init.o
- .debug_info    0x00000b6f      0x26a main.o
- .debug_info    0x00000dd9      0x308 read.o
+ .debug_info    0x00000b6f      0x263 main.o
+ .debug_info    0x00000dd2      0x308 read.o
 
 .debug_abbrev   0x00000000      0xb7f
  *(.debug_abbrev)
@@ -745,7 +745,7 @@ END GROUP
  .debug_str     0x00000461       0xb7 init.o
                                 0x220 (size before relaxing)
  .debug_str     0x00000518       0x94 main.o
-                                0x24e (size before relaxing)
+                                0x249 (size before relaxing)
  .debug_str     0x000005ac       0x50 read.o
                                 0x25e (size before relaxing)
 
