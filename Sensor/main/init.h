@@ -8,12 +8,13 @@
 #ifndef INIT_H
 #define INIT_H
 
-void init_IR();							//	Initializing IR-sensor.
-void init_gyro();						//	Initializing gyro.	
-void init_reflex();						//	Initializing line sensor.
-void init_interrupt();					//	Initializing interrupt.	
-void init_SPI();						//	Initializing SPI-bus.
-void init_timer();						//	Initializing gyro-timer.
-int init_reflex_calibrate();			//	Initializing Calibrating tape value for line sensor.
+void init_IR();							// Initializing IR-sensor.
+void init_gyro();						// Initializing gyro.	
+void init_line_front();					// Initializing front line sensor.
+void init_line_back();                  // Initializing back line sensor.
+void init_interrupt();					// Initializing interrupt.	
+void init_SPI();						// Initializing SPI-bus.
+void init_timer();						// Initializing gyro-timer.
+int init_reflex_calibrate();			// Initializing Calibrating tape value for line sensor.
 
 #endif
