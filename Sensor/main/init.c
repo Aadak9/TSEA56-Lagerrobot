@@ -36,6 +36,7 @@ void init_line_front()
 	ADCSRA = (1<<ADEN)|(0<<ADSC)|(0<<ADATE)|(0<<ADIF)|(0<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);	// Activate ADC, Prescaler 128.
 }
 
+
 void init_line_back()
 {
 	DDRD |= 0x1F;																					// Ports for enable and choice of sensor.

@@ -62,7 +62,7 @@ def on_key_press(event):
         pressed_keys.add(key)
         buttonpressed(key.upper()) 
 
-def on_key_release(event):
+def on_key_release(event): #Manuell styrning höger+framåt osv löses säkert här
     key = event.keysym.lower()
     if key in pressed_keys:
         pressed_keys.remove(key)

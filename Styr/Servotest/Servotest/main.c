@@ -85,16 +85,7 @@ volatile unsigned long timertime = 8000;
 		{
 			increase_speed();
 		}
-		/*
-		else if(current_action == 0x20 && current_action != last_action && current_joint < 5)
-		{
-			current_joint += 1;
-		}
-		else if(current_action == 0x21 && current_action != last_action && current_joint > 1)
-		{
-			current_joint -= 1;
-		}
-		*/
+
 		
 		// Reglering
 		
@@ -119,7 +110,7 @@ volatile unsigned long timertime = 8000;
 			counter += 1;
 			if(counter >= timertime)
 			{
-				add1degree(current_joint);
+				add1degree_joint(current_joint);
 				counter = 0;
 			}
 		}
@@ -128,7 +119,7 @@ volatile unsigned long timertime = 8000;
 			counter +=1;
 			if(counter >= timertime)
 			{
-				sub1degree(current_joint);
+				sub1degree_joint(current_joint);
 				counter = 0;
 			}
 		}
