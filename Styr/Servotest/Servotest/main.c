@@ -15,7 +15,7 @@
 #define BAUD 1000000
 #define MYUBRR FOSC/16/BAUD-1
 
-volatile unsigned long counter = 0;
+volatile unsigned long counter = 0;   
 
 volatile unsigned long timertime = 8000;
 
@@ -72,6 +72,14 @@ volatile unsigned long timertime = 8000;
 		else if(current_action == 0x4 )
 		{
 			rotate_right_maybe();
+		}
+		else if(current_action == FWD_LEFT)
+		{
+			fwd_left();
+		}
+		else if(current_action == FWD_RIGHT) 
+		{
+			fwd_right();
 		}
 		else if(current_action == 0)
 		{
