@@ -12,6 +12,8 @@ lagerhöjd = 3
 global current_joint
 current_joint = 1
 
+autonom_active = False
+
 try:
     bt.sendbyte(0x20)
     bt.sendbyte(current_joint) 
@@ -57,6 +59,10 @@ def buttonpressed(button):
 
 
 def on_key_press(event):
+    global autonom_active
+    if autonom_active:
+        return #ej möjliggöra knapptryck i autonomt läge
+    
     key = event.keysym.lower()
     if key in ["w", "a", "s", "d", "q", "e", "y", "h", "z", "c"] and (key not in pressed_keys):
         pressed_keys.add(key)
@@ -127,9 +133,11 @@ def get_sensordata(): #hämta sensordata från IR och uppdatera i GUI
 ir_data = 0
 
 def auto_pressed():
-
+    global autonom_active
     auto_active_color = buttonAuto.cget("bg")
     if auto_active_color == "grey":
+        autonom_active = True
+
         buttonAuto.config(bg="green")
         buttonManuell.config(bg="grey")
         Lager.config(highlightbackground="green", highlightcolor ="green")
@@ -159,19 +167,25 @@ def auto_pressed():
                 except:
                     pass
 
+        
+
         buttonStart.pack(fill="both", expand=True, padx=1, pady=1)            
         buttonStart.lift()
         buttonStart.config(bg="green")
+        buttonStartdata.pack_forget()
 
 
     elif (auto_active_color == "green"):
+        autonom_active = False
         buttonAuto.config(bg="green")
         buttonManuell.config(bg="grey")
     
     return
 
 def manuell_pressed():
-
+    global autonom_active
+    autonom_active = False
+    
     manuell_active_color = buttonManuell.cget("bg")
     if manuell_active_color == "grey":
         buttonAuto.config(bg="grey")
@@ -203,7 +217,8 @@ def manuell_pressed():
                 except:
                     pass
 
-
+        buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
+        buttonStartdata.lift()          
         buttonStart.pack_forget()
 
     elif (manuell_active_color == "green"):
@@ -277,6 +292,20 @@ def start_pressed():
                 widget.config(state="normal")
             except:
                 pass
+
+def startdata_pressed():
+    data_active_color = buttonStartdata.cget("bg")
+
+    if data_active_color == "green":
+        buttonStartdata.config(bg="red")
+        buttonStartdata.config(text="Avbryt data")
+        start_receive_data()
+
+    elif data_active_color == "red":
+        stop_receive_data()
+        buttonStartdata.config(bg="green")
+        buttonStartdata.config(text="Start data")
+
 
 def start_receive_data():
     thread = threading.Thread(target=rd.start_data_collection)
@@ -395,6 +424,24 @@ Manuellknapp.pack_propagate(False)
 
 buttonManuell = tk.Button(Manuellknapp, text="Manuellt", bg="green", fg="white", font=("Arial", 16), command=manuell_pressed)
 buttonManuell.pack(fill="both", expand=True, padx=1, pady=1)
+
+###############################################################
+###############################################################
+
+#startdata-knappen
+
+startdataknapp_width = autoknapp_width/2
+startdataknapp_height = autoknapp_height
+startdataknapp_x = winwidth*0.51
+startdataknapp_y = winheight*0.04
+
+Startdataknapp = tk.Frame(master=window, width=startdataknapp_width, height=startdataknapp_height, bd=0, relief="solid",bg=window.cget("bg"), padx=4, pady=4)
+Startdataknapp.place(x=startdataknapp_x, y=startdataknapp_y)
+Startdataknapp.pack_propagate(False)
+
+buttonStartdata = tk.Button(Startdataknapp, text="Starta data", bg="green", fg="white", font=("Arial", 16), command=startdata_pressed)
+buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
+
 
 ###############################################################
 ###############################################################

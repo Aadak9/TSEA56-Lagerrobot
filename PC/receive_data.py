@@ -31,15 +31,15 @@ def receive_and_save_data():
 
     try:
         while running:  # Fortsätt bara om running är True
-            bt.sendbyte(0x00)  # Skicka byte 0x00 för att hämta IR-värde
+            bt.sendbyte(0x60)  # Skicka byte 0x00 för att hämta IR-värde
             ir_data = bt.receive_data()
             ir_list.append(ir_data)
 
-            bt.sendbyte(0x01)  # Skicka byte 0x01 för reflex
+            bt.sendbyte(0x61)  # Skicka byte 0x01 för reflex
             reflex_data = bt.receive_data()
             reflex_list.append(reflex_data)
 
-            bt.sendbyte(0x02)  # Skicka byte 0x02 för gyro
+            bt.sendbyte(0x62)  # Skicka byte 0x02 för gyro
             gyro_data = bt.receive_data()
             gyro_list.append(gyro_data)
 
