@@ -22,11 +22,20 @@ except:
 ########## MÅSTE FIXA I RASPBERRY SÅ ATT DEN TAR EMOT OCH SKICKAR CURRENT_JOINT OCKSÅ
 #test
 
-
-def buttonpressed(button):
+def update_action():
     global current_joint
-    
-    if(button=="W"):
+    button = pressed_keys[-1]
+    try:
+        button2 = pressed_keys[-2]
+    except:
+        button2 = button
+    if((button == "W" and button2 == "A") or (button == "A" and button2 == "W")):
+        print("test2")
+        bt.sendbyte(5)
+    elif((button == "W" and button2 == "D") or (button == "D" and button2 == "W")):
+        bt.sendbyte(6)
+    elif(button=="W"):
+        print("test")
         bt.sendbyte(1)
     elif(button=="A"):
         bt.sendbyte(2)
@@ -58,23 +67,45 @@ def buttonpressed(button):
 
 
 
+
+
+
 def on_key_press(event):
+    key = event.keysym.upper()
+    if key in ["W", "A", "S", "D", "Q", "E", "Y", "H", "Z", "C"] and (key not in pressed_keys):
+        pressed_keys.append(key)
+        update_action()
     global autonom_active
     if autonom_active:
         return #ej möjliggöra knapptryck i autonomt läge
     
-    key = event.keysym.lower()
-    if key in ["w", "a", "s", "d", "q", "e", "y", "h", "z", "c"] and (key not in pressed_keys):
-        pressed_keys.add(key)
-        buttonpressed(key.upper()) 
 
 def on_key_release(event): #Manuell styrning höger+framåt osv löses säkert här
-    key = event.keysym.lower()
+    key = event.keysym.upper()
     if key in pressed_keys:
         pressed_keys.remove(key)
+        if(len(pressed_keys) > 0):
+            update_action()
+        else:
+            all_keys_released()
     
     if not pressed_keys:
         all_keys_released()
+
+
+# Simulated key event for press/release
+def simulate_key_event(key, action):
+    event = type('Event', (object,), {'keysym': key})
+    if action == 'press':
+        on_key_press(event)
+    elif action == 'release':
+        on_key_release(event)
+
+
+
+
+
+
 
 def all_keys_released():
     bt.sendbyte(0)
@@ -572,22 +603,31 @@ for widget in Lagerknapp.winfo_children():
 # INNEHÅLL RUTA1
 
 
-buttonw = tk.Button(ruta1, text= "W", width =8, height=4, command=lambda: buttonpressed("W"))
+buttonw = tk.Button(ruta1, text= "W", width =8, height=4)
 buttonw.grid(row = 1, column=1, padx=5, pady= 5)
+buttonw.bind("<ButtonPress-1>", lambda e: simulate_key_event("w", "press"))
+buttonw.bind("<ButtonRelease-1>", lambda e: simulate_key_event("w", "release"))
 
-buttona = tk.Button(ruta1, text= "A", width =8, height=4, command=lambda: buttonpressed("A"))
+buttona = tk.Button(ruta1, text= "A", width =8, height=4)
 buttona.grid(row = 2, column=0, padx=5, pady= 5)
+buttona.bind("<ButtonPress-1>", lambda e: simulate_key_event("a", "press"))
+buttona.bind("<ButtonRelease-1>", lambda e: simulate_key_event("a", "release"))
 
-buttons = tk.Button(ruta1, text= "S", width =8, height=4, command=lambda: buttonpressed("S"))
+
+buttons = tk.Button(ruta1, text= "S", width =8, height=4)
 buttons.grid(row = 2, column=1, padx=5, pady= 5)
+buttons.bind("<ButtonPress-1>", lambda e: simulate_key_event("s", "press"))
+buttons.bind("<ButtonRelease-1>", lambda e: simulate_key_event("s", "release"))
 
-buttond = tk.Button(ruta1, text= "D", width =8, height=4, command=lambda: buttonpressed("D"))
+buttond = tk.Button(ruta1, text= "D", width =8, height=4)
 buttond.grid(row = 2, column=2, padx=5, pady= 5)
+buttond.bind("<ButtonPress-1>", lambda e: simulate_key_event("d", "press"))
+buttond.bind("<ButtonRelease-1>", lambda e: simulate_key_event("d", "release"))
 
 platta = tk.Label(ruta1, text="Platta", font=("Arial", 15))
 platta.grid(column= 1, row = 0)
 
-pressed_keys = set()
+pressed_keys = list()
 
 
 # INNEHÅLL RUTA2
@@ -595,36 +635,45 @@ pressed_keys = set()
 gripklotext = tk.Label(ruta2, text="Gripklo", font=("Arial", 15))
 gripklotext.pack(pady=5)
 
-button_open = tk.Button(ruta2, text="Öppna", width =20, height=3, command=lambda: buttonpressed("Öppna"))
+button_open = tk.Button(ruta2, text="Öppna", width =20, height=3)
 button_open.pack(padx=30, pady=25)
 
-button_close = tk.Button(ruta2, text="Stäng", width =20, height=3, command=lambda: buttonpressed("Stäng"))
+button_close = tk.Button(ruta2, text="Stäng", width =20, height=3)
 button_close.pack(padx=30, pady=25)
 
-button_turnright = tk.Button(ruta2, text="Vrid höger", width =20, height=3, command=lambda: buttonpressed("Vrid höger"))
+button_turnright = tk.Button(ruta2, text="Vrid höger", width =20, height=3)
 button_turnright.pack(padx=30, pady=25)
 
-button_turnleft = tk.Button(ruta2, text="Vrid vänster", width =20, height=3, command=lambda: buttonpressed("Vrid vänster"))
+button_turnleft = tk.Button(ruta2, text="Vrid vänster", width =20, height=3)
 button_turnleft.pack(padx=30, pady=25)
 
 
 
 # INNEHÅLL RUTA3
 
-button_minus = tk.Button(ruta3, text="- \n (Y)", font=("Arial", 20), width =3, height=1, command=lambda: buttonpressed("-"))
+button_minus = tk.Button(ruta3, text="- \n (Y)", font=("Arial", 20), width =3, height=1)
 button_minus.grid(row = 1, column=0, padx=5, pady= 5)
+button_minus.bind("<ButtonPress-1>", lambda e: simulate_key_event("-", "press"))
+button_minus.bind("<ButtonRelease-1>", lambda e: simulate_key_event("-", "release"))
 
 servo = tk.Label(ruta3, text="Servo " + str(current_joint), font=("Arial", 15))
 servo.grid(row=1, column=1)
 
-button_plus = tk.Button(ruta3, text="+", font=("Arial", 20), width =3, height=1, command=lambda: buttonpressed("+"))
+button_plus = tk.Button(ruta3, text="+", font=("Arial", 20), width =3, height=1)
 button_plus.grid(row = 1, column=2, padx=5, pady= 5)
+button_plus.bind("<ButtonPress-1>", lambda e: simulate_key_event("+", "press"))
+button_plus.bind("<ButtonRelease-1>", lambda e: simulate_key_event("+", "release"))
 
-button_counterclockwise = tk.Button(ruta3, text="CCW", width =20, height=3, command=lambda: buttonpressed("CCW"))
+button_counterclockwise = tk.Button(ruta3, text="CCW", width =20, height=3)
 button_counterclockwise.grid(row = 2, column=0, padx=5, pady= 5)
+button_counterclockwise.bind("<ButtonPress-1>", lambda e: simulate_key_event("z", "press"))
+button_counterclockwise.bind("<ButtonRelease-1>", lambda e: simulate_key_event("z", "release"))
 
-button_clockwise = tk.Button(ruta3, text="CW", width =20, height=3, command=lambda: buttonpressed("CW"))
+
+button_clockwise = tk.Button(ruta3, text="CW", width =20, height=3)
 button_clockwise.grid(row = 2, column=2, padx=5, pady= 5)
+button_clockwise.bind("<ButtonPress-1>", lambda e: simulate_key_event("a", "press"))
+button_clockwise.bind("<ButtonRelease-1>", lambda e: simulate_key_event("a", "release"))
 
 
 arm = tk.Label(ruta3, text="Arm", font=("Arial", 15))

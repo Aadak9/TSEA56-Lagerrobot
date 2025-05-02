@@ -1416,16 +1416,16 @@ uint8_t read_IR()
 000007ce <read_gyro>:
 
 
-int8_t read_gyro()
+uint8_t read_gyro()
 {			
  7ce:	cf 93       	push	r28
  7d0:	df 93       	push	r29
  7d2:	00 d0       	rcall	.+0      	; 0x7d4 <read_gyro+0x6>
  7d4:	cd b7       	in	r28, 0x3d	; 61
  7d6:	de b7       	in	r29, 0x3e	; 62
-		volatile int8_t indata = AD_convert() - 129;						// 129 is digital voltage with 0 rotation.
+		volatile int8_t indata = AD_convert() - 130;						// 129 is digital voltage with 0 rotation.
  7d8:	77 dc       	rcall	.-1810   	; 0xc8 <AD_convert>
- 7da:	81 58       	subi	r24, 0x81	; 129
+ 7da:	82 58       	subi	r24, 0x82	; 130
  7dc:	89 83       	std	Y+1, r24	; 0x01
 		w_int += indata*4;													// Looses the two MSB, multiply with 4.
  7de:	29 81       	ldd	r18, Y+1	; 0x01
