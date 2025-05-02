@@ -48,7 +48,7 @@ void init_line_back()
 void init_interrupt()
 {
 	EICRA |=(1<<ISC01)|(1<<ISC00);																	// Interrupt on rising edge.
-	EIMSK |= (1<<INT0);																				// ACtivate INT0.
+//	EIMSK |= (1<<INT0);																				// ACtivate INT0.
 }
 
 

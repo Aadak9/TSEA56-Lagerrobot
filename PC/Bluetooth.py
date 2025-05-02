@@ -15,19 +15,23 @@ def bluetoothinit():
     return
 
 def sendbyte(byte):
-    s.send(byte.to_bytes(1, 'big'))
-    #data = s.recv(size)
-    return
+    try:
+        s.send(byte.to_bytes(1, 'big'))  # Skicka 1 byte
+    except Exception as e:
+        print(f"Fel vid sändning av byte: {e}")
 
-#bluetoothinit()
-#time.sleep(1)
-size = 1024
 
-#while True:
-#  sendbyte(0x00)
-#  data = s.recv(size)
-#  print(data)
+
+def receive_data():
+    try:
+        data = s.recv(size)  # Vänta på att ta emot 1 byte
+        if data:
+            return data[0]  # Återvänd med den mottagna byten
+    except Exception as e:
+        print(f"Fel vid mottagning av data: {e}")
+    return None
   
 
-
+size = 1024
+bluetoothinit()
 

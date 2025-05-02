@@ -7,7 +7,11 @@
 
 #define REVERSE 0x3
 
-#define RIGHT 0x4
+#define ROTATE_RIGHT 0x4
+
+#define FWD_LEFT 0x5
+
+#define FWD_RIGHT 0x6
 
 #define STOP 0
 

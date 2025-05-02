@@ -36,7 +36,7 @@ int main()
 	TCCR1B &= ~(1 << CS11) | (1 << CS10);				// Turn off timer and gyro.		
 	reset_w();
 	
-//	init_interrupt();
+	init_interrupt();
 	init_SPI();
 	init_timer();
 	
@@ -83,6 +83,9 @@ ISR(SPI_STC_vect)
 	else if(choose_sensor == 2) 
 	{
 		SPDR = line_back_send;
+		//volatile uint8_t test = 12; 
+		//SPDR = test;
+		//sei();
 	}
 	else if(choose_sensor == 3) 
 	{
