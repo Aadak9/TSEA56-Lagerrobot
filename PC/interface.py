@@ -308,11 +308,13 @@ def startdata_pressed():
 
 
 def start_receive_data():
+    bt.sendbyte(0x63)
     thread = threading.Thread(target=rd.start_data_collection)
     thread.daemon = True
     thread.start()
 
 def stop_receive_data():
+    bt.sendbyte(0x64)
     rd.stop_data_collection()
 
 

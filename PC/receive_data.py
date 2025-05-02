@@ -45,7 +45,7 @@ def receive_and_save_data():
 
             
 
-            time.sleep(1)
+            time.sleep(0.01)
     
     except KeyboardInterrupt:
         print("\nProgrammet har avbrutits av användaren.")
