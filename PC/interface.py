@@ -18,11 +18,20 @@ except:
 ########## MÅSTE FIXA I RASPBERRY SÅ ATT DEN TAR EMOT OCH SKICKAR CURRENT_JOINT OCKSÅ
 #test
 
-
-def buttonpressed(button):
+def update_action():
     global current_joint
-    
-    if(button=="W"):
+    button = pressed_keys[-1]
+    try:
+        button2 = pressed_keys[-2]
+    except:
+        button2 = button
+    if((button == "W" and button2 == "A") or (button == "A" and button2 == "W")):
+        print("test2")
+        bt.sendbyte(5)
+    elif((button == "W" and button2 == "D") or (button == "D" and button2 == "W")):
+        bt.sendbyte(6)
+    elif(button=="W"):
+        print("test")
         bt.sendbyte(1)
     elif(button=="A"):
         bt.sendbyte(2)
@@ -54,19 +63,27 @@ def buttonpressed(button):
 
 
 
+
+
+
 def on_key_press(event):
-    key = event.keysym.lower()
-    if key in ["w", "a", "s", "d", "q", "e", "y", "h", "z", "c"] and (key not in pressed_keys):
-        pressed_keys.add(key)
-        buttonpressed(key.upper()) 
+    key = event.keysym.upper()
+    if key in ["W", "A", "S", "D", "Q", "E", "Y", "H", "Z", "C"] and (key not in pressed_keys):
+        pressed_keys.append(key)
+        update_action()
 
 def on_key_release(event): #Manuell styrning höger+framåt osv löses säkert här
-    key = event.keysym.lower()
+    key = event.keysym.upper()
     if key in pressed_keys:
         pressed_keys.remove(key)
+        if(len(pressed_keys) > 0):
+            update_action()
+        else:
+            all_keys_released()
     
     if not pressed_keys:
         all_keys_released()
+
 
 def all_keys_released():
     bt.sendbyte(0)
@@ -526,7 +543,7 @@ buttond.grid(row = 2, column=2, padx=5, pady= 5)
 platta = tk.Label(ruta1, text="Platta", font=("Arial", 15))
 platta.grid(column= 1, row = 0)
 
-pressed_keys = set()
+pressed_keys = list()
 
 
 # INNEHÅLL RUTA2
