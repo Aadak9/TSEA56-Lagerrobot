@@ -1,4 +1,4 @@
-volatile unsigned int rotatespeed = 9;
+volatile unsigned int rotatespeed = 8;
 
 volatile unsigned int current_joint = 1;
 
@@ -120,6 +120,43 @@ void sub1degree2(unsigned int ID1, unsigned int ID2)
 	}	
 	
 }
+
+
+
+void add1degree2_joint(unsigned int ID1, unsigned int ID2)
+{
+	unsigned int angle1 = get_angle(ID1);
+	unsigned int angle2 = get_angle(ID2);
+	//if(angle1 < 1023)
+	{
+		angle1 += rotatespeed*1.3;
+		angle2 -= rotatespeed;
+		load_servo(ID1, angle1);
+		load_servo(ID2, angle2);
+		action();
+
+	}
+	
+}
+
+void sub1degree2_joint(unsigned int ID1, unsigned int ID2)
+{
+
+	unsigned int angle1 = get_angle(ID1);
+	unsigned int angle2 = get_angle(ID2);
+	
+	angle1 -= rotatespeed;
+	angle2 += rotatespeed*1.3;
+	//if(angle1 > 0)
+	{
+
+		load_servo(ID1, angle1);
+		load_servo(ID2, angle2);
+		action();
+
+	}
+	
+}
 /*
 void check_servos(unsigned int ID1, unsigned int ID2)
 {
@@ -173,11 +210,11 @@ void add1degree_joint(unsigned int joint)
 	}
 	else if(joint == 2)
 	{
-		add1degree2(2,3);
+		add1degree2_joint(2,3);
 	}
 	else if(joint == 3)
 	{
-		add1degree2(4,5);
+		add1degree2_joint(4,5);
 	}
 	else if(joint == 4)
 	{
@@ -203,11 +240,11 @@ void sub1degree_joint(unsigned int joint)
 	}
 	else if(joint == 2)
 	{
-		sub1degree2(2,3);
+		sub1degree2_joint(2,3);
 	}
 	else if(joint == 3)
 	{
-		sub1degree2(4,5);
+		sub1degree2_joint(4,5);
 	}
 	else if(joint == 4)
 	{

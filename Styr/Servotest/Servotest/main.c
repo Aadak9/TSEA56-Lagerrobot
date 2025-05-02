@@ -52,6 +52,15 @@ volatile unsigned long timertime = 8000;
 	SPI_init();
 	init_pwm();
 	_delay_us(30);
+	
+	move_servo(3, 0);
+	move_servo(2, 1022);
+	/*
+	_delay_ms(2000);
+	load_servo(3, 1022);
+	load_servo(2, 0);
+	action();
+	*/
 
 	while (1)
 	{
@@ -120,6 +129,7 @@ volatile unsigned long timertime = 8000;
 			{
 				add1degree_joint(current_joint);
 				counter = 0;
+				_delay_ms(50);
 			}
 		}
 		else if(current_action == 0x32)
@@ -129,6 +139,7 @@ volatile unsigned long timertime = 8000;
 			{
 				sub1degree_joint(current_joint);
 				counter = 0;
+				_delay_ms(50);
 			}
 		}
 
@@ -142,4 +153,4 @@ volatile unsigned long timertime = 8000;
 
 		
 		last_action = current_action;
-	}}
+	}}//Frågor om armen:// Maxvinkel bestämd sen innan?// Motsols och medsols i dubbelleder?
