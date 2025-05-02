@@ -17,7 +17,7 @@
 
 volatile unsigned long counter = 0;   
 
-volatile unsigned long timertime = 8000;
+volatile unsigned long timertime = 14000;
 
 
 
@@ -42,6 +42,7 @@ volatile unsigned long timertime = 8000;
 
 
 
+
 int main(void)
 {
 	
@@ -51,16 +52,57 @@ volatile unsigned long timertime = 8000;
 	USART_Init(MYUBRR);
 	SPI_init();
 	init_pwm();
-	_delay_us(30);
 	
-	move_servo(3, 0);
-	move_servo(2, 1022);
+	_delay_ms(200);
+	
+	for(unsigned int i=1; i <= 8; i++)
+	{
+		set_speed(i, 40);
+		//unsigned int angle = get_angle(i);
+		//move_servo(i, angle);
+	}
+	/*
+	while(1)
+	{
+		_delay_ms(2000);
+		volatile unsigned int angle5 = get_angle(5);
+		_delay_us(50);
+		volatile unsigned int angle4 = get_angle(4);
+		
+		volatile unsigned int angletot = angle4 + angle5;
+		
+		
+		
+		
+	}
+	*/
+	
+	
+	load_servo(4, 500);
+	load_servo(5, 1023-500);
+	action();
+
+	//// Petter testar {
+	while(0) {
+		_delay_ms(5000);
+		load_servo(2, 1022);
+		load_servo(3, 0);
+		action();		// Servon	
+		_delay_ms(5000);
+		load_servo(2, 0);
+		load_servo(3, 1022);
+		action();		// Servon	
+	};
+	
+	//// } Petter testar
+	
 	/*
 	_delay_ms(2000);
 	load_servo(3, 1022);
 	load_servo(2, 0);
 	action();
 	*/
+
 
 	while (1)
 	{
