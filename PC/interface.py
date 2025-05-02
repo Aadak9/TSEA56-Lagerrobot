@@ -72,12 +72,14 @@ def update_action():
 
 def on_key_press(event):
     key = event.keysym.upper()
-    if key in ["W", "A", "S", "D", "Q", "E", "Y", "H", "Z", "C"] and (key not in pressed_keys):
-        pressed_keys.append(key)
-        update_action()
     global autonom_active
     if autonom_active:
         return #ej möjliggöra knapptryck i autonomt läge
+    if key in ["W", "A", "S", "D", "Q", "E", "Y", "H", "Z", "C"] and (key not in pressed_keys):
+        pressed_keys.append(key)
+        update_action()
+    
+    
     
 
 def on_key_release(event): #Manuell styrning höger+framåt osv löses säkert här
@@ -150,18 +152,14 @@ def reset_lager():
 
 
 
-def get_sensordata(): #hämta sensordata från IR och uppdatera i GUI
+def get_sensordata(data_list): #hämta sensordata från IR och uppdatera i GUI
+    text4.config(text=f"Avstånd till hinder: {data_list[0]}")
+    text1.config(text=f"Rotation platta: {data_list[2]}")
+    text5.config(text=f"Lateral position: {data_list[1]}")
 
-    global ir_data
-    #ir_data += 1
-    ir_data = bt.sendbyte()  #IR
-    text4.config(text=f"Avstånd till hinder: {ir_data}")
-   # bt.sendbyte(0x01)  #Reflex
-    # bt.sendbyte(0x02)  #Gyro
+    return
 
-   # window.after(100, get_sensordata)
 
-ir_data = 0
 
 def auto_pressed():
     global autonom_active
@@ -294,7 +292,7 @@ def start_pressed():
 
 
     elif start_active_color == "red":
-        stop_receive_data()
+        #stop_receive_data()
         #cancel_auto = bt.sendbyte(0x41)
         buttonStart.config(bg="green")
         buttonStart.config(text="Start")
@@ -339,15 +337,26 @@ def startdata_pressed():
 
 
 def start_receive_data():
+    global running
+    running = True
     bt.sendbyte(0x63)
-    thread = threading.Thread(target=rd.start_data_collection)
+    thread = threading.Thread(target=start_data_collection)
     thread.daemon = True
     thread.start()
 
 def stop_receive_data():
     bt.sendbyte(0x64)
-    rd.stop_data_collection()
+    global running
+    running = False
+    start_data_collection()
 
+def start_data_collection():
+    global running
+    while running:
+        data_list = rd.receive_and_save_data()
+        get_sensordata(data_list)
+    if not running:
+        rd.stop_data_collection()
 
 bt.bluetoothinit()
 
@@ -504,7 +513,7 @@ text2.grid(column= 0, row = 1, sticky="nsw")
 text3 = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
 text3.grid(column= 0, row = 2, sticky="nsw")
 
-text4 = tk.Label(Data, text=f"Avstånd till hinder: {ir_data}", font=("Arial", 15))
+text4 = tk.Label(Data, text=f"Avstånd till hinder: ", font=("Arial", 15))
 text4.grid(column= 1, row = 0, sticky="nsw")
 
 text5 = tk.Label(Data, text="Rotation platta: ", font=("Arial", 15))
