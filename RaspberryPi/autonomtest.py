@@ -32,70 +32,117 @@ data = 0
 
 
 address = None
-Automatic = True
+Automatic = False
 
 last_error = 0
-KP = 0.5
-KD = 1
-time1 = time.time()
+KP = -200
+KD = 50	
+#time1 = time.time()
 status = 0
 
 ####
 # kod för att skicka data till pc från dess begäran
+if not Automatic:
+	client, address = s.accept()
+#def driving_loop():
 while True:
+
 	if Automatic:
 		try:
-			
-			regler_error = 6 - spi_sensor.xfer2([1])[0] # skicka 1, få tillbaka reflexdata
-			time.sleep(0.001)
+			#start_gyro = spi_sensor.xfer2([2])
+			#gyro_data = (spi_sensor.xfer2([4])[0]*500/255)*180/3.14
+			#print(gyro_data)
+			#if (gyro_data >= 80):
+				#end_gyro = spi_sensor.xfer2([3])
+				
+			regler_error_front = 6 - (spi_sensor.xfer2([1])[0])/2
+			print(f"Front: {regler_error_front}")
+			time.sleep(0.01)
 		except:
-			regler_error1 = 10
-		print(f"reglererror: {regler_error}")
-		if(regler_error == 0):
-			
-			spi_styr.xfer2([1])
-			
-		else:
-			
-			time2 = time.time()
-			
-			output = r.PDController(regler_error, last_error, KP, KD, time2 - time1)
-			time1 = time.time()
-			last_error = regler_error
+			print(f"reglererror")
 			
 			
+		try:
+			regler_error_back = 6 - (spi_sensor.xfer2([2])[0])/2 # skicka 1, få tillbaka reflexdata
+			#print(f"Back + 6 : {regler_error_back}")
+			time.sleep(0.01)
+		except:
+			print(f"reglererror")
+
+		#time2 = time.time()
+		output = r.PDController(regler_error_front, regler_error_back, KP, KD)
+		#time1 = time.time()
+		#last_error = regler_error_front
 		
-			output *= 100
-			output = int(output)
-			if (output < 0):
-				status = 1
-				output = abs(output)
-			
-			high = (output >> 8) & 0xFF
-			
-			low = output & 0xFF
-			
-			
-			response = spi_styr.xfer2([0x30, status, high, low])
-			print(response)
-			#spi_styr.xfer2([status, high, low])
-			
+		
+	
+		output *= 100
+		output = int(output) 
+		if (output > 0):
+			status = 1
+			output = abs(output)
+		
+		high = (output >> 8) & 0xFF	
+		low = output & 0xFF
+		
+		
+		response = spi_styr.xfer2([0x30, status, high, low])
+		
+		
+	
 			
 		
 	else:
-
+				
 
 		try:
-			client, address = s.accept()
-			while True:
-				data = client.recv(size)		
-				print(data)			
-				try:	
-					spi.xfer2(data)
+			
+			
+			data = client.recv(size).hex()
+			#print(data)
+			if(data == "20"): #Ändrar aktuell armled
+				print("hej1")
+				data = client.recv(size) 
+				print(data)
+				try:
+					response = spi_styr.xfer2([0x20] + list(data))
+
 				except:
-					print("invalid data")
+					print("invalid data 1")
+					
+			elif data == "63": #Starta gyro
+				spi_sensor.xfer2([3])
+				time.sleep(0.01)
+			elif data == "60": #IR
+				spi_sensor.xfer2([0])[0]
+				time.sleep(0.01)
+				response = spi_sensor.xfer2([0])[0]
+				print(response)
+				client.send(response.to_bytes(1, 'big'))
+			elif data == "61": #Reflex
+				spi_sensor.xfer2([1])[0]
+				time.sleep(0.01)
+				response = spi_sensor.xfer2([1])[0]
+				client.send(response.to_bytes(1, 'big'))
+			elif data == "62": #Gyro
+				response = spi_sensor.xfer2([5])[0]
+				time.sleep(0.01)
+				response = spi_sensor.xfer2([5])[0]
+				client.send(response.to_bytes(1, 'big'))
+			elif data == "64": #Stoppa gyro
+				spi_sensor.xfer2([4])
+				time.sleep(0.01)
+				
+			else:
+				try:	
+					response = spi_styr.xfer2(bytes.fromhex(data))
+					print(response)
+				except:
+					print("invalid data 2")
+			time.sleep(0.01)
 		except:
-			print("Disconnected, looking for new socket")
+			print("Disconnected, looking for new socket")   
+			client, address = s.accept()                                                               
 		
 
 def close_connection():

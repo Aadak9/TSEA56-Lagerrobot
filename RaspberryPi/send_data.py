@@ -25,52 +25,54 @@ Automatic = False
 
 ####
 # kod för att skicka data till pc från dess begäran
-while True:
+def receive_and_send_data():
 	
-	
-	try:
-			
-		client, address = s.accept()
-		print("Ansluten till", address)
+	while True:
 		
-		while True:
-			data = client.recv(size)
-			print(data)
+		
+		try:
+				
+			client, address = s.accept()
+			print("Ansluten till", address)
 			
-			if not data:
-				print("inget data mottaget")
-				client.close()
-				break
+			while True:
+				data = client.recv(size)
+				print(data)
 				
-			try:
-				received_value = data[0]
-				print("Mottagen data: ", received_value)
-			
-			except Exception as e:
-				print("Kunde inte avkoda", e)
-				continue
-				
-				
-			if received_value == 0:  #IR
-				response = spi.xfer2([0])
-				print(response)
-			elif received_value == 1: #Reflex
-				response = spi.xfer2([1])
-				print(response)
-			elif received_value == 2:  #Gyro
-				response = spi.xfer2([2])
-			else:
-				response = "3"
-				print(response)
+				if not data:
+					print("inget data mottaget")
+					client.close()
+					break
 					
-			client.send(response[0].to_bytes(1, 'big'))	
-			#client.send(response.encode('utf-8'))
-			
-	
+				try:
+					received_value = data[0]
+					print("Mottagen data: ", received_value)
+				
+				except Exception as e:
+					print("Kunde inte avkoda", e)
+					continue
+					
+					
+				if received_value == 0:  #IR
+					response = spi.xfer([0])[0]
+					print(response)
+				elif received_value == 1: #Reflex
+					response = 1
+					print(response)
+				elif received_value == 2:  #Gyro
+					response = 2
+				else:
+					response = "3"
+					print(response)
 						
-					
-	except Exception as e:
-		print("Disconnected, looking for new socket", e)
+				client.send(response.to_bytes(1, 'big'))	
+				#client.send(response.encode('utf-8'))
+				
+		
+							
+						
+		except Exception as e:
+			print("Disconnected, looking for new socket", e)
 
 def close_connection():
 	client.close()
