@@ -9,12 +9,13 @@
 #include "Motorcontrol.h"
 #include "Servocontrol.h"
 #include "SPI.h"
+#include "Kommunikations_Definitioner.h"
 
 #define FOSC 16000000 // Clock Speed
 #define BAUD 1000000
 #define MYUBRR FOSC/16/BAUD-1
 
-volatile unsigned long counter = 0;
+volatile unsigned long counter = 0;   
 
 volatile unsigned long timertime = 8000;
 
@@ -51,74 +52,34 @@ volatile unsigned long timertime = 8000;
 	SPI_init();
 	init_pwm();
 	_delay_us(30);
-	load_servo(3,0);
-	load_servo(2, 0);
-	action();
-	_delay_ms(1000);
-	
-/*						
-	while (1)
-	{
-		counter += 1;
-		if(counter >= timertime)
-		{
-			add1degree2(2,3);
-			counter = 0;
-		}
-		
-		
-	
-	}
-*/
+
 	while (1)
 	{
 	
 		if(current_action == 0x1)
 		{
-			//drive_fwd();
-			//move_servo(3,300);
-			counter += 1;
-			if(counter >= timertime)
-			{
-				add1degree(3);
-				counter = 0;
-			}
-			
+			drive_fwd();
+		
 		}
 		else if(current_action == 0x2)
 		{
-			//rotate_left_maybe();
-			//move_servo(3, 0);
-			counter += 1;
-			if(counter >= timertime)
-			{
-				add1degree2(2,3);
-				counter = 0;
-			}
+			rotate_left_maybe();
 		}
 		else if(current_action == 0x3)
 		{
-			//reverse();
-			//sub1degree(3);
-			//move_servo(3,200);
-			//get_angle(2);
-			counter += 1;
-			if(counter >= timertime)
-			{
-				sub1degree(3);
-				counter = 0;
-			}
+			reverse();
 		}
 		else if(current_action == 0x4 )
 		{
-			//rotate_right_maybe();
-			//move_servo(3, 300);
-			counter += 1;
-			if(counter >= timertime)
-			{
-				sub1degree2(2,3);
-				counter = 0;
-			}
+			rotate_right_maybe();
+		}
+		else if(current_action == FWD_LEFT)
+		{
+			fwd_left();
+		}
+		else if(current_action == FWD_RIGHT) 
+		{
+			fwd_right();
 		}
 		else if(current_action == 0)
 		{
@@ -132,20 +93,32 @@ volatile unsigned long timertime = 8000;
 		{
 			increase_speed();
 		}
-		else if(current_action == 0x20 && current_action != last_action && currentID < 5)
+
+		
+		// Reglering
+		
+		
+		else if(current_action == 0x30)
 		{
-			currentID += 1;
+			float reglercopy;
+			cli();
+			reglercopy = reglerstyr;
+			sei();
+			
+			drive_and_turn(reglercopy);
+			
 		}
-		else if(current_action == 0x21 && current_action != last_action && currentID > 1)
-		{
-			currentID -= 1;
-		}
+
+		
+			
+			
+		// Servon	
 		else if(current_action == 0x31)
 		{
 			counter += 1;
 			if(counter >= timertime)
 			{
-				add1degree(currentID);
+				add1degree_joint(current_joint);
 				counter = 0;
 			}
 		}
@@ -154,18 +127,19 @@ volatile unsigned long timertime = 8000;
 			counter +=1;
 			if(counter >= timertime)
 			{
-				sub1degree(currentID);
+				sub1degree_joint(current_joint);
 				counter = 0;
 			}
-		}
-		else if(current_action == 0x30)
-		{
-			drive_and_turn(reglerstyr);
-			
 		}
 
 		
 		
+		
+		
+		
+		
+		
+
 		
 		last_action = current_action;
 	}}

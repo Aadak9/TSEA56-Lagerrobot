@@ -1,11 +1,20 @@
+/*
+ * init.h
+ *
+ * Created: 2025-04-02 15:58:02
+ * Author : andno773, sigry751
+ */
+
 #ifndef INIT_H
 #define INIT_H
 
-void init_IR();
-void init_gyro();
-void init_reflex();
-void init_interrupt();
-void init_SPI();
-void init_timer();
+void init_IR();							// Initializing IR-sensor.
+void init_gyro();						// Initializing gyro.	
+void init_line_front();					// Initializing front line sensor.
+void init_line_back();                  // Initializing back line sensor.
+void init_interrupt();					// Initializing interrupt.	
+void init_SPI();						// Initializing SPI-bus.
+void init_timer();						// Initializing gyro-timer.
+int init_reflex_calibrate();			// Initializing Calibrating tape value for line sensor.
 
 #endif

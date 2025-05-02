@@ -1,6 +1,6 @@
 volatile unsigned int rotatespeed = 9;
 
-volatile unsigned int currentID = 1;
+volatile unsigned int current_joint = 1;
 
 
 
@@ -76,7 +76,7 @@ void USART_Transmit( unsigned char* data, unsigned int size )
 	unsigned char data[] = {header, header, ID, Length, Instruction, Checksum};
 	unsigned char data_size = sizeof(data) / sizeof(data[0]);
 	USART_Transmit(data, data_size);
-	_delay_us(10);}void add1degree(unsigned int ID){	unsigned int angle = get_angle(ID);	if(angle < 1023)
+	_delay_us(10);}void move_2servo(unsigned int ID1, unsigned int ID2, unsigned int angle){	load_servo(ID1, angle);	load_servo(ID2, angle);	action();		}void add1degree(unsigned int ID){	unsigned int angle = get_angle(ID);	if(angle < 1023)
 	{					
 		angle += rotatespeed;
 		move_servo(ID, angle);
@@ -95,7 +95,9 @@ void add1degree2(unsigned int ID1, unsigned int ID2)
 	if(angle1 < 1023)
 	{
 		angle1 += rotatespeed;
-		angle2 += rotatespeed;
+		angle2 -= rotatespeed;
+		set_speed_dir(ID1, 800, 1);
+		set_speed_dir(ID2, 800, 0);
 		load_servo(ID1, angle1);
 		load_servo(ID2, angle2);
 		action();
@@ -112,7 +114,9 @@ void sub1degree2(unsigned int ID1, unsigned int ID2)
 	if(angle1 > 0)
 	{
 		angle1 -= rotatespeed;
-		angle2 -= rotatespeed;
+		angle2 += rotatespeed;
+		set_speed_dir(ID1, 800, 0);
+		set_speed_dir(ID2, 800, 1);
 		load_servo(ID1, angle1);
 		load_servo(ID2, angle2);
 		action();
@@ -134,3 +138,114 @@ void check_servos(unsigned int ID1, unsigned int ID2)
 */
 
 
+
+void move_joint(unsigned int joint, unsigned int angle)
+{
+	if(joint == 1)
+	{
+		move_servo(1, angle);
+	}
+	else if(joint == 2)
+	{
+		move_2servo(2,3,angle);
+	}
+	else if(joint == 3)
+	{
+		move_2servo(4,5,angle);
+	}
+	else if(joint == 4)
+	{
+		move_servo(6, angle);
+	}
+	else if(joint == 5)
+	{
+		move_servo(7,angle);
+	}
+	else if(joint == 6)
+	{
+		move_servo(8, angle);
+	}
+
+}
+
+
+void add1degree_joint(unsigned int joint)
+{
+	if(joint == 1)
+	{
+		add1degree(1);
+	}
+	else if(joint == 2)
+	{
+		add1degree2(2,3);
+	}
+	else if(joint == 3)
+	{
+		add1degree2(4,5);
+	}
+	else if(joint == 4)
+	{
+		add1degree(6);
+	}
+	else if(joint == 5)
+	{
+		add1degree(7);
+	}
+	else if(joint == 6)
+	{
+		add1degree(8);
+	}
+	
+}
+
+
+void sub1degree_joint(unsigned int joint)
+{
+	if(joint == 1)
+	{
+		sub1degree(1);
+	}
+	else if(joint == 2)
+	{
+		sub1degree2(2,3);
+	}
+	else if(joint == 3)
+	{
+		sub1degree2(4,5);
+	}
+	else if(joint == 4)
+	{
+		sub1degree(6);
+	}
+	else if(joint == 5)
+	{
+		sub1degree(7);
+	}
+	else if(joint == 6)
+	{
+		sub1degree(8);
+	}
+}
+
+
+
+void set_speed_dir(unsigned int ID, unsigned int speed, unsigned char clockwise)
+{
+	if (speed > 1023) speed = 1023;
+
+	// Bit 10 anger riktning: 0 = CW, 1 = CCW
+	if (!clockwise)
+	speed |= (1 << 10); // sätt riktning till moturs
+
+	unsigned char P2 = speed & 0xFF;
+	unsigned char P3 = (speed >> 8) & 0xFF;
+
+	unsigned char header = 0xFF;
+	unsigned char length = 0x05;
+	unsigned char instruction = 0x03;
+	unsigned char address = 32; // Moving Speed
+	unsigned char checksum = ~(ID + length + instruction + address + P2 + P3);
+
+	unsigned char data[] = {header, header, ID, length, instruction, address, P2, P3, checksum};
+	USART_Transmit(data, sizeof(data));
+}

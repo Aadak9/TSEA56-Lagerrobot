@@ -16,7 +16,7 @@
 volatile int w_int;
 volatile int w_send;
 
-int8_t read_reflex()
+int8_t read_line_front(int reflex_high)
 {
 	int i;
 	volatile int8_t data;
@@ -27,42 +27,69 @@ int8_t read_reflex()
 	volatile int roadmarkRight = 0;
 	volatile int pivot = 0;	
 	
-	for(i = 0; i < 11; i++)
+	for(i = 1; i < 12; i++)
 	{
-		PORTA &= 0xF0;									// Nollställer de fyra LSB bitarna i PORT A
-		PORTA |= i;										// Sätter Muxen till index i
-		PORTA |= 0x10;									// Startar sensorn
+		PORTA &= 0xF0;														// Resets the 4 LSB bits in PORT A.
+		PORTA |= i;															// Set multiplexer to index i.
+		PORTD |= 0x20;														// Start sensor.
 		
-		 if (i == 0) {
-			 is_active_reflex();						// Läs men kasta resultatet
-			 _delay_us(20);								//Första läsningen från i = 0 ger fel värde
-			 continue;
-		 }
+
+		indata = is_active_reflex(reflex_high);								// 1 if current sensor sees tape, 0 otherwise.
+		PORTD &= 0xDF;														// Turn off sensor.
 		
-		indata = is_active_reflex();
-		PORTA &= 0xEF;									// Stänger av sensorn
-		
-		sum += indata;									// 1 eller 0
-		sum_index += (i+1)*indata;
-		
-		if ((i == 0) && (indata == 1)) {
+		sum += indata;									
+		sum_index += (i)*indata;
+
+		if ((i == 1) && (indata == 1)) {									// Sees left turn.
 			roadmarkLeft = 1;
 		}
-		if ((i == 10) && (indata == 1)) {
+		if ((i == 11) && (indata == 1)) {									// Sees right turn.
 			roadmarkRight = 1;
 		}
 	}
-	
-	if (sum == 0)
+
+	if (sum == 0)															// Sees no tape.
 	{
-		pivot = 6;
+		pivot = 12;
 	} else {
-		pivot = sum_index/sum;
+		pivot = (sum_index*2)/sum;											// Center of mass calculation, multiply with 2 to get decimals.
 	}
 
-	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);
+	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);	// Center of mass calculation on bit 0-6, 7 bit for right turn, 8 bit for left turn.
 }
 
+int8_t read_line_back(int reflex_high)
+{
+	int i;
+	volatile int8_t data;
+	volatile uint8_t indata = 0;
+	volatile int sum = 0;
+	volatile int sum_index = 0;
+	volatile int pivot = 0;	
+	
+	for(i = 1; i < 12; i++)
+	{
+		PORTD &= 0xF0;														// Resets the 4 LSB bits in PORT A.
+		PORTD |= i;															// Set multiplexer to index i.
+		PORTD |= 0x10;														// Start sensor.
+		
+
+		indata = is_active_reflex(reflex_high - 1);								// 1 if current sensor sees tape, 0 otherwise.
+		PORTD &= 0xEF;														// Turn off sensor.
+		
+		sum += indata;									
+		sum_index += (i)*indata;
+	}
+
+	if (sum == 0)															// Sees no tape.
+	{
+		pivot = 12;
+	} else {
+		pivot = (sum_index*2)/sum;											// Center of mass calculation, multiply with 2 to get decimals.
+	}
+
+	return data = (int8_t)(pivot);											// Center of mass calculation 
+}
 
 uint8_t read_IR()
 {	
@@ -73,16 +100,16 @@ uint8_t read_IR()
 
 
 uint8_t read_gyro()
-{		
-	volatile int8_t indata = AD_convert() - 129;							// värdet 125 måste kalibreras
-	w_int += indata*4;
-	w_send = abs(w_int/100);
- 	volatile uint8_t w = (uint8_t)w_send;
-	return w;
+{			
+		volatile int8_t indata = AD_convert() - 130;						// 129 is digital voltage with 0 rotation.
+		w_int += indata*4;													// Looses the two MSB, multiply with 4.
+		w_send = abs(w_int/100);											// Absolute value to avoid negative numbers over bus, divide by 100 since the value is big.
+		volatile uint8_t w = (uint8_t)w_send;
+		return w;
 }
 
 
 void reset_w()
 {
-	w_int = 0;
+	w_int = 0;																// Resets w_int after gyro is done.
 }
