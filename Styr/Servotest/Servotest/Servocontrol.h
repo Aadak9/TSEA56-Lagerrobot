@@ -95,7 +95,9 @@ void add1degree2(unsigned int ID1, unsigned int ID2)
 	if(angle1 < 1023)
 	{
 		angle1 += rotatespeed;
-		angle2 += rotatespeed;
+		angle2 -= rotatespeed;
+		set_speed_dir(ID1, 800, 1);
+		set_speed_dir(ID2, 800, 0);
 		load_servo(ID1, angle1);
 		load_servo(ID2, angle2);
 		action();
@@ -112,7 +114,9 @@ void sub1degree2(unsigned int ID1, unsigned int ID2)
 	if(angle1 > 0)
 	{
 		angle1 -= rotatespeed;
-		angle2 -= rotatespeed;
+		angle2 += rotatespeed;
+		set_speed_dir(ID1, 800, 0);
+		set_speed_dir(ID2, 800, 1);
 		load_servo(ID1, angle1);
 		load_servo(ID2, angle2);
 		action();
@@ -221,4 +225,27 @@ void sub1degree_joint(unsigned int joint)
 	{
 		sub1degree(8);
 	}
+}
+
+
+
+void set_speed_dir(unsigned int ID, unsigned int speed, unsigned char clockwise)
+{
+	if (speed > 1023) speed = 1023;
+
+	// Bit 10 anger riktning: 0 = CW, 1 = CCW
+	if (!clockwise)
+	speed |= (1 << 10); // sätt riktning till moturs
+
+	unsigned char P2 = speed & 0xFF;
+	unsigned char P3 = (speed >> 8) & 0xFF;
+
+	unsigned char header = 0xFF;
+	unsigned char length = 0x05;
+	unsigned char instruction = 0x03;
+	unsigned char address = 32; // Moving Speed
+	unsigned char checksum = ~(ID + length + instruction + address + P2 + P3);
+
+	unsigned char data[] = {header, header, ID, length, instruction, address, P2, P3, checksum};
+	USART_Transmit(data, sizeof(data));
 }
