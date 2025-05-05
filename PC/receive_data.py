@@ -38,8 +38,8 @@ def receive_and_save_data():
         ir_list.append(ir_data)
 
         bt.sendbyte(0x61)  # Skicka byte 0x61 för reflex
-        reflex_data = bt.receive_data()
-        reflex_list.append((reflex_data/2)-6)
+        reflex_data = 6-(bt.receive_data())/2
+        reflex_list.append(reflex_data)
 
         bt.sendbyte(0x62)  # Skicka byte 0x62 för gyro
         gyro_data = bt.receive_data()
@@ -53,7 +53,7 @@ def receive_and_save_data():
         gas_left_data = bt.receive_data()
         gas_left_list.append(gas_left_data)
 
-        time.sleep(0.2)
+        time.sleep(1.0)
         return [ir_data, reflex_data, gyro_data, gas_right_data, gas_left_data]
     
     except KeyboardInterrupt:
