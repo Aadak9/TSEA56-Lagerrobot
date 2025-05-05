@@ -491,7 +491,7 @@ buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
 ###############################################################
 ###############################################################
 
-#startdata-knappen
+#kalibrerings-knappen
 
 kalibreringknapp_width = autoknapp_width
 kalibreringknapp_height = autoknapp_height
