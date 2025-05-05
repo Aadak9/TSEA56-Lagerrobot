@@ -45,11 +45,11 @@ def receive_and_save_data():
         gyro_data = bt.receive_data()
         gyro_list.append(gyro_data)
 
-        bt.sendbyte(0x63) #skicka byte 0x63 för gaspådrag höger sida
+        bt.sendbyte(0x65) #skicka byte 0x63 för gaspådrag höger sida
         gas_right_data = bt.receive_data()
         gas_right_list.append(gas_right_data)
 
-        bt.sendbyte(0x64) #skicka byte 0x64 för gaspådrag vänster sida
+        bt.sendbyte(0x66) #skicka byte 0x64 för gaspådrag vänster sida
         gas_left_data = bt.receive_data()
         gas_left_list.append(gas_left_data)
 
