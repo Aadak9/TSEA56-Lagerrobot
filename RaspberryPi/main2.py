@@ -6,6 +6,7 @@ import time
 import threading
 
 Automatic = False
+size = 1024
 
 def autonomous_loop(spi_styr, spi_sensor, KP, KD):
     try:
@@ -29,7 +30,7 @@ def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
     try:
         time.sleep(0.01)
         if(data == "20"): #Ändrar aktuell armled
-            data = client.recv(bt.size) 
+            data = client.recv(size) 
             try:
                 response = spi_styr.xfer2([0x20] + list(data))
             except:
@@ -98,7 +99,7 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
     print("Bluetooth connected")
     while True:
         try:
-            data = client.recv(bt.size).hex()
+            data = client.recv(size).hex()
             if data == "99": #Växla körläge
                 Automatic = not Automatic
                 continue

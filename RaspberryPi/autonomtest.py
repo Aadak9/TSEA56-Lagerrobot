@@ -32,11 +32,11 @@ data = 0
 
 
 address = None
-Automatic = True 
+Automatic = False
 
 last_error = 0
-KP = -200
-KD = 50	
+KP = 200
+KD = -50	
 #time1 = time.time()
 status = 0
 
