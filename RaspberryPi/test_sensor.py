@@ -11,19 +11,37 @@ data = 0
 
 address = None
 
-
+try:
+	sensor_data = spi.xfer2([3])
+		
+except:
+	print("Felaktig data")
 
 
 while 1:	
 		
 	try:
-		sensor_data = spi.xfer2([1])
-		print(f"Sensorvärde: {sensor_data}")
-		time.sleep(1)
+		sensor_data1 = spi.xfer2([5])
+		print(f"Sensorvärde: {sensor_data1}")
+		time.sleep(0.01)
+		
 	except:
 		print("Felaktig data")
+	
+		
 			
 
 			
-
+#while 1:	
+		
+#	try:
+#		start_gyro = spi.xfer2([2])
+#		gyro_data = spi.xfer([4])
+#		if (gyro_data >= 80):
+#			end_gyro = spi.xfer([3])
+#		
+#		print(f"Sensorvärde: {sensor_data}")
+#		time.sleep(0.01)
+#	except:
+#		print("Felaktig data")
 	

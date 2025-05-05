@@ -37,3 +37,4 @@ void init_pwm(){
 	sei(); // Aktivera globala avbrott
 	
 }
+
