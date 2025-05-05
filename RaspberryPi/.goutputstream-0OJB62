@@ -32,7 +32,7 @@ data = 0
 
 
 address = None
-Automatic = True 
+Automatic = False
 
 last_error = 0
 KP = -200
@@ -49,26 +49,33 @@ while True:
 
 	if Automatic:
 		try:
+			#start_gyro = spi_sensor.xfer2([2])
+			#gyro_data = (spi_sensor.xfer2([4])[0]*500/255)*180/3.14
+			#print(gyro_data)
+			#if (gyro_data >= 80):
+				#end_gyro = spi_sensor.xfer2([3])
+				
 			regler_error_front = 6 - (spi_sensor.xfer2([1])[0])/2
-			time.sleep(0.01)
-			regler_error_front = 6 - (spi_sensor.xfer2([1])[0])/2
-			print(f"regler Front {regler_error_front}")
+			print(f"Front: {regler_error_front}")
 			time.sleep(0.01)
 		except:
 			print(f"reglererror")
 			
+			
 		try:
 			regler_error_back = 6 - (spi_sensor.xfer2([2])[0])/2 # skicka 1, få tillbaka reflexdata
-			time.sleep(0.01)
-			regler_error_back = 6 - (spi_sensor.xfer2([2])[0])/2
+			#print(f"Back + 6 : {regler_error_back}")
 			time.sleep(0.01)
 		except:
 			print(f"reglererror")
 
-		
+		#time2 = time.time()
 		output = r.PDController(regler_error_front, regler_error_back, KP, KD)
-
-
+		#time1 = time.time()
+		#last_error = regler_error_front
+		
+		
+	
 		output *= 100
 		output = int(output) 
 		if (output > 0):
@@ -77,31 +84,12 @@ while True:
 		
 		high = (output >> 8) & 0xFF	
 		low = output & 0xFF
+		
+		
 		response = spi_styr.xfer2([0x30, status, high, low])
 		
-		try:
-			roadmark = spi_sensor.xfer2([6])[0]
-			time.sleep(0.01)
-			roadmark = spi_sensor.xfer2([6])[0]
-			time.sleep(0.01)
-			
-			print(f"roadmark {roadmark}")
-			
-			if (roadmark == 3):
-				print("roadmark")
-				spi_sensor.xfer2([3])
-				angle = 0
-				while (angle < 60):
-					time.sleep(0.01)
-					angle = spi_sensor.xfer2([5])[0]
-					time.sleep(0.01)
-					angle = spi_sensor.xfer2([5])[0]
-					time.sleep(0.01)
-					spi_styr.xfer2([0x2])
-					print(angle)
-				spi_sensor.xfer2([4])
-		except:
-			print("Fel")
+		
+	
 			
 		
 	else:
@@ -109,34 +97,33 @@ while True:
 
 		try:
 			
-			time.sleep(0.01)
+			
 			data = client.recv(size).hex()
+			#print(data)
 			if(data == "20"): #Ändrar aktuell armled
+				print("hej1")
 				data = client.recv(size) 
+				print(data)
 				try:
 					response = spi_styr.xfer2([0x20] + list(data))
+
 				except:
 					print("invalid data 1")
 					
+			elif data == "63": #Starta gyro
+				spi_sensor.xfer2([3])
+				time.sleep(0.01)
 			elif data == "60": #IR
 				spi_sensor.xfer2([0])[0]
 				time.sleep(0.01)
 				response = spi_sensor.xfer2([0])[0]
-				print(f"avstånd {response}")
+				print(response)
 				client.send(response.to_bytes(1, 'big'))
 			elif data == "61": #Reflex
 				spi_sensor.xfer2([1])[0]
 				time.sleep(0.01)
 				response = spi_sensor.xfer2([1])[0]
-				print(f"reflex {response}")
 				client.send(response.to_bytes(1, 'big'))
-			elif data == "67": #kalibrera linjesensor
-				response = spi_sensor.xfer2([7])
-				time.sleep(0.01)
-			
-			elif data == "63": #Starta gyro
-				spi_sensor.xfer2([3])
-				time.sleep(0.01)
 			elif data == "62": #Gyro
 				response = spi_sensor.xfer2([5])[0]
 				time.sleep(0.01)
@@ -146,21 +133,9 @@ while True:
 				spi_sensor.xfer2([4])
 				time.sleep(0.01)
 				
-			elif data == "65": #gaspådrag höger
-				spi_styr.xfer2([0x41])[0]
+			elif data == "67": #kalibrera linjesensor
+				spi_sensor.xfer2([7])
 				time.sleep(0.01)
-				response = spi_styr.xfer2([0x41])[0]
-				print(f"gas höger {response}")
-				client.send(response.to_bytes(1, 'big'))
-				
-			elif data == "66": #gaspådrag vänster
-				spi_styr.xfer2([0x40])[0]
-				time.sleep(0.01)
-				response = spi_styr.xfer2([0x40])[0]
-				print(f"gas vänster {response}")
-				client.send(response.to_bytes(1, 'big'))
-				
-			
 			else:
 				try:	
 					response = spi_styr.xfer2(bytes.fromhex(data))
