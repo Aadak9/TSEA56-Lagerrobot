@@ -37,7 +37,7 @@ def receive_and_save_data():
 
         bt.sendbyte(0x61)  # Skicka byte 0x01 för reflex
         reflex_data = bt.receive_data()
-        reflex_list.append(reflex_data)
+        reflex_list.append((reflex_data/2)-6)
 
         bt.sendbyte(0x62)  # Skicka byte 0x02 för gyro
         gyro_data = bt.receive_data()
