@@ -56,10 +56,12 @@ Kortaste väg algoritm (nära till klart) med styrbeslut, automatisk rörelse f�
     |------------|-------|-------|-------|-------|-------|-------|
     | Ebba       | 40    | 40    | 30    | 10    | 10    | 130   |
     | Ida        | 30    | 30    | 29    | 13    | 12    | 114   |
-    | Lisa       |       |       |       |       |       |       |   (lämnar tomt pga mycket sjukdom)
+    | Lisa       |       |       |       |       |       |       |   
     | Linus      | 30    | 30    | 29    | 12    | 12    | 113   |
     | Andreas    | 40    | 40    | 30    | 7     | 7     | 124   |
     | Sigge      | 30    | 30    | 29    | 16    | 14    | 119   |
+
+    (lämnar tomt för lisa pga sjukdom)
     
     - Redovisa också vilka aktiviteter som respektive person ska arbeta med:
         - Ebba: Färdigställa gui och se till att datan visas. Reglering. Skriva dokument. 
