@@ -101,7 +101,7 @@ uint8_t read_IR()
 
 uint8_t read_gyro()
 {			
-		volatile int8_t indata = AD_convert() - 130;						// 129 is digital voltage with 0 rotation.
+		volatile int8_t indata = AD_convert() - 126;						// 126 is digital voltage with 0 rotation.
 		w_int += indata*4;													// Looses the two MSB, multiply with 4.
 		w_send = abs(w_int/100);											// Absolute value to avoid negative numbers over bus, divide by 100 since the value is big.
 		volatile uint8_t w = (uint8_t)w_send;
