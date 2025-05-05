@@ -156,6 +156,7 @@ def get_sensordata(data_list): #hämta sensordata från IR och uppdatera i GUI
     text4.config(text=f"Avstånd till hinder: {data_list[0]}")
     text1.config(text=f"Rotation platta: {data_list[2]}")
     text5.config(text=f"Lateral position: {data_list[1]}")
+    text2.config(text=f"Gaspådrag: {data_list[4]}, {data_list[3]}")
 
     return
 
@@ -336,7 +337,7 @@ def startdata_pressed():
         buttonStartdata.config(text="Start data")
 
 def calibrate_sensor():
-    bt.sendbyte(0x7)
+    bt.sendbyte(0x67)
 
 
 def start_receive_data():
