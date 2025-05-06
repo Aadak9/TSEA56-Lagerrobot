@@ -1,29 +1,49 @@
 
 import spi as spi
 import bluetooth as bt
-import regler as r
+import autonom as auto
 import time
 import threading
+from collections import deque
 
 Automatic = False
 size = 1024
 
-def autonomous_loop(spi_styr, spi_sensor, KP, KD):
-    try:
-        spi_sensor.xfer2([1])
-        regler_error_front = 6 - (spi_sensor.xfer2([1])[0])/2
-        time.sleep(0.01)
-        spi_sensor.xfer2([2])        
-        regler_error_back = 6 - (spi_sensor.xfer2([2])[0])/2
-        output = r.PDController(regler_error_front, regler_error_back, KP, KD)
-        output = int(output * 100)
-        status = 1 if output > 0 else 0
-        output = abs(output)
+def autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan):
 
-        high, low = (output >> 8) & 0xFF, output & 0xFF
-        spi_styr.xfer2([0x30, status, high, low])
-    except:
-        print("Sensor error")
+
+    roadmark_status = auto.check_roadmark(spi_sensor)
+    if(roadmark_status == 0):
+        auto.control_loop(spi_styr, spi_sensor, KP, KD)
+    
+    elif(roadmark_status == 1): # and dags att plocka vara
+        #stanna och plocka vara
+        pass
+    elif(roadmark_status == 2): # and dags att plocka vara
+        #stanna och plocka vara
+        pass
+    elif(roadmark_status == 3): #sväng utifrån planerad väg
+
+        if(nav_plan):
+            next_move = nav_plan.popleft()
+        else:
+            print("Slut på styrbeslut")
+        #Kolla om vi ska svänga eller ej
+        
+        if(next_move == "rakt"):
+            auto.drive_fwd(spi_styr)
+            time.sleep(0.3)
+        
+        elif(next_move == "höger"):
+            auto.rotate_right(spi_styr)
+
+        elif(next_move == "vänster"):
+            auto.rotate_left(spi_styr)
+
+        
+
+
+
 
 
 def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
@@ -120,6 +140,10 @@ def main():
     s = bt.init_bluetooth()
     spi_styr, spi_sensor = spi.initspi()
 
+    #skapa styrbeslutslistan
+
+    nav_plan = deque(["rakt", "höger", "rakt", "rakt", "vänster"]) #hårdkodad för nu
+
     bt_thread = threading.Thread(target=bluetooth_listener, args=(s, spi_styr, spi_sensor), daemon=True)
     bt_thread.start()
 
@@ -127,7 +151,7 @@ def main():
 
     while True:
         if Automatic:
-           autonomous_loop(spi_styr, spi_sensor, KP, KD)
+           autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan)
            time.sleep(0.005)
 
 
