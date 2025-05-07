@@ -1,4 +1,3 @@
-
 import spi as spi
 import bluetooth as bt
 import autonom as auto
@@ -6,40 +5,46 @@ import time
 import threading
 from collections import deque
 
-Automatic = False
+Automatic = True
 size = 1024
 
+has_seen_roadmark = False
+
 def autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan):
-
-
+    global has_seen_roadmark
     roadmark_status = auto.check_roadmark(spi_sensor)
+    print(has_seen_roadmark)
     if(roadmark_status == 0):
+        has_seen_roadmark = False
         auto.control_loop(spi_styr, spi_sensor, KP, KD)
-    
     elif(roadmark_status == 1): # and dags att plocka vara
         #stanna och plocka vara
-        pass
+        auto.drive_fwd(spi_styr) # Kör förbi plockstaion
     elif(roadmark_status == 2): # and dags att plocka vara
         #stanna och plocka vara
-        pass
-    elif(roadmark_status == 3): #sväng utifrån planerad väg
-
+        auto.drive_fwd(spi_styr) # Kör förbi plockstaion
+    elif(roadmark_status == 3 and not has_seen_roadmark): #sväng utifrån planerad väg
+        has_seen_roadmark = True
+        time.sleep(0.18)
         if(nav_plan):
             next_move = nav_plan.popleft()
+            print(next_move)
         else:
             print("Slut på styrbeslut")
         #Kolla om vi ska svänga eller ej
         
         if(next_move == "rakt"):
+            print("rakt")
             auto.drive_fwd(spi_styr)
-            time.sleep(0.3)
-        
-        elif(next_move == "höger"):
-            auto.rotate_right(spi_styr)
 
         elif(next_move == "vänster"):
-            auto.rotate_left(spi_styr)
+           auto.rotate_left(spi_styr, spi_sensor)
+            
+        elif(next_move == "höger"):
+            auto.rotate_right(spi_styr, spi_sensor)
 
+    else:
+        auto.drive_fwd(spi_styr)
         
 
 
@@ -123,8 +128,7 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
             if data == "99": #Växla körläge
                 Automatic = not Automatic
                 continue
-            if not Automatic:
-                bluetooth_control_loop(data, client, spi_styr, spi_sensor)
+            bluetooth_control_loop(data, client, spi_styr, spi_sensor)
         except Exception as e:
             print(f"Bluetooth error: {e}")
             try:
@@ -142,17 +146,17 @@ def main():
 
     #skapa styrbeslutslistan
 
-    nav_plan = deque(["rakt", "höger", "rakt", "rakt", "vänster"]) #hårdkodad för nu
+    nav_plan = deque(["vänster", "höger", "rakt", "höger", "höger", "rakt", "rakt", "vänster"]) #hårdkodad för nu
 
     bt_thread = threading.Thread(target=bluetooth_listener, args=(s, spi_styr, spi_sensor), daemon=True)
     bt_thread.start()
 
-    KP, KD = -200, 50
+    KP, KD = 90, 100
 
     while True:
         if Automatic:
-           autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan)
-           time.sleep(0.005)
+            autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan)
+            time.sleep(0.005)
 
 
 if __name__ == "__main__":
