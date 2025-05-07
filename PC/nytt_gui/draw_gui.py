@@ -2,10 +2,18 @@ import tkinter as tk
 import buttoncontrol as bc
 import bluetooth as bt
 from buttoncontrol import current_joint
+import time
 global buttonManuell, Manuellknapp, Autoknapp, buttonAuto, Kontrollruta, Lager, Canvas, ruta1, ruta3, buttonStartdata, buttonStart, Lagerknapp, textH, textW
 Canvas = None
 global lagerbredd, lagerhöjd
 lagerbredd, lagerhöjd = 3, 3
+global timestart
+timestart = time.time()
+global timeractive
+timeractive = False
+global window
+window = tk.Tk()
+
 
 def draw_gui(window):
 
@@ -134,7 +142,7 @@ def draw_gui(window):
     Startdataknapp.place(x=startdataknapp_x, y=startdataknapp_y)
     Startdataknapp.pack_propagate(False)
 
-    buttonStartdata = tk.Button(Startdataknapp, text="Starta data", bg="green", fg="white", font=("Arial", 16))# ,command=bc.startdata_pressed)
+    buttonStartdata = tk.Button(Startdataknapp, text="Starta data", bg="green", fg="white", font=("Arial", 16), command=bc.startdata_pressed)
     buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
 
 
@@ -174,23 +182,27 @@ def draw_gui(window):
     Data.grid_columnconfigure(0, weight=1)
     Data.grid_columnconfigure(1, weight=1)
 
-    text1 = tk.Label(Data, text="Lateral position: ", font=("Arial", 15))
-    text1.grid(column= 0, row = 0, sticky="nsw")
 
-    text2 = tk.Label(Data, text="Gaspådrag: ", font=("Arial", 15))
-    text2.grid(column= 0, row = 1, sticky="nsw")
+    global text_lateral, text_gas, text_varor, text_IR, text_rotation, text_tid
 
-    text3 = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
-    text3.grid(column= 0, row = 2, sticky="nsw")
 
-    text4 = tk.Label(Data, text=f"Avstånd till hinder: ", font=("Arial", 15))
-    text4.grid(column= 1, row = 0, sticky="nsw")
+    text_lateral = tk.Label(Data, text="Lateral position: ", font=("Arial", 15))
+    text_lateral.grid(column= 0, row = 0, sticky="nsw")
 
-    text5 = tk.Label(Data, text="Rotation platta: ", font=("Arial", 15))
-    text5.grid(column= 1, row = 1, sticky="nsw")
+    text_gas = tk.Label(Data, text="Gaspådrag: ", font=("Arial", 15))
+    text_gas.grid(column= 0, row = 1, sticky="nsw")
 
-    text6 = tk.Label(Data, text="Total körningstid: ", font=("Arial", 15))
-    text6.grid(column= 1, row = 2, sticky="nsw")
+    text_varor = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
+    text_varor.grid(column= 0, row = 2, sticky="nsw")
+
+    text_IR = tk.Label(Data, text=f"Avstånd till hinder: ", font=("Arial", 15))
+    text_IR.grid(column= 1, row = 0, sticky="nsw")
+
+    text_rotation = tk.Label(Data, text="Rotation platta: ", font=("Arial", 15))
+    text_rotation.grid(column= 1, row = 1, sticky="nsw")
+
+    text_tid = tk.Label(Data, text="Total körningstid: ", font=("Arial", 15))
+    text_tid.grid(column= 1, row = 2, sticky="nsw")
 
 
     ###############################################################
@@ -460,7 +472,77 @@ def update_joint(current_joint):
     servo.update()
 
 
-   
+def display_sensor_value(sensor, value):
+    global text_lateral, text_gas, text_varor, text_IR, text_rotation, text_tid
+    if sensor == "IR":
+        text_IR.config(text="Avstånd till hinder: " + value)
+    elif sensor == "Reflex":
+        text_lateral.config(text="Lateral position: " + value)
+    elif sensor == "Gas":
+        text_gas.config(text="Gaspådrag: " + value)
+    elif sensor == "Gyro":
+        text_rotation.config(text="Rotation platta: " + value)
+    elif sensor == "Time":
+        text_tid.config(text="Total körningstid: " + value)
+
+
+
+
+
+
+def data_loop(window):
+    if not bc.gather_data:
+        window.after(100, lambda: data_loop(window))
+        return
+    try:
+        IR_data = bt.send_and_receive(0x60)
+    except:
+        print("IR misslyckat")
+    display_sensor_value("IR", str(IR_data))
+
+    try:
+        Reflex_data = bt.send_and_receive(0x61)
+        Reflex_data = 6 - Reflex_data/2
+    except:
+        print("Reflex misslyckat")
+    display_sensor_value("Reflex", str(Reflex_data))
+
+    try:
+        leftgas = bt.send_and_receive(0x66)
+    except:
+        print("Vänster gas misslyckat")
+
+    try:    
+        rightgas = bt.send_and_receive(0x65)
+    except:
+        print("Höger gas misslyckat")
+    gas_value = str(leftgas) + ", " + str(rightgas)
+    display_sensor_value("Gas", gas_value)
+
+    try:
+        Gyro_data = bt.send_and_receive(0x62)
+    except:
+        print("Gyro misslyckat")
+    display_sensor_value("Gyro", str(Gyro_data))
+    
+
+    
+    window.after(100, lambda: data_loop(window))
+
+
+def timer(window):
+    print("timer kör")
+    print(timeractive)
+    if timeractive:
+        timenow = time.time()
+        elapsed_time = round(timenow - timestart, 0)
+        display_sensor_value("Time", str(elapsed_time))
+    else:
+        display_sensor_value("Time", "---")
+    window.after(1000, lambda: timer(window))
+
+
+
 
 def windowclosed():
     try:

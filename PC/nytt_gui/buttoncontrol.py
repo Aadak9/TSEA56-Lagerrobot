@@ -1,6 +1,6 @@
 import bluetooth as bt
 import draw_gui as dg
-
+import time
 
 global pressed_keys
 pressed_keys = list()
@@ -8,7 +8,8 @@ global autonom_active
 autonom_active = False
 global current_joint
 current_joint = 1
-
+global gather_data
+gather_data = False
 
 
 def update_action():
@@ -197,10 +198,13 @@ def auto_pressed():
     return
 
 def manuell_pressed():
-    #global buttonManuell, buttonAuto, Kontrollruta, Lager, Canvas, ruta1, ruta3, buttonStartdata
     global autonom_active
     autonom_active = False
-    
+    try:
+        bt.sendbyte(99) #Växla läge
+    except:
+        print("kunde inte växla läge till manuellt")
+
     manuell_active_color = dg.buttonManuell.cget("bg")
     if manuell_active_color == "grey":
         dg.buttonAuto.config(bg="grey")
@@ -214,7 +218,7 @@ def manuell_pressed():
 
         for widget in dg.Lager.winfo_children():
             try:
-                widget.config(state="disbaled")
+                widget.config(state="disabled")
             except:
                 pass
 
@@ -244,10 +248,20 @@ def manuell_pressed():
 def start_pressed():
     
     start_active_color = dg.buttonStart.cget("bg")
-
+    try:
+        bt.sendbyte(99) #Växla läge
+    except:
+        print("kunde inte växla läge")
     if start_active_color == "green":
-        #start_receive_data()
-       # activate_auto = bt.sendbyte(0x40)
+        dg.timestart = time.time()
+        dg.timeractive = True
+        dg.timer(dg.window)
+        global gather_data
+        gather_data = True
+        try:
+            bt.sendbyte(0x40) #startar autonomt läge
+        except:
+            print("kunde inte starta autonomt läge")
         dg.buttonStart.config(bg="red")
         dg.buttonStart.config(text="Avbryt")
 
@@ -279,8 +293,13 @@ def start_pressed():
 
 
     elif start_active_color == "red":
-        #stop_receive_data()
-        #cancel_auto = bt.sendbyte(0x41)
+        gather_data = False
+        dg.timeractive = False
+        dg.timer(dg.window)
+        try:
+            bt.sendbyte(0x41) #Avbryt autonomt
+        except:
+            print("kunde inte avsluta autonomt läge")
         dg.buttonStart.config(bg="green")
         dg.buttonStart.config(text="Start")
         dg.Lager.config(highlightbackground="green", highlightcolor ="green")
@@ -308,6 +327,24 @@ def start_pressed():
                 widget.config(state="normal")
             except:
                 pass
+
+def startdata_pressed():
+    global gather_data
+    data_active_color = dg.buttonStartdata.cget("bg")
+
+    if data_active_color == "green":
+        gather_data = True
+        dg.buttonStartdata.config(bg="red")
+        dg.buttonStartdata.config(text="Avbryt data")
+        
+
+    elif data_active_color == "red":
+        gather_data = False
+        dg.buttonStartdata.config(bg="green")
+        dg.buttonStartdata.config(text="Start data")
+
+
+
 
 
 def calibrate_sensor():

@@ -6,13 +6,15 @@ def main():
 
     bt.bluetoothinit()
 
-    
-    window = tk.Tk()
-    dg.draw_gui(window)
+    global window
+    dg.draw_gui(dg.window)
     print("drawguid")
     dg.draw_lager()
     print("lagerdrawed")
-    window.mainloop()
+    dg.data_loop(dg.window)
+    #dg.timer(dg.window)    
+    dg.window.mainloop()
+
 
 
 main()
