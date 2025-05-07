@@ -52,7 +52,7 @@ int main()
 		init_line_front();
 		line_front = read_line_front(reflex_high);
 		
-		roadmark_send = (line_front >> 6) & (0x03);					// Roadmark bits to the right.
+		roadmark_send = (line_front >> 6) & (0x03);			// Roadmark bits to the right.
 		line_front_send = line_front & (0x3F);				// MSB to 0. 
 
 		init_line_back();

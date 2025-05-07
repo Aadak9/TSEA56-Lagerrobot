@@ -74,7 +74,7 @@ int8_t read_line_back(int reflex_high)
 		PORTD |= 0x10;														// Start sensor.
 		
 
-		indata = is_active_reflex(reflex_high - 1);								// 1 if current sensor sees tape, 0 otherwise.
+		indata = is_active_reflex(reflex_high);								// 1 if current sensor sees tape, 0 otherwise.
 		PORTD &= 0xEF;														// Turn off sensor.
 		
 		sum += indata;									
@@ -113,3 +113,4 @@ void reset_w()
 {
 	w_int = 0;																// Resets w_int after gyro is done.
 }
+
