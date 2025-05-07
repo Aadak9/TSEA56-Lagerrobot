@@ -26,7 +26,6 @@ def update_action():
     elif((button == "W" and button2 == "D") or (button == "D" and button2 == "W")):
         bt.sendbyte(6)
     elif(button=="W"):
-        print("test")
         bt.sendbyte(1)
     elif(button=="A"):
         bt.sendbyte(2)
@@ -200,10 +199,6 @@ def auto_pressed():
 def manuell_pressed():
     global autonom_active
     autonom_active = False
-    try:
-        bt.sendbyte(99) #Växla läge
-    except:
-        print("kunde inte växla läge till manuellt")
 
     manuell_active_color = dg.buttonManuell.cget("bg")
     if manuell_active_color == "grey":
@@ -249,7 +244,7 @@ def start_pressed():
     
     start_active_color = dg.buttonStart.cget("bg")
     try:
-        bt.sendbyte(99) #Växla läge
+        bt.sendbyte(0x99) #Växla läge
     except:
         print("kunde inte växla läge")
     if start_active_color == "green":
@@ -258,10 +253,6 @@ def start_pressed():
         dg.timer(dg.window)
         global gather_data
         gather_data = True
-        try:
-            bt.sendbyte(0x40) #startar autonomt läge
-        except:
-            print("kunde inte starta autonomt läge")
         dg.buttonStart.config(bg="red")
         dg.buttonStart.config(text="Avbryt")
 
@@ -296,10 +287,6 @@ def start_pressed():
         gather_data = False
         dg.timeractive = False
         dg.timer(dg.window)
-        try:
-            bt.sendbyte(0x41) #Avbryt autonomt
-        except:
-            print("kunde inte avsluta autonomt läge")
         dg.buttonStart.config(bg="green")
         dg.buttonStart.config(text="Start")
         dg.Lager.config(highlightbackground="green", highlightcolor ="green")

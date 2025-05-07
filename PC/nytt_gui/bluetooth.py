@@ -25,7 +25,7 @@ def sendbyte(byte):
 
 def receive_data():
     try:
-        data = s.recv(1)  # Vänta på att ta emot 1 byte
+        data = s.recv(1024)  # Vänta på att ta emot 1 byte
         if data:
             return data[0]  # Återvänd med den mottagna byten
     except Exception as e:

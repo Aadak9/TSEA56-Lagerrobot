@@ -201,7 +201,7 @@ def draw_gui(window):
     text_rotation = tk.Label(Data, text="Rotation platta: ", font=("Arial", 15))
     text_rotation.grid(column= 1, row = 1, sticky="nsw")
 
-    text_tid = tk.Label(Data, text="Total körningstid: ", font=("Arial", 15))
+    text_tid = tk.Label(Data, text="Total körningstid: --- ", font=("Arial", 15))
     text_tid.grid(column= 1, row = 2, sticky="nsw")
 
 
@@ -531,14 +531,11 @@ def data_loop(window):
 
 
 def timer(window):
-    print("timer kör")
-    print(timeractive)
     if timeractive:
         timenow = time.time()
         elapsed_time = round(timenow - timestart, 0)
         display_sensor_value("Time", str(elapsed_time))
-    else:
-        display_sensor_value("Time", "---")
+
     window.after(1000, lambda: timer(window))
 
 

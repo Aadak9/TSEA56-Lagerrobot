@@ -11,8 +11,7 @@ def main():
     print("drawguid")
     dg.draw_lager()
     print("lagerdrawed")
-    dg.data_loop(dg.window)
-    #dg.timer(dg.window)    
+    dg.data_loop(dg.window)   
     dg.window.mainloop()
 
 
