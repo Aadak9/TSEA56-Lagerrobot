@@ -525,7 +525,7 @@ def data_loop(window):
         print("Gyro misslyckat")
     display_sensor_value("Gyro", str(Gyro_data))
     
-
+    print("letar data")
     
     window.after(100, lambda: data_loop(window))
 

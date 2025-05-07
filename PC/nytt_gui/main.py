@@ -5,8 +5,6 @@ import bluetooth as bt
 def main():
 
     bt.bluetoothinit()
-
-    global window
     dg.draw_gui(dg.window)
     print("drawguid")
     dg.draw_lager()

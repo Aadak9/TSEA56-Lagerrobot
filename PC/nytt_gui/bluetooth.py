@@ -2,10 +2,11 @@ import socket
 import time
 import threading
 
+bluetoothlock = threading.Lock()
+
 def bluetoothinit():
     global s
     s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-    #s.settimeout(0.1)
     try:
         s.connect(('B8:27:EB:E9:12:27', 4))
         print("Ansluten till raspberry pi")
@@ -25,7 +26,7 @@ def sendbyte(byte):
 
 def receive_data():
     try:
-        data = s.recv(1024)  # Vänta på att ta emot 1 byte
+        data = s.recv(1)  # Vänta på att ta emot 1 byte
         if data:
             return data[0]  # Återvänd med den mottagna byten
     except Exception as e:
@@ -34,6 +35,7 @@ def receive_data():
   
 
 def send_and_receive(command):
+    #with bluetoothlock:
     try:
         sendbyte(command)
         received = receive_data()
