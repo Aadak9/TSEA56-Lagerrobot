@@ -14,7 +14,8 @@ main.d main.o: .././main.c .././init.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
- .././Motorcontrol.h .././Servocontrol.h .././SPI.h
+ .././Motorcontrol.h .././Servocontrol.h .././SPI.h \
+ .././Kommunikations_Definitioner.h
 
 .././init.h:
 
@@ -53,3 +54,5 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 .././Servocontrol.h:
 
 .././SPI.h:
+
+.././Kommunikations_Definitioner.h:

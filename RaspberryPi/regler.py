@@ -1,8 +1,8 @@
 import time
 
-def PDController(error, previous_error, KP, KD, dt):
-	proportional = KP * error
-	derivative = KD *(error - previous_error) / dt
+def PDController(front_error, back_error, KP, KD):
+	derivative = KD * (front_error - back_error)
+	proportional = KP * back_error
 	output = proportional + derivative
 	return output
 

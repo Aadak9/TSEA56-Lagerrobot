@@ -1,13 +1,16 @@
+/*
+ * convert.h
+ *
+ * Created: 2025-04-02 15:58:02
+ * Author : andno773, sigry751
+ */
+
 #ifndef CONVERT_H
 #define CONVERT_H
 
-uint8_t AD_convert();
-float digital_to_volt(int digital_out);
-int convert_uint8_t(uint8_t num);
-int is_active_reflex();
-int volt_to_dist(int digital_out);
-int dist_table(int indata);
-int w_table(int indata);
-int linear_interpolation(int indata);
+uint8_t AD_convert();								// AD converting.
+float digital_to_volt(int digital_out);				// Translate AD value to volt.					
+int is_active_reflex(int reflex_high);				// Return 0 for no tape, 1 for tape.
+int linear_interpolation(int indata);				// Linear interpolation to get distance from IR-sensor.
 
 #endif

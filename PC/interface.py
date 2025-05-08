@@ -1,6 +1,7 @@
 import tkinter as tk
 import Bluetooth as bt
-
+import threading
+import receive_data as rd
 
 global lagerbredd
 lagerbredd = 3
@@ -8,10 +9,33 @@ lagerbredd = 3
 global lagerhöjd
 lagerhöjd = 3
 
+global current_joint
+current_joint = 1
 
+autonom_active = False
 
-def buttonpressed(button):
-    if(button=="W"):
+try:
+    bt.sendbyte(0x20)
+    bt.sendbyte(current_joint) 
+except:
+    pass
+########## MÅSTE FIXA I RASPBERRY SÅ ATT DEN TAR EMOT OCH SKICKAR CURRENT_JOINT OCKSÅ
+#test
+
+def update_action():
+    global current_joint
+    button = pressed_keys[-1]
+    try:
+        button2 = pressed_keys[-2]
+    except:
+        button2 = button
+    if((button == "W" and button2 == "A") or (button == "A" and button2 == "W")):
+        print("test2")
+        bt.sendbyte(5)
+    elif((button == "W" and button2 == "D") or (button == "D" and button2 == "W")):
+        bt.sendbyte(6)
+    elif(button=="W"):
+        print("test")
         bt.sendbyte(1)
     elif(button=="A"):
         bt.sendbyte(2)
@@ -19,22 +43,20 @@ def buttonpressed(button):
         bt.sendbyte(3)
     elif(button=="D"):
         bt.sendbyte(4)
-    elif(button=="Q"):
-        bt.sendbyte(0x14)
-    elif(button=="E"):
-        bt.sendbyte(0x15)
     elif(button=="Y"):
-        if(int(servo.cget("text")[6]) < 5):
-            new_number = int(servo.cget("text")[6]) + 1
-            servo.config(text="Servo " + str(new_number))
+        if(current_joint < 6):
+            current_joint += 1
+            servo.config(text="Servo " + str(current_joint))
             servo.update()
             bt.sendbyte(0x20)
+            bt.sendbyte(current_joint)
     elif(button=="H"):
-        if(int(servo.cget("text")[6]) > 1):
-            new_number = int(servo.cget("text")[6]) - 1
-            servo.config(text="Servo " + str(new_number))
+        if(current_joint > 1):
+            current_joint -= 1
+            servo.config(text="Servo " + str(current_joint))
             servo.update()
-            bt.sendbyte(0x21)
+            bt.sendbyte(0x20)
+            bt.sendbyte(current_joint)
     elif(button=="Z"):
         bt.sendbyte(0x31)
     elif(button=="C"):
@@ -45,19 +67,47 @@ def buttonpressed(button):
 
 
 
-def on_key_press(event):
-    key = event.keysym.lower()
-    if key in ["w", "a", "s", "d", "q", "e", "y", "h", "z", "c"] and (key not in pressed_keys):
-        pressed_keys.add(key)
-        buttonpressed(key.upper()) 
 
-def on_key_release(event):
-    key = event.keysym.lower()
+
+
+def on_key_press(event):
+    key = event.keysym.upper()
+    global autonom_active
+    if autonom_active:
+        return #ej möjliggöra knapptryck i autonomt läge
+    if key in ["W", "A", "S", "D", "Q", "E", "Y", "H", "Z", "C"] and (key not in pressed_keys):
+        pressed_keys.append(key)
+        update_action()
+    
+    
+    
+
+def on_key_release(event): #Manuell styrning höger+framåt osv löses säkert här
+    key = event.keysym.upper()
     if key in pressed_keys:
         pressed_keys.remove(key)
+        if(len(pressed_keys) > 0):
+            update_action()
+        else:
+            all_keys_released()
     
     if not pressed_keys:
         all_keys_released()
+
+
+# Simulated key event for press/release
+def simulate_key_event(key, action):
+    event = type('Event', (object,), {'keysym': key})
+    if action == 'press':
+        on_key_press(event)
+    elif action == 'release':
+        on_key_release(event)
+
+
+
+
+
+
 
 def all_keys_released():
     bt.sendbyte(0)
@@ -102,7 +152,11 @@ def reset_lager():
 
 
 
-def get_sensordata(): #hämta sensordata från IR och uppdatera i GUI
+def get_sensordata(data_list): #hämta sensordata från IR och uppdatera i GUI
+    text4.config(text=f"Avstånd till hinder: {data_list[0]}")
+    text1.config(text=f"Rotation platta: {data_list[2]}")
+    text5.config(text=f"Lateral position: {data_list[1]}")
+    text2.config(text=f"Gaspådrag: {data_list[4]}, {data_list[3]}")
 
     global ir_data
     #ir_data += 1
@@ -113,11 +167,209 @@ def get_sensordata(): #hämta sensordata från IR och uppdatera i GUI
         print("Kunde inte hämta sensordata")
    # bt.sendbyte(0x01)  #Reflex
     # bt.sendbyte(0x02)  #Gyro
+    return
 
-    window.after(100, get_sensordata)
 
-ir_data = 0
 
+def auto_pressed():
+    global autonom_active
+    auto_active_color = buttonAuto.cget("bg")
+    if auto_active_color == "grey":
+        autonom_active = True
+
+        buttonAuto.config(bg="green")
+        buttonManuell.config(bg="grey")
+        Lager.config(highlightbackground="green", highlightcolor ="green")
+        Lagerknapp.config(highlightbackground="green", highlightcolor ="green")
+        Kontrollruta.config(highlightbackground="grey", highlightcolor ="grey")
+        Lager.config(bg="SystemButtonFace")
+        Canvas.config(bg="SystemButtonFace")
+        Lagerknapp.config(bg="SystemButtonFace")
+
+        for widget in Lager.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+
+        for widget in Lagerknapp.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+       
+        for ruta in [ruta1, ruta3]:
+            ruta.config(bg="#d3d3d3")
+            for widget in ruta.winfo_children():
+                try:
+                    widget.config(state="disabled")
+                except:
+                    pass
+
+        
+
+        buttonStart.pack(fill="both", expand=True, padx=1, pady=1)            
+        buttonStart.lift()
+        buttonStart.config(bg="green")
+        buttonStartdata.pack_forget()
+
+
+    elif (auto_active_color == "green"):
+        autonom_active = False
+        buttonAuto.config(bg="green")
+        buttonManuell.config(bg="grey")
+    
+    return
+
+def manuell_pressed():
+    global autonom_active
+    autonom_active = False
+    
+    manuell_active_color = buttonManuell.cget("bg")
+    if manuell_active_color == "grey":
+        buttonAuto.config(bg="grey")
+        buttonManuell.config(bg="green")
+        Lager.config(highlightbackground="grey", highlightcolor ="grey")
+        Lagerknapp.config(highlightbackground="grey", highlightcolor ="grey")
+        Kontrollruta.config(highlightbackground="green", highlightcolor ="green")
+        Lager.config(bg="#d3d3d3")
+        Canvas.config(bg="#d3d3d3")
+        Lagerknapp.config(bg="#d3d3d3")
+
+        for widget in Lager.winfo_children():
+            try:
+                widget.config(state="disbaled")
+            except:
+                pass
+
+        for widget in Lagerknapp.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+        for ruta in [ruta1, ruta3]:
+            ruta.config(bg="SystemButtonFace")
+            for widget in ruta.winfo_children():
+                try:
+                    widget.config(state="normal")
+                except:
+                    pass
+
+        buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
+        buttonStartdata.lift()          
+        buttonStart.pack_forget()
+
+    elif (manuell_active_color == "green"):
+        buttonAuto.config(bg="grey")
+        buttonManuell.config(bg="green")
+    return
+
+def start_pressed():
+    start_active_color = buttonStart.cget("bg")
+
+    if start_active_color == "green":
+        start_receive_data()
+       # activate_auto = bt.sendbyte(0x40)
+        buttonStart.config(bg="red")
+        buttonStart.config(text="Avbryt")
+
+        Lager.config(highlightbackground="red", highlightcolor ="red")
+        Lagerknapp.config(highlightbackground="red", highlightcolor ="red")
+
+        for widget in Lager.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+        for widget in Lagerknapp.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+        for widget in Autoknapp.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+        for widget in Manuellknapp.winfo_children():
+            try:
+                widget.config(state="disabled")
+            except:
+                pass
+
+
+    elif start_active_color == "red":
+        stop_receive_data()
+        #cancel_auto = bt.sendbyte(0x41)
+        buttonStart.config(bg="green")
+        buttonStart.config(text="Start")
+        Lager.config(highlightbackground="green", highlightcolor ="green")
+        Lagerknapp.config(highlightbackground="green", highlightcolor ="green")
+
+        for widget in Lager.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+
+        for widget in Lagerknapp.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+
+        for widget in Autoknapp.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+        for widget in Manuellknapp.winfo_children():
+            try:
+                widget.config(state="normal")
+            except:
+                pass
+
+def startdata_pressed():
+    data_active_color = buttonStartdata.cget("bg")
+
+    if data_active_color == "green":
+        buttonStartdata.config(bg="red")
+        buttonStartdata.config(text="Avbryt data")
+        start_receive_data()
+
+    elif data_active_color == "red":
+        stop_receive_data()
+        buttonStartdata.config(bg="green")
+        buttonStartdata.config(text="Start data")
+
+def calibrate_sensor():
+    bt.sendbyte(0x67)
+
+
+def start_receive_data():
+    global running
+    running = True
+    bt.sendbyte(0x63)
+    thread = threading.Thread(target=start_data_collection)
+    thread.daemon = True
+    thread.start()
+
+def stop_receive_data():
+    bt.sendbyte(0x64)
+    global running
+    running = False
+    start_data_collection()
+
+def start_data_collection():
+    global running
+    while running:
+        data_list = rd.receive_and_save_data()
+        get_sensordata(data_list)
+    if not running:
+        rd.stop_data_collection()
 
 bt.bluetoothinit()
 
@@ -133,9 +385,10 @@ window.update()
 winwidth = window.winfo_width()
 winheight = window.winfo_height()
 
-###############################################################
-###############################################################
 
+
+###############################################################
+###############################################################
 
 # Lagerknapp-rutan
 lagerknapp_width = winwidth * 0.45
@@ -143,10 +396,9 @@ lagerknapp_height = winheight*0.15
 lagerknapp_x = winwidth*0.04
 lagerknapp_y = (winheight - winheight*0.75)/2
 
-Lagerknapp = tk.Frame(master=window, width=lagerknapp_width, height=lagerknapp_height, bd=1, relief="solid", padx=4, pady=4)
+Lagerknapp = tk.Frame(master=window, width=lagerknapp_width, height=lagerknapp_height, bd=1, relief="solid", padx=4, pady=4, highlightthickness=6)
 Lagerknapp.place(x=lagerknapp_x, y=lagerknapp_y)
 Lagerknapp.grid_propagate(False)
-
 
 Lagerknapp.grid_rowconfigure(0, weight=1)
 Lagerknapp.grid_rowconfigure(1, weight=1)
@@ -156,6 +408,7 @@ Lagerknapp.grid_columnconfigure(1, weight=1)
 Lagerknapp.grid_columnconfigure(2, weight=30)
 
 
+Lagerknapp.config(bg="#d3d3d3")
 
 
 
@@ -168,9 +421,99 @@ lager_height = winheight * 0.56
 lager_x = winwidth * 0.04
 lager_y = (winheight + lagerknapp_height - lager_height) / 2
 
-Lager = tk.Frame(master=window, width=lager_width, height=lager_height, bd=1, relief="solid", padx=4, pady=4)
+Lager = tk.Frame(master=window, width=lager_width, height=lager_height, bd=1, relief="solid", padx=4, pady=4, highlightthickness=6)
 Lager.place(x=lager_x, y= lager_y)
 
+Lager.config(bg="#d3d3d3")
+
+
+###############################################################
+###############################################################
+
+#autonoma start-knappen
+
+autoknapp_width = lagerknapp_width/2
+autoknapp_height = winheight*0.075
+autoknapp_x = winwidth*0.04
+autoknapp_y = winheight*0.04
+
+Autoknapp = tk.Frame(master=window, width=autoknapp_width, height=autoknapp_height, bd=0, relief="solid", padx=4, pady=4)
+Autoknapp.place(x=autoknapp_x, y=autoknapp_y)
+Autoknapp.pack_propagate(False)
+
+buttonAuto = tk.Button(Autoknapp, text="Autonomt", bg="grey", fg="white", font=("Arial", 16), command=auto_pressed)
+buttonAuto.pack(fill="both", expand=True, padx=1, pady=1)
+
+###############################################################
+###############################################################
+
+#start-knappen
+
+startknapp_width = autoknapp_width/2
+startknapp_height = autoknapp_height
+startknapp_x = winwidth*0.835
+startknapp_y = winheight*0.04
+
+Startknapp = tk.Frame(master=window, width=startknapp_width, height=startknapp_height, bd=0, relief="solid",bg=window.cget("bg"), padx=4, pady=4)
+Startknapp.place(x=startknapp_x, y=startknapp_y)
+Startknapp.pack_propagate(False)
+
+buttonStart = tk.Button(Startknapp, text="Start", bg="grey", fg="white", font=("Arial", 16), command=start_pressed)
+buttonStart.pack(fill="both", expand=True, padx=1, pady=1)
+
+buttonStart.pack_forget()
+
+###############################################################
+###############################################################
+
+#manuell-knappen
+
+manuellknapp_width = lagerknapp_width/2
+manuellknapp_height = winheight*0.075
+manuellknapp_x = lagerknapp_width/2 + autoknapp_x
+manuellknapp_y = winheight*0.04
+
+Manuellknapp = tk.Frame(master=window, width=manuellknapp_width, height=manuellknapp_height, bd=0, relief="solid", padx=4, pady=4)
+Manuellknapp.place(x=manuellknapp_x, y=manuellknapp_y)
+Manuellknapp.pack_propagate(False)
+
+buttonManuell = tk.Button(Manuellknapp, text="Manuellt", bg="green", fg="white", font=("Arial", 16), command=manuell_pressed)
+buttonManuell.pack(fill="both", expand=True, padx=1, pady=1)
+
+###############################################################
+###############################################################
+
+#startdata-knappen
+
+startdataknapp_width = autoknapp_width/2
+startdataknapp_height = autoknapp_height
+startdataknapp_x = winwidth*0.51
+startdataknapp_y = winheight*0.04
+
+Startdataknapp = tk.Frame(master=window, width=startdataknapp_width, height=startdataknapp_height, bd=0, relief="solid",bg=window.cget("bg"), padx=4, pady=4)
+Startdataknapp.place(x=startdataknapp_x, y=startdataknapp_y)
+Startdataknapp.pack_propagate(False)
+
+buttonStartdata = tk.Button(Startdataknapp, text="Starta data", bg="green", fg="white", font=("Arial", 16), command=startdata_pressed)
+buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
+
+
+###############################################################
+###############################################################
+
+#kalibrerings-knappen
+
+kalibreringknapp_width = autoknapp_width
+kalibreringknapp_height = autoknapp_height
+kalibreringknapp_x = winwidth*0.62
+kalibreringknapp_y = winheight*0.04
+
+Kalibreringknapp = tk.Frame(master=window, width=kalibreringknapp_width, height=kalibreringknapp_height, bd=0, relief="solid",bg=window.cget("bg"), padx=4, pady=4)
+Kalibreringknapp.place(x=kalibreringknapp_x, y=kalibreringknapp_y)
+Kalibreringknapp.pack_propagate(False)
+
+buttonKalibrering = tk.Button(Kalibreringknapp, text="Kalibrera linjesensor", bg="green", fg="white", font=("Arial", 16), command=calibrate_sensor)
+buttonKalibrering.pack(fill="both", expand=True, padx=1, pady=1)
 
 ###############################################################
 ###############################################################
@@ -200,12 +543,14 @@ text2.grid(column= 0, row = 1, sticky="nsw")
 text3 = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
 text3.grid(column= 0, row = 2, sticky="nsw")
 
-
-text4 = tk.Label(Data, text=f"Avstånd till hinder: {ir_data}", font=("Arial", 15))
+text4 = tk.Label(Data, text=f"Avstånd till hinder: ", font=("Arial", 15))
 text4.grid(column= 1, row = 0, sticky="nsw")
 
 text5 = tk.Label(Data, text="Rotation platta: ", font=("Arial", 15))
 text5.grid(column= 1, row = 1, sticky="nsw")
+
+text6 = tk.Label(Data, text="Total körningstid: ", font=("Arial", 15))
+text6.grid(column= 1, row = 2, sticky="nsw")
 
 
 ###############################################################
@@ -218,15 +563,15 @@ kontroll_height = winheight * 0.53
 kontroll_x = winwidth * 0.51
 kontroll_y = ((winheight - winheight*0.75) / 2 + winheight*0.75 - kontroll_height)
 
-Kontrollruta = tk.Frame(master=window, width=kontroll_width, height=kontroll_height, bd=1, relief="solid", padx=4, pady=4)
+Kontrollruta = tk.Frame(master=window, width=kontroll_width, height=kontroll_height, bd=1, relief="solid", highlightthickness=6, padx=4, pady=4)
 Kontrollruta.grid_propagate(False)
+Kontrollruta.config(highlightbackground="green", highlightcolor="green")
 
 Kontrollruta.place(x=kontroll_x, y=kontroll_y)
 
 Kontrollruta.grid_rowconfigure(0, weight=1)
 Kontrollruta.grid_rowconfigure(1, weight=1)
 Kontrollruta.grid_columnconfigure(0, weight=1)
-Kontrollruta.grid_columnconfigure(1, weight=1)
 
 
 
@@ -242,10 +587,6 @@ ruta1.grid_columnconfigure(0, uniform=True)
 ruta1.grid_columnconfigure(1, uniform=True)
 ruta1.grid_columnconfigure(2, uniform=True)
 ruta1.grid_rowconfigure(1, uniform=True)
-
-
-ruta2 = tk.Frame(Kontrollruta, relief="solid", bd = 2)
-ruta2.grid(row=0, column=1, rowspan=2, sticky="nsew")
 
 
 ruta3 = tk.Frame(Kontrollruta, relief="solid", bd = 2)
@@ -265,93 +606,93 @@ textC.grid(column= 0, row = 0, sticky="nsw")
 textR = tk.Label(Lagerknapp, text="Rader: ", font=("Arial", 15))
 textR.grid(column= 0, row = 1, sticky="nsw")
 
-buttonaddW = tk.Button(Lagerknapp, text="+", width =8, height=4, command=lambda: increase_lager_width())
+buttonaddW = tk.Button(Lagerknapp, text="+", font=("Arial", 15), width =6, height=2, command=lambda: increase_lager_width())
 buttonaddW.grid(row = 0, column=2, padx=5, pady= 5)
 
 textW = tk.Label(Lagerknapp, text=lagerbredd, font=("Arial", 15))
 textW.grid(row = 0, column=1)
 
-buttonsubW = tk.Button(Lagerknapp, text="-", width =8, height=4, command=lambda: decrease_lager_width())
+buttonsubW = tk.Button(Lagerknapp, text="-", font=("Arial", 15), width =6, height=2, command=lambda: decrease_lager_width())
 buttonsubW.grid(row = 0, column=0, padx=5, pady= 5)
 
 
-buttonaddH = tk.Button(Lagerknapp, text="+", width =8, height=4, command=lambda: increase_lager_height())
+buttonaddH = tk.Button(Lagerknapp, text="+",  font=("Arial", 15), width =6, height=2, command=lambda: increase_lager_height())
 buttonaddH.grid(row = 1, column=2, padx=5, pady= 5)
 
 textH = tk.Label(Lagerknapp, text=lagerhöjd, font=("Arial", 15))
 textH.grid(row = 1, column=1)
 
-buttonsubH = tk.Button(Lagerknapp, text="-", width =8, height=4, command=lambda: decrease_lager_height())
+buttonsubH = tk.Button(Lagerknapp, text="-", font=("Arial", 15), width =6, height=2, command=lambda: decrease_lager_height())
 buttonsubH.grid(row = 1, column=0, padx=5, pady= 5)
 
 resetbutton = tk.Button(Lagerknapp, text="Reset", width =8, height=4, command=lambda: reset_lager())
 resetbutton.grid(row = 2, column=1, padx=5, pady= 5)
 
+for widget in Lagerknapp.winfo_children():
+    try:
+        widget.config(state="disabled")
+    except:
+        pass
 
 # INNEHÅLL RUTA1
 
-buttonq = tk.Button(ruta1, text="Q", width =8, height=4, command=lambda: buttonpressed("Q"))
-buttonq.grid(row = 1, column=0, padx=5, pady= 5)
 
-buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: buttonpressed("E"))
-buttone.grid(row = 1, column=2, padx=5, pady= 5)
-
-buttone = tk.Button(ruta1, text="E", width =8, height=4, command=lambda: decrease_lager_width())
-buttone.grid(row = 1, column=2, padx=5, pady= 5)
-
-buttonw = tk.Button(ruta1, text= "W", width =8, height=4, command=lambda: buttonpressed("W"))
+buttonw = tk.Button(ruta1, text= "W", width =8, height=4)
 buttonw.grid(row = 1, column=1, padx=5, pady= 5)
+buttonw.bind("<ButtonPress-1>", lambda e: simulate_key_event("w", "press"))
+buttonw.bind("<ButtonRelease-1>", lambda e: simulate_key_event("w", "release"))
 
-buttona = tk.Button(ruta1, text= "A", width =8, height=4, command=lambda: buttonpressed("A"))
+buttona = tk.Button(ruta1, text= "A", width =8, height=4)
 buttona.grid(row = 2, column=0, padx=5, pady= 5)
+buttona.bind("<ButtonPress-1>", lambda e: simulate_key_event("a", "press"))
+buttona.bind("<ButtonRelease-1>", lambda e: simulate_key_event("a", "release"))
 
-buttons = tk.Button(ruta1, text= "S", width =8, height=4, command=lambda: buttonpressed("S"))
+
+buttons = tk.Button(ruta1, text= "S", width =8, height=4)
 buttons.grid(row = 2, column=1, padx=5, pady= 5)
+buttons.bind("<ButtonPress-1>", lambda e: simulate_key_event("s", "press"))
+buttons.bind("<ButtonRelease-1>", lambda e: simulate_key_event("s", "release"))
 
-buttond = tk.Button(ruta1, text= "D", width =8, height=4, command=lambda: buttonpressed("D"))
+buttond = tk.Button(ruta1, text= "D", width =8, height=4)
 buttond.grid(row = 2, column=2, padx=5, pady= 5)
+buttond.bind("<ButtonPress-1>", lambda e: simulate_key_event("d", "press"))
+buttond.bind("<ButtonRelease-1>", lambda e: simulate_key_event("d", "release"))
 
 platta = tk.Label(ruta1, text="Platta", font=("Arial", 15))
 platta.grid(column= 1, row = 0)
 
-pressed_keys = set()
+pressed_keys = list()
 
 
-# INNEHÅLL RUTA2
 
-gripklotext = tk.Label(ruta2, text="Gripklo", font=("Arial", 15))
-gripklotext.pack(pady=5)
-
-button_open = tk.Button(ruta2, text="Öppna", width =20, height=3, command=lambda: buttonpressed("Öppna"))
-button_open.pack(padx=30, pady=25)
-
-button_close = tk.Button(ruta2, text="Stäng", width =20, height=3, command=lambda: buttonpressed("Stäng"))
-button_close.pack(padx=30, pady=25)
-
-button_turnright = tk.Button(ruta2, text="Vrid höger", width =20, height=3, command=lambda: buttonpressed("Vrid höger"))
-button_turnright.pack(padx=30, pady=25)
-
-button_turnleft = tk.Button(ruta2, text="Vrid vänster", width =20, height=3, command=lambda: buttonpressed("Vrid vänster"))
-button_turnleft.pack(padx=30, pady=25)
 
 
 
 # INNEHÅLL RUTA3
 
-button_minus = tk.Button(ruta3, text="-", font=("Arial", 20), width =3, height=1, command=lambda: buttonpressed("-"))
+button_minus = tk.Button(ruta3, text="- (H)", font=("Arial", 15), width =7, height=1)
 button_minus.grid(row = 1, column=0, padx=5, pady= 5)
+button_minus.bind("<ButtonPress-1>", lambda e: simulate_key_event("-", "press"))
+button_minus.bind("<ButtonRelease-1>", lambda e: simulate_key_event("-", "release"))
 
-servo = tk.Label(ruta3, text="Servo 1", font=("Arial", 15))
+servo = tk.Label(ruta3, text="Led " + str(current_joint), font=("Arial", 15))
 servo.grid(row=1, column=1)
 
-button_plus = tk.Button(ruta3, text="+", font=("Arial", 20), width =3, height=1, command=lambda: buttonpressed("+"))
+button_plus = tk.Button(ruta3, text="+ (Y)", font=("Arial", 15), width =7, height=1)
 button_plus.grid(row = 1, column=2, padx=5, pady= 5)
+button_plus.bind("<ButtonPress-1>", lambda e: simulate_key_event("+", "press"))
+button_plus.bind("<ButtonRelease-1>", lambda e: simulate_key_event("+", "release"))
 
-button_counterclockwise = tk.Button(ruta3, text="CCW", width =20, height=3, command=lambda: buttonpressed("CCW"))
+button_counterclockwise = tk.Button(ruta3, text="CCW (Z)", font=("Arial", 9), width =15, height=3)
 button_counterclockwise.grid(row = 2, column=0, padx=5, pady= 5)
+button_counterclockwise.bind("<ButtonPress-1>", lambda e: simulate_key_event("z", "press"))
+button_counterclockwise.bind("<ButtonRelease-1>", lambda e: simulate_key_event("z", "release"))
 
-button_clockwise = tk.Button(ruta3, text="CW", width =20, height=3, command=lambda: buttonpressed("CW"))
+
+button_clockwise = tk.Button(ruta3, text="CW (C)", font=("Arial", 9), width =15, height=3)
 button_clockwise.grid(row = 2, column=2, padx=5, pady= 5)
+button_clockwise.bind("<ButtonPress-1>", lambda e: simulate_key_event("a", "press"))
+button_clockwise.bind("<ButtonRelease-1>", lambda e: simulate_key_event("a", "release"))
 
 
 arm = tk.Label(ruta3, text="Arm", font=("Arial", 15))
@@ -381,11 +722,11 @@ def windowclosed():
 
 
 
-def draw_map():
+#def draw_map():
 #
 #
 #
-    window.after(100, draw_map)
+ #   window.after(100, draw_map)
 
 
 
@@ -399,7 +740,7 @@ def draw_map():
 
 window.update()
 window.update_idletasks()
-get_sensordata()
+#get_sensordata()
 
 
 
@@ -413,6 +754,14 @@ get_sensordata()
 Lager.update()
 Canvas = tk.Canvas(Lager, height=str(Lager.winfo_height()), width=str(Lager.winfo_width()) ,bg="white")
 Canvas.pack()
+
+Canvas.config(bg="#d3d3d3")
+
+for widget in Lager.winfo_children():
+    try:
+        widget.config(state="disabled")
+    except:
+        pass
 
 
 def draw_circle(canvas, x, y, r, color="blue"):

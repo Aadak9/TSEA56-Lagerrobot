@@ -2,9 +2,9 @@ import spidev
 import time
 import socket
 #from bluetooth_server import *
-import test_sensor
+#import test_sensor
 
-import regler
+import regler as r
 
 hostMACaddress = 'B8:27:EB:E9:12:27'
 port = 4
@@ -16,8 +16,8 @@ s.listen(1)
 spi_styr = spidev.SpiDev()
 spi_sensor = spidev.SpiDev()
 
-spi_styr.open(1, 0)
-spi_sensor.open(0, 0) #Öppna SPI-bussen
+spi_styr.open(0, 0)
+spi_sensor.open(0, 1) #Öppna SPI-bussen
 
 spi_styr.max_speed_hz = 1000000 #Ställ in klockhastighet
 spi_sensor.max_speed_hz = 1000000 #Ställ in klockhastighet
@@ -35,44 +35,142 @@ address = None
 Automatic = False
 
 last_error = 0
-KP = 0.5
-KD = 1
-time1 = time.time()
+KP = 200
+KD = -50	
+#time1 = time.time()
+status = 0
 
 ####
 # kod för att skicka data till pc från dess begäran
+if not Automatic:
+	client, address = s.accept()
+#def driving_loop():
 while True:
+
 	if Automatic:
-		reflex_data = spi_sensor.xfer2(1) # skicka 1, få tillbaka reflexdata
-		regler_error = reflex_data and 0b11111
-		if(regler_error == 0):
-			spi_styr.xfer2(1)
+		try:
+			regler_error_front = 6 - (spi_sensor.xfer2([1])[0])/2
+			time.sleep(0.01)
+			regler_error_front = 6 - (spi_sensor.xfer2([1])[0])/2
+			print(f"regler Front {regler_error_front}")
+			time.sleep(0.01)
+		except:
+			print(f"reglererror")
 			
-		else:
-			time2 = time.time()
-			output = PDController(regler_error, last_error, KP, KD, time2 - time1)
-			time1 = time.time()
-			last_error = regler_error
+		try:
+			regler_error_back = 6 - (spi_sensor.xfer2([2])[0])/2 # skicka 1, få tillbaka reflexdata
+			time.sleep(0.01)
+			regler_error_back = 6 - (spi_sensor.xfer2([2])[0])/2
+			time.sleep(0.01)
+		except:
+			print(f"reglererror")
+
+		
+		output = r.PDController(regler_error_front, regler_error_back, KP, KD)
+
+
+		output *= 100
+		output = int(output) 
+		if (output > 0):
+			status = 1
+			output = abs(output)
+		
+		high = (output >> 8) & 0xFF	
+		low = output & 0xFF
+		response = spi_styr.xfer2([0x30, status, high, low])
+		
+		try:
+			roadmark = spi_sensor.xfer2([6])[0]
+			time.sleep(0.01)
+			roadmark = spi_sensor.xfer2([6])[0]
+			time.sleep(0.01)
 			
-			spi_styr.xfer2(b'\x30')
-			spi_styr.xfer2(output.to_bytes(1, 'big'))
+			print(f"roadmark {roadmark}")
 			
+			if (roadmark == 3):
+				print("roadmark")
+				spi_sensor.xfer2([3])
+				angle = 0
+				while (angle < 60):
+					time.sleep(0.01)
+					angle = spi_sensor.xfer2([5])[0]
+					time.sleep(0.01)
+					angle = spi_sensor.xfer2([5])[0]
+					time.sleep(0.01)
+					spi_styr.xfer2([0x2])
+					print(angle)
+				spi_sensor.xfer2([4])
+		except:
+			print("Fel")
 			
 		
 	else:
-
+				
 
 		try:
-			client, address = s.accept()
-			while True:
-				data = client.recv(size)		
-				print(data)			
-				try:	
-					spi.xfer2(data)
+			
+			time.sleep(0.01)
+			data = client.recv(size).hex()
+			if(data == "20"): #Ändrar aktuell armled
+				data = client.recv(size) 
+				try:
+					response = spi_styr.xfer2([0x20] + list(data))
 				except:
-					print("invalid data")
+					print("invalid data 1")
+					
+			elif data == "60": #IR
+				spi_sensor.xfer2([0])[0]
+				time.sleep(0.01)
+				response = spi_sensor.xfer2([0])[0]
+				print(f"avstånd {response}")
+				client.send(response.to_bytes(1, 'big'))
+			elif data == "61": #Reflex
+				spi_sensor.xfer2([1])[0]
+				time.sleep(0.01)
+				response = spi_sensor.xfer2([1])[0]
+				print(f"reflex {response}")
+				client.send(response.to_bytes(1, 'big'))
+			elif data == "67": #kalibrera linjesensor
+				response = spi_sensor.xfer2([7])
+				time.sleep(0.01)
+			
+			elif data == "63": #Starta gyro
+				spi_sensor.xfer2([3])
+				time.sleep(0.01)
+			elif data == "62": #Gyro
+				response = spi_sensor.xfer2([5])[0]
+				time.sleep(0.01)
+				response = spi_sensor.xfer2([5])[0]
+				client.send(response.to_bytes(1, 'big'))
+			elif data == "64": #Stoppa gyro
+				spi_sensor.xfer2([4])
+				time.sleep(0.01)
+				
+			elif data == "65": #gaspådrag höger
+				spi_styr.xfer2([0x41])[0]
+				time.sleep(0.01)
+				response = spi_styr.xfer2([0x41])[0]
+				print(f"gas höger {response}")
+				client.send(response.to_bytes(1, 'big'))
+				
+			elif data == "66": #gaspådrag vänster
+				spi_styr.xfer2([0x40])[0]
+				time.sleep(0.01)
+				response = spi_styr.xfer2([0x40])[0]
+				print(f"gas vänster {response}")
+				client.send(response.to_bytes(1, 'big'))
+				
+			
+			else:
+				try:	
+					response = spi_styr.xfer2(bytes.fromhex(data))
+					print(response)
+				except:
+					print("invalid data 2")
+			time.sleep(0.01)
 		except:
-			print("Disconnected, looking for new socket")
+			print("Disconnected, looking for new socket")   
+			client, address = s.accept()                                                               
 		
 
 def close_connection():

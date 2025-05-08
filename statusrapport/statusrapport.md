@@ -36,42 +36,53 @@ Glöm inte att även uppdatera tidplanen.
 3. Kommande vecka tänker vi fortsätta så att kommunikationen mellan samtliga enheter fungerar. Se till att lösa de problem som finns, dvs gyrot och servona. 
 
 ## Vecka 17 (Grupp XX)(rapporteras måndag v 18)
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+1. Den gångna veckan har vi utvecklat gui:n så att dess design är nästintill klar. Linjeföljning fungerar för första gången. Kortaste väg algoritm klar men utan hinder. Vi har suttit mycket med testning inom reglering.
+2. Just nu har vi problem med att få linjeföljningen att bli helt korrekt. Det finns mycket förbättringspotential. Behöver kolla en sista gång på gyrot. 
+3. Kommande vecka tänker vi få klart alla baskrav inför bp5a och få ut armen och se till att den kan styras manuellt från pc.
 
 ## Vecka 18 Utökad statusrapport (Grupp XX)(rapporteras måndag v 19)
 
 1. Vilken funktionalitet har roboten idag?
+Den skan styras manuellt med alla kommandon givna i kravspecen. Man kan styra armen manuellt men inte så bra. Roboten kan följa en tejpbit automatiskt. Den kan samla sensorvärden och skicka till PC. 
 2. Vilken funktionalitet återstår?
+Kortaste väg algoritm (nära till klart) med styrbeslut, automatisk rörelse för armen. Fortsatt automatisk körning av roboten i rutnät. Kunna plocka upp vara. Behandling av hinder. 
 3. Hur mycket tid har ni kvar av budgeterade timmar?
+
 4. Hur många timmar har respektive projektmedlem kvar att leverera (för att nå målet på 230 timmar) och hur ska dessa timmar fördelas över de kvarvarande veckorna? 
     - Redovisa i en tabell i statusrapporten hur många timmar detta blir per person och vecka. 
     
     Arbetstidstabell (timmar/vecka): 
     | Person     | v19   | v20   | v21   | v22   | v23   | Totalt| 
     |------------|-------|-------|-------|-------|-------|-------|
-    | Person 1   | 30    | 30    | 29    | 19    | 12    | 120   |
-    | Person 2   |       |       |       |       |       |       |
-    | Person 3   |       |       |       |       |       |       |
-    | Person 4   |       |       |       |       |       |       |
-    | Person 5   |       |       |       |       |       |       |
-    | Person 6   |       |       |       |       |       |       |
+    | Ebba       | 40    | 40    | 30    | 10    | 10    | 130   |
+    | Ida        | 30    | 30    | 29    | 13    | 12    | 114   |
+    | Lisa       |       |       |       |       |       |       |   
+    | Linus      | 30    | 30    | 29    | 12    | 12    | 113   |
+    | Andreas    | 40    | 40    | 30    | 7     | 7     | 124   |
+    | Sigge      | 30    | 30    | 29    | 16    | 14    | 119   |
+
+    (lämnar tomt för lisa pga sjukdom)
     
     - Redovisa också vilka aktiviteter som respektive person ska arbeta med:
-        - Person 1: reglering, integrering, ....
-        - Person 2: ...
+        - Ebba: Färdigställa gui och se till att datan visas. Reglering. Skriva dokument. 
+        - Ida:  Färdigställa gui och se till att datan visas. Reglering. Skriva dokument.
+        - Lisa: Kortaste väg algoritm samt hantering vid hinder. Skriva dokument.
+        - Linus: Armen och styrbeslut. Skriva dokument 
+        - Andreas: Gyro och reglering. Skriva dokument
+        - Sigge: Gyro och reglering. Skriva dokument. 
 
 5.  Är arbetsbelastningen jämn i gruppen? 
-    - Om ej, ange orsak och vilken åtgärd ni vidtar.
+    - Förutom Lisa som tyvärr varit sjuk så är arbetsbelastningen jämn. Vi jobbar mycket tillsammans. 
 
 6. Beskriv eventuella tekniska problem.
+problem med manuella styrningen av armen, vissa servon är "svaga" och det hoppar lite. Gyrot krånglar. 
 7. Beskriv eventuella samarbetsproblem.
+Inga problem
 
 ### Ordinare statusrapport vecka 18:
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+1. Den gångna veckan har vi löst linjeföljningen. Skapat data-fil så att data kan sparas och visas i gui. Hämtat ut armen och monterat på roboten, samt manuell styrning. Fixat så allt sitter på ett virkort och inte två. Fixat så man kan åka fram höger och fram vänster för robotplattformen. 
+2. Just nu har vi problem med manuella styringen av armen. Gyrot är krångligt. Kortaste väg algoritmen funkar men svårt hur signalerna ska skickas för styrbeslut. 
+3. Kommande vecka tänker vi lösa ovanstående problem samt förhoppningsvis utevckla regleringen och påbörja mer av den automatiska styrningen. 
 
 ## Vecka 19 (Grupp XX)(rapporteras måndag v 20)
 1. Den gångna veckan har vi ...

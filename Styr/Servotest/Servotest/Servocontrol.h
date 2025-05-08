@@ -1,6 +1,6 @@
-volatile unsigned int rotatespeed = 9;
+volatile unsigned int rotatespeed = 10;
 
-volatile unsigned int currentID = 1;
+volatile unsigned int current_joint = 1;
 
 
 
@@ -39,7 +39,7 @@ void USART_Transmit( unsigned char* data, unsigned int size )
 	unsigned char data[] = {header, header, ID, Length, Instruction, P1, P2, P3, Checksum};
 	unsigned int data_size = sizeof(data) / sizeof(data[0]);
 	USART_Transmit(data, data_size);
-}void load_servo(unsigned int ID, unsigned int Angle){				unsigned int header = 0xFF; //Börja varje med 2st 0xFF
+}void load_servo(unsigned int ID, unsigned int Angle){		unsigned int header = 0xFF; //Börja varje med 2st 0xFF
 	unsigned int Length = 0x5; // 2 + antal P
 	unsigned int Instruction = 0x04; // skriv
 	unsigned int P1 = 30; // Address att skriva till
@@ -48,7 +48,16 @@ void USART_Transmit( unsigned char* data, unsigned int size )
 	
 	unsigned char data[] = {header, header, ID, Length, Instruction, P1, P2, P3, Checksum};
 	unsigned int data_size = sizeof(data) / sizeof(data[0]);
-	USART_Transmit(data, data_size);	}void read_temp(unsigned int ID){		unsigned int header = 0xFF; //Börja varje med 2st 0xFF	unsigned int length = 0x04;	unsigned int instruction = 0x02;	unsigned int P1 = 43;	unsigned int P2 = 0x01;	unsigned int Checksum = ~(ID + length + instruction + P1 + P2);		unsigned char data[] = {header, header, ID, length, instruction, P1, P2, Checksum};
+	USART_Transmit(data, data_size);	}void set_speed(unsigned int ID, unsigned int speed){	unsigned int header = 0xFF; //Börja varje med 2st 0xFF
+	unsigned int Length = 0x5; // 2 + antal P
+	unsigned int Instruction = 0x03; // skriv
+	unsigned int P1 = 32; // Address att skriva till
+	unsigned char P2 = (unsigned char)speed; // första byten i målpositionen, minst signifikant	unsigned char P3 = (unsigned char)(speed>>8); // andra byten i målpositionen
+	unsigned int Checksum = ~(ID + Length + Instruction + P1 + P2 + P3);
+	
+	unsigned char data[] = {header, header, ID, Length, Instruction, P1, P2, P3, Checksum};
+	unsigned int data_size = sizeof(data) / sizeof(data[0]);
+	USART_Transmit(data, data_size);			}void read_temp(unsigned int ID){		unsigned int header = 0xFF; //Börja varje med 2st 0xFF	unsigned int length = 0x04;	unsigned int instruction = 0x02;	unsigned int P1 = 43;	unsigned int P2 = 0x01;	unsigned int Checksum = ~(ID + length + instruction + P1 + P2);		unsigned char data[] = {header, header, ID, length, instruction, P1, P2, Checksum};
 	unsigned int data_size = sizeof(data) / sizeof(data[0]);
 	USART_Transmit(data, data_size);	PORTD &= ~(1 << 2);}unsigned int get_angle(unsigned int ID)
 {
@@ -76,7 +85,7 @@ void USART_Transmit( unsigned char* data, unsigned int size )
 	unsigned char data[] = {header, header, ID, Length, Instruction, Checksum};
 	unsigned char data_size = sizeof(data) / sizeof(data[0]);
 	USART_Transmit(data, data_size);
-	_delay_us(10);}void add1degree(unsigned int ID){	unsigned int angle = get_angle(ID);	if(angle < 1023)
+	_delay_us(10);}void move_2servo(unsigned int ID1, unsigned int ID2, unsigned int angle){	load_servo(ID1, angle);	load_servo(ID2, angle);	action();		}void add1degree(unsigned int ID){	unsigned int angle = get_angle(ID);	if(angle < 1023)
 	{					
 		angle += rotatespeed;
 		move_servo(ID, angle);
@@ -95,7 +104,7 @@ void add1degree2(unsigned int ID1, unsigned int ID2)
 	if(angle1 < 1023)
 	{
 		angle1 += rotatespeed;
-		angle2 += rotatespeed;
+		angle2 -= rotatespeed;
 		load_servo(ID1, angle1);
 		load_servo(ID2, angle2);
 		action();
@@ -112,7 +121,8 @@ void sub1degree2(unsigned int ID1, unsigned int ID2)
 	if(angle1 > 0)
 	{
 		angle1 -= rotatespeed;
-		angle2 -= rotatespeed;
+		angle2 += rotatespeed;
+
 		load_servo(ID1, angle1);
 		load_servo(ID2, angle2);
 		action();
@@ -120,17 +130,130 @@ void sub1degree2(unsigned int ID1, unsigned int ID2)
 	}	
 	
 }
-/*
-void check_servos(unsigned int ID1, unsigned int ID2)
+
+
+
+void add1degree2_joint(unsigned int ID1, unsigned int ID2)
 {
 	unsigned int angle1 = get_angle(ID1);
-	unsigned int angle2 = get_angle(ID2);
-	
-	if(fabs((int)angle1 - (int)angle2) > 0.1)
+	//unsigned int angle2 = get_angle(ID2);
+	//if(angle1 < 1023)
 	{
-		log_error("Servos not in sync");
+		angle1 += rotatespeed;
+		load_servo(ID1, angle1);
+		load_servo(ID2, 1023-angle1);
+		action();
+
+	}
+	
+}
+
+void sub1degree2_joint(unsigned int ID1, unsigned int ID2)
+{
+
+	unsigned int angle1 = get_angle(ID1);
+	//unsigned int angle2 = get_angle(ID2);
+	
+	angle1 -= rotatespeed;
+	//angle2 += rotatespeed*1.3;
+	//if(angle1 > 0)
+	{
+		load_servo(ID1, angle1);
+		load_servo(ID2, 1023-angle1);
+		action();
+
+	}
+	
+}
+
+
+
+void move_joint(unsigned int joint, unsigned int angle)
+{
+	if(joint == 1)
+	{
+		move_servo(1, angle);
+	}
+	else if(joint == 2)
+	{
+		move_2servo(2,3,angle);
+	}
+	else if(joint == 3)
+	{
+		move_2servo(4,5,angle);
+	}
+	else if(joint == 4)
+	{
+		move_servo(6, angle);
+	}
+	else if(joint == 5)
+	{
+		move_servo(7,angle);
+	}
+	else if(joint == 6)
+	{
+		move_servo(8, angle);
+	}
+
+}
+
+
+void add1degree_joint(unsigned int joint)
+{
+	if(joint == 1)
+	{
+		add1degree(1);
+	}
+	else if(joint == 2)
+	{
+		add1degree2_joint(2,3);
+	}
+	else if(joint == 3)
+	{
+		add1degree2_joint(4,5);
+	}
+	else if(joint == 4)
+	{
+		add1degree(6);
+	}
+	else if(joint == 5)
+	{
+		add1degree(7);
+	}
+	else if(joint == 6)
+	{
+		add1degree(8);
+	}
+	
+}
+
+
+void sub1degree_joint(unsigned int joint)
+{
+	if(joint == 1)
+	{
+		sub1degree(1);
+	}
+	else if(joint == 2)
+	{
+		sub1degree2_joint(2,3);
+	}
+	else if(joint == 3)
+	{
+		sub1degree2_joint(4,5);
+	}
+	else if(joint == 4)
+	{
+		sub1degree(6);
+	}
+	else if(joint == 5)
+	{
+		sub1degree(7);
+	}
+	else if(joint == 6)
+	{
+		sub1degree(8);
 	}
 }
-*/
 
 
