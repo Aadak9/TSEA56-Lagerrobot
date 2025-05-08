@@ -158,6 +158,15 @@ def get_sensordata(data_list): #hämta sensordata från IR och uppdatera i GUI
     text5.config(text=f"Lateral position: {data_list[1]}")
     text2.config(text=f"Gaspådrag: {data_list[4]}, {data_list[3]}")
 
+    global ir_data
+    #ir_data += 1
+    try:
+        ir_data = bt.sendbyte(0x00)  #IR
+        text4.config(text=f"Avstånd till hinder: {ir_data}")
+    except:
+        print("Kunde inte hämta sensordata")
+   # bt.sendbyte(0x01)  #Reflex
+    # bt.sendbyte(0x02)  #Gyro
     return
 
 
@@ -793,11 +802,16 @@ def draw_lager():
             y1, y2 = yposlist[i], yposlist[i + 1]
             line = Canvas.create_line(x, y1, x, y2, fill="black", width=5, tags="line")
             lines.append((line, (x, y1, x, y2)))
+
     
-    #Draw nodes
+
+    #Draw nodes and save the positions in a list
+    #node_positions = []
+
     node_count = 1
     for xpos in xposlist:
         for ypos in yposlist:
+            #node_positions[node_count] = (xpos, ypos)
             draw_circle(Canvas, xpos, ypos, 16, color="lightgray")
             Canvas.create_text(xpos, ypos, text=str(node_count), fill="black", font=("Arial", 14))
             node_count += 1
