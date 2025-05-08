@@ -1,4 +1,7 @@
 import spidev
+import threading
+import time
+spi_lock = threading.Lock()
 
 def initspi():
     spi_styr = spidev.SpiDev()
@@ -16,3 +19,16 @@ def initspi():
     spi_styr.bits_per_word = 8
     spi_sensor.bits_per_word = 8
     return spi_styr, spi_sensor
+    
+    
+def send_spi(spi, data):
+    with spi_lock:
+        if (type(data) == list):           
+            spi.writebytes(data)
+            time.sleep(0.001)
+            response = spi.xfer2(data)[0]
+        else:
+            spi.writebytes([data])
+            time.sleep(0.001)
+            response = spi.xfer2([data])[0]
+    return response

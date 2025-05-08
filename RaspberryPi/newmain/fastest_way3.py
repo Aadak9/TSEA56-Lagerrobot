@@ -180,23 +180,25 @@ def sväng_instructions(correct_path, lagerbredd):
 
     return directions
 
-Graf = skapa_graf(3, 3)
-målnoder = {1:[1], 2:[13,14], 3:[10,14], 4:[14,15]} #noder som ska besökas, där första noden är start och slutnod
-matris = skapa_avståndsmatris(Graf, målnoder)
-kostnad, ordning = held_karp_väg(matris)
+def fastest_way(lagerbredd, lagerhöjd, målnoder):
+	Graf = skapa_graf(lagerhöjd, lagerbredd)
+	matris = skapa_avståndsmatris(Graf, målnoder)
+	kostnad, ordning = held_karp_väg(matris)
 
-path = []
-#beräkna vägen till alla varor
-for i in range(len(ordning)-1):
-    if len(path) > 0: 
-        last_path = path[i-1]
-        path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], last_path[-3]))
-    else:
-        path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], 0))
+	path = []
+	#beräkna vägen till alla varor
+	for i in range(len(ordning)-1):
+		if len(path) > 0: 
+			last_path = path[i-1]
+			path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], last_path[-3]))
+		else:
+			path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], 0))
 
-correct_path = [item for sublist in path for item in sublist]
+	correct_path = [item for sublist in path for item in sublist]
 
-print(correct_path)
-print(kostnad)
+	print(correct_path)
+	print(kostnad)
+	print(sväng_instructions(correct_path, lagerbredd))	
+	
+	return sväng_instructions(correct_path, lagerbredd)
 
-print(sväng_instructions(correct_path, 3))
