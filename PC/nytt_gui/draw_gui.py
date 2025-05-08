@@ -527,7 +527,7 @@ def data_loop(window):
     
     print("letar data")
     
-    window.after(100, lambda: data_loop(window))
+    window.after(500, lambda: data_loop(window))
 
 
 def timer(window):
