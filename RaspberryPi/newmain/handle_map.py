@@ -21,7 +21,12 @@ def receive_map_data(client):
 	try:
 		print(num_nodes)
 		n = int(num_nodes)
-		nodes = client.recv(n)
+		nodes = b''
+		while len(nodes) < n:
+			data = client.recv(n-len(nodes))
+			if not data:
+				raise ConnectionError("misslyckat dataöverföring noder")
+			nodes += data
 		nodes = list(nodes)
 		nodes = [nodes[i:i+2] for i in range(0, len(nodes), 2)]
 		print(nodes)
@@ -31,13 +36,15 @@ def receive_map_data(client):
 		print("slutet sket sig")
 	
 def update_path(client):
-	lagerbredd, lagerbredd, nodes = receive_map_data(client)	
+	lagerbredd, lagerhöjd, nodes = receive_map_data(client)	
 	målnoder = {1:[1]}
 	nodnumber = 2
 	for nod in nodes:
 		målnoder[nodnumber] = nod
 		nodnumber += 1
-	print(målnoder)
-		
+	
+	väg = fw.fastest_way(int(lagerbredd), int(lagerhöjd), målnoder)
+	print(väg)
+	return väg	
 		
 	

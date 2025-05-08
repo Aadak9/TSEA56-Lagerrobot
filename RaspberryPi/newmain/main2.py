@@ -108,6 +108,7 @@ def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
 
 def bluetooth_listener(s, spi_styr, spi_sensor):
     #global Automatic
+    global nav_plan
     client, _ = s.accept()
     print("Bluetooth connected")
     while True:
@@ -118,7 +119,7 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
                 if auto.Automatic:
                     spi.send_spi(spi_styr, 0)
                 else:
-                    hm.update_path(client)
+                    nav_plan = hm.update_path(client)
                 auto.Automatic = not auto.Automatic
                 continue
             else:
@@ -135,6 +136,7 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
 
 def main():
     #global Automatic
+    global nav_plan
     s = bt.init_bluetooth()
     spi_styr, spi_sensor = spi.initspi()
 
