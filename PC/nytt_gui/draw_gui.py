@@ -15,6 +15,10 @@ global window
 window = tk.Tk()
 
 
+global placed_goods
+placed_goods = []
+
+
 def draw_gui(window):
 
     global buttonManuell, Manuellknapp, Autoknapp, buttonAuto, Kontrollruta, Lager, ruta1, ruta3, buttonStartdata, buttonStart, Lagerknapp, textH, textW
@@ -400,27 +404,60 @@ def draw_circle(canvas, x, y, r, color="blue"):
 
 
 def draw_lager():
-    global Canvas, Lager, lagerbredd, lagerhöjd
+    global Canvas, Lager, lagerbredd, lagerhöjd, nodes, placed_goods
+
+    placed_goods = []
     Canvas.delete("all")
     nr_xnodes = lagerbredd + 1
     nr_ynodes = lagerhöjd + 1
 
-    xposlist =[]
+    xposlist = []
     nr = 1
     while nr <= nr_xnodes:
-        xposlist.append(Lager.winfo_width()/(nr_xnodes + 1) * nr)
+        xposlist.append(Lager.winfo_width() / (nr_xnodes + 1) * nr)
         nr += 1
 
     yposlist = []
     nr = 1
     while nr <= nr_ynodes:
-        yposlist.append(Lager.winfo_height()/(nr_ynodes + 1) * nr)
-        print(yposlist)
+        yposlist.append(Lager.winfo_height() / (nr_ynodes + 1) * nr)
         nr += 1
 
+    nodes = {}  # nodnummer: (x, y)
+    node_grid = {}  # (i, j): nodnummer
+    node_count = 1
+    for i, xpos in enumerate(xposlist):
+        for j, ypos in enumerate(yposlist):
+            nodes[node_count] = (xpos, ypos)
+            node_grid[(i, j)] = node_count
+            node_count += 1
 
-    lines = []
+    # Draw horizontal lines
+    for j, y in enumerate(yposlist):
+        for i in range(len(xposlist) - 1):
+            x1, x2 = xposlist[i], xposlist[i + 1]
+            n1 = node_grid[(i, j)]
+            n2 = node_grid[(i + 1, j)]
+            Canvas.create_line(x1, y, x2, y, fill="black", width=5, tags=("line", f"{n1}-{n2}"))
 
+    # Draw vertical lines
+    for i, x in enumerate(xposlist):
+        for j in range(len(yposlist) - 1):
+            y1, y2 = yposlist[j], yposlist[j + 1]
+            n1 = node_grid[(i, j)]
+            n2 = node_grid[(i, j + 1)]
+            Canvas.create_line(x, y1, x, y2, fill="black", width=5, tags=("line", f"{n1}-{n2}"))
+
+    # Rita noder
+    node_count = 1
+    for xpos in xposlist:
+        for ypos in yposlist:
+            draw_circle(Canvas, xpos, ypos, 16, color="lightgray")
+            Canvas.create_text(xpos, ypos, text=str(node_count), fill="black", font=("Arial", 14))
+            node_count += 1
+
+    print(placed_goods)
+    """
     # Draw horizontal lines
     for y in yposlist:
         for i in range(len(xposlist) - 1):
@@ -441,12 +478,47 @@ def draw_lager():
         for ypos in yposlist:
             draw_circle(Canvas, xpos, ypos, 16, color="lightgray")
             Canvas.create_text(xpos, ypos, text=str(node_count), fill="black", font=("Arial", 14))
-            node_count += 1
+            node_count += 1"""
 
 
 
 #Draw goalnode
 def on_line_click(event):
+    global Canvas, placed_goods, nodes
+    clicked_items = Canvas.find_withtag("current")
+    if not clicked_items:
+        return
+
+    item = clicked_items[0]
+    tags = Canvas.gettags(item)
+
+    for tag in tags:
+        if "-" in tag:
+            try:
+                n1, n2 = map(int, tag.split("-"))
+                pos1 = nodes[n1]
+                pos2 = nodes[n2]
+                print(f"Vara placerad mellan nod {n1} och {n2}")
+
+                mx = (pos1[0] + pos2[0]) / 2
+                my = (pos1[1] + pos2[1]) / 2
+
+                # Rita ut varan
+                node = Canvas.create_oval(mx - 10, my - 10, mx + 10, my + 10, fill="green", outline="black")
+
+                # Lägg till nodpar i taggar för att kunna radera senare
+                Canvas.itemconfig(node, tags=("good", f"{n1}-{n2}"))
+                Canvas.tag_bind(node, "<Button-1>", remove_node)
+
+                # Spara nodparet i listan
+                placed_goods.append([n1, n2])
+            except Exception as e:
+                print("Fel:", e)
+
+    print("Alla placerade varor:", placed_goods)
+
+
+    """
     global Canvas
     clicked_items = Canvas.find_withtag("current")
     if not clicked_items:
@@ -461,9 +533,31 @@ def on_line_click(event):
 
     node = Canvas.create_oval(mx - 10, my - 10, mx + 10, my + 10, fill="green", outline="black")
     Canvas.tag_bind(node, "<Button-1>", remove_node)
+    """
 
 def remove_node(event):
-    Canvas.delete("current")
+    global placed_goods
+    node_id = Canvas.find_withtag("current")[0]
+    tags = Canvas.gettags(node_id)
+
+    for tag in tags:
+        if "-" in tag:
+            try:
+                n1, n2 = map(int, tag.split("-"))
+                if [n1, n2] in placed_goods:
+                    placed_goods.remove([n1, n2])
+                elif [n2, n1] in placed_goods:
+                    placed_goods.remove([n2, n1])
+                print(f"Vara mellan noder {n1} och {n2} borttagen")
+                break
+            except:
+                pass
+
+    Canvas.delete(node_id)
+
+
+#def remove_node(event):
+ #   Canvas.delete("current")
 
 
 

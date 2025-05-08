@@ -248,6 +248,7 @@ def start_pressed():
     except:
         print("kunde inte växla läge")
     if start_active_color == "green":
+        send_lager_info()
         dg.timestart = time.time()
         dg.timeractive = True
         dg.timer(dg.window)
@@ -336,3 +337,19 @@ def startdata_pressed():
 
 def calibrate_sensor():
     bt.sendbyte(0x67)
+
+
+def send_lager_info():
+    bt.sendbyte(0x70) #nu kommer lagerinfo
+    bt.sendbyte(dg.lagerbredd)
+    bt.sendbyte(dg.lagerhöjd)
+    num_nodes = len(dg.placed_goods)*2
+
+    bt.sendbyte(num_nodes)
+
+    for node_list in dg.placed_goods:
+        bt.sendbyte(node_list[0])
+        bt.sendbyte(node_list[1])  
+
+    return
+
