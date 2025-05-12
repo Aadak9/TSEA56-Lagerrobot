@@ -30,7 +30,14 @@ ISR(SPI_STC_vect) {
 			{
 				spi_state = SPI_STATE_RECIEVE_JOINT;
 			}
-			
+			else if(received == SEND_LEFT_GAS)
+			{
+				SPDR = OCR2A;	
+			}
+			else if(received == SEND_RIGHT_GAS)
+			{
+				SPDR = OCR2B;
+			}
 			else
 			{
 				current_action = received;

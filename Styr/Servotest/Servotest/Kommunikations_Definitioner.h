@@ -26,3 +26,7 @@
 #define CCW_SERVO 0x31
 
 #define CW_servo 0x32
+
+#define SEND_LEFT_GAS 0x40
+
+#define SEND_RIGHT_GAS 0x41
