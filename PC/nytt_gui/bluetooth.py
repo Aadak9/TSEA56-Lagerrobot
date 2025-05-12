@@ -7,7 +7,7 @@ bluetoothlock = threading.Lock()
 def bluetoothinit():
     global s
     s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-    s.settimeout(1)
+    #s.settimeout(1)
     try:
         s.connect(('B8:27:EB:E9:12:27', 4))
         print("Ansluten till raspberry pi")
