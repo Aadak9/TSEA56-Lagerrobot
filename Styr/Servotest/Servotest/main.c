@@ -55,12 +55,13 @@ volatile unsigned long timertime = 14000;
 	
 	_delay_ms(200);
 	
-	for(unsigned int i=1; i <= 8; i++)
+	for(unsigned int i=1; i <= 7; i++)
 	{
 		set_speed(i, 40);
-		//unsigned int angle = get_angle(i);
-		//move_servo(i, angle);
+		unsigned int angle = get_angle(i);
+		move_servo(i, angle);
 	}
+	set_speed(8, 500);
 	/*
 	while(1)
 	{
@@ -78,9 +79,9 @@ volatile unsigned long timertime = 14000;
 	*/
 	
 	
-	load_servo(4, 500);
-	load_servo(5, 1023-500);
-	action();
+	//load_servo(4, 300);
+	//load_servo(5, 1023-300);
+	//action();
 
 	//// Petter testar {
 	while(0) {

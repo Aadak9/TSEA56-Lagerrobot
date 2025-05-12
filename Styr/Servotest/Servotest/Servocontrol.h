@@ -1,4 +1,4 @@
-volatile unsigned int rotatespeed = 10;
+volatile unsigned int rotatespeed = 30;
 
 volatile unsigned int current_joint = 1;
 
