@@ -196,9 +196,11 @@ def fastest_way(lagerbredd, lagerhöjd, målnoder):
 
 	correct_path = [item for sublist in path for item in sublist]
 
-	print(correct_path)
-	print(kostnad)
-	print(sväng_instructions(correct_path, lagerbredd))	
+	#print(correct_path)
+	#print(kostnad)
+	#print(sväng_instructions(correct_path, lagerbredd))	
+	väg = deque(sväng_instructions(correct_path, lagerbredd))
+	väg.append("lämna")
 	
-	return sväng_instructions(correct_path, lagerbredd)
+	return väg
 
