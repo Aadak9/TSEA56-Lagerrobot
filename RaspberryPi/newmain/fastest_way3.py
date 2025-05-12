@@ -119,7 +119,7 @@ def node_to_xy(node, lagerbredd, lagerhöjd):
                 return(i, j)
             else:
                 continue
-            
+    
     return(0,0)
             
 
@@ -143,7 +143,6 @@ def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
     directions = []
     # Ta bort 'goal'
     pos = [node_to_xy(n, lagerbredd, lagerhöjd) for n in correct_path if isinstance(n, int)]
-    print(pos)
     if len(pos) < 2:
         return directions
 
@@ -187,6 +186,17 @@ def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
 
     return directions
 
+def remove_path(Graf, n1, n2):
+    #ta bort n1 från n2´s grannar och n2 från n1´s grannar
+    for i in Graf:
+        if i == n1:
+            Graf[i].remove(n2)
+        elif i == n2:
+            Graf[i].remove(n1)
+    
+    return(Graf)
+            
+
 def fastest_way(lagerbredd, lagerhöjd, målnoder):
 	Graf = skapa_graf(lagerhöjd, lagerbredd)
 	matris = skapa_avståndsmatris(Graf, målnoder)
@@ -203,9 +213,9 @@ def fastest_way(lagerbredd, lagerhöjd, målnoder):
 
 	correct_path = [item for sublist in path for item in sublist]
 
-	print(correct_path)
 	print(kostnad)
-	print(sväng_instructions(correct_path, lagerbredd))	
+	print(sväng_instructions(correct_path, lagerbredd, lagerhöjd))	
 	
-	return sväng_instructions(correct_path, lagerbredd)
+	return sväng_instructions(correct_path, lagerbredd, lagerhöjd)
 
+fastest_way(3, 3, {1:[1], 2:[2,6]})
