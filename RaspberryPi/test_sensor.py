@@ -21,6 +21,7 @@ except:
 while 1:	
 		
 	try:
+		time.sleep(0.01)
 		sensor_data1 = spi.xfer2([5])
 		print(f"Sensorvärde: {sensor_data1}")
 		time.sleep(0.01)

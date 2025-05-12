@@ -15,19 +15,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 00000100  00000000  00000000  00000e24  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000010f4  00000000  00000000  00000f24  2**0
+  6 .debug_info   000010fd  00000000  00000000  00000f24  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000b17  00000000  00000000  00002018  2**0
+  7 .debug_abbrev 00000b17  00000000  00000000  00002021  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000009db  00000000  00000000  00002b2f  2**0
+  8 .debug_line   000009e1  00000000  00000000  00002b38  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000344  00000000  00000000  0000350c  2**2
+  9 .debug_frame  00000344  00000000  00000000  0000351c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000635  00000000  00000000  00003850  2**0
+ 10 .debug_str    00000635  00000000  00000000  00003860  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000792  00000000  00000000  00003e85  2**0
+ 11 .debug_loc    00000792  00000000  00000000  00003e95  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000000c0  00000000  00000000  00004617  2**0
+ 12 .debug_ranges 000000c0  00000000  00000000  00004627  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -827,15 +827,15 @@ int main()
  468:	80 91 5c 01 	lds	r24, 0x015C	; 0x80015c <reflex_high>
 		line_front = read_line_front(reflex_high);
  46c:	90 91 5d 01 	lds	r25, 0x015D	; 0x80015d <reflex_high+0x1>
- 470:	b2 d0       	rcall	.+356    	; 0x5d6 <read_line_front>
+ 470:	b3 d0       	rcall	.+358    	; 0x5d8 <read_line_front>
  472:	80 93 60 01 	sts	0x0160, r24	; 0x800160 <line_front>
  476:	80 91 60 01 	lds	r24, 0x0160	; 0x800160 <line_front>
 		
-		roadmark_send = line_front >> 6;					// Roadmark bits to the right.
- 47a:	86 fb       	bst	r24, 6
- 47c:	88 0f       	add	r24, r24
- 47e:	88 0b       	sbc	r24, r24
- 480:	80 f9       	bld	r24, 0
+		roadmark_send = (line_front >> 6) & (0x03);			// Roadmark bits to the right.
+ 47a:	82 95       	swap	r24
+ 47c:	86 95       	lsr	r24
+ 47e:	86 95       	lsr	r24
+ 480:	83 70       	andi	r24, 0x03	; 3
  482:	80 93 5a 01 	sts	0x015A, r24	; 0x80015a <__data_end>
  486:	80 91 60 01 	lds	r24, 0x0160	; 0x800160 <line_front>
 		line_front_send = line_front & (0x3F);				// MSB to 0. 
@@ -847,7 +847,7 @@ int main()
  492:	80 91 5c 01 	lds	r24, 0x015C	; 0x80015c <reflex_high>
 		line_back_send = read_line_back(reflex_high);
  496:	90 91 5d 01 	lds	r25, 0x015D	; 0x80015d <reflex_high+0x1>
- 49a:	21 d1       	rcall	.+578    	; 0x6de <read_line_back>
+ 49a:	22 d1       	rcall	.+580    	; 0x6e0 <read_line_back>
  49c:	80 93 5b 01 	sts	0x015B, r24	; 0x80015b <line_back_send>
  4a0:	de cf       	rjmp	.-68     	; 0x45e <main+0x38>
 
@@ -943,7 +943,7 @@ ISR(SPI_STC_vect)
 		SPDR = IR_send;
  530:	80 91 61 01 	lds	r24, 0x0161	; 0x800161 <IR_send>
  534:	8e bd       	out	0x2e, r24	; 46
- 536:	39 c0       	rjmp	.+114    	; 0x5aa <__vector_19+0xb4>
+ 536:	3a c0       	rjmp	.+116    	; 0x5ac <__vector_19+0xb6>
 	} 
 	else if(choose_sensor == 1) 
  538:	89 81       	ldd	r24, Y+1	; 0x01
@@ -953,7 +953,7 @@ ISR(SPI_STC_vect)
 		SPDR = line_front_send;
  53e:	80 91 5e 01 	lds	r24, 0x015E	; 0x80015e <line_front_send>
  542:	8e bd       	out	0x2e, r24	; 46
- 544:	32 c0       	rjmp	.+100    	; 0x5aa <__vector_19+0xb4>
+ 544:	33 c0       	rjmp	.+102    	; 0x5ac <__vector_19+0xb6>
 	}
 	else if(choose_sensor == 2) 
  546:	89 81       	ldd	r24, Y+1	; 0x01
@@ -963,338 +963,336 @@ ISR(SPI_STC_vect)
 		SPDR = line_back_send;
  54c:	80 91 5b 01 	lds	r24, 0x015B	; 0x80015b <line_back_send>
  550:	8e bd       	out	0x2e, r24	; 46
- 552:	2b c0       	rjmp	.+86     	; 0x5aa <__vector_19+0xb4>
-		//volatile uint8_t test = 12; 
-		//SPDR = test;
-		//sei();
+ 552:	2c c0       	rjmp	.+88     	; 0x5ac <__vector_19+0xb6>
 	}
 	else if(choose_sensor == 3) 
  554:	89 81       	ldd	r24, Y+1	; 0x01
  556:	83 30       	cpi	r24, 0x03	; 3
- 558:	31 f4       	brne	.+12     	; 0x566 <__vector_19+0x70>
+ 558:	39 f4       	brne	.+14     	; 0x568 <__vector_19+0x72>
 	{
+		reset_w();
+ 55a:	6c d1       	rcall	.+728    	; 0x834 <reset_w>
 		TCCR1B |= (1 << CS11) | (1 << CS10);			// Start timer and gyro.
- 55a:	e1 e8       	ldi	r30, 0x81	; 129
- 55c:	f0 e0       	ldi	r31, 0x00	; 0
- 55e:	80 81       	ld	r24, Z
- 560:	83 60       	ori	r24, 0x03	; 3
- 562:	80 83       	st	Z, r24
- 564:	22 c0       	rjmp	.+68     	; 0x5aa <__vector_19+0xb4>
+ 55c:	e1 e8       	ldi	r30, 0x81	; 129
+ 55e:	f0 e0       	ldi	r31, 0x00	; 0
+ 560:	80 81       	ld	r24, Z
+ 562:	83 60       	ori	r24, 0x03	; 3
+ 564:	80 83       	st	Z, r24
+ 566:	22 c0       	rjmp	.+68     	; 0x5ac <__vector_19+0xb6>
 	} 
 	else if(choose_sensor == 4) 
- 566:	89 81       	ldd	r24, Y+1	; 0x01
- 568:	84 30       	cpi	r24, 0x04	; 4
- 56a:	49 f4       	brne	.+18     	; 0x57e <__vector_19+0x88>
+ 568:	89 81       	ldd	r24, Y+1	; 0x01
+ 56a:	84 30       	cpi	r24, 0x04	; 4
+ 56c:	49 f4       	brne	.+18     	; 0x580 <__vector_19+0x8a>
 	{
 		cli();
- 56c:	f8 94       	cli
-		TCCR1B &= ~(1 << CS11) | (1 << CS10);			// Turn off timer and gyro.
- 56e:	e1 e8       	ldi	r30, 0x81	; 129
- 570:	f0 e0       	ldi	r31, 0x00	; 0
- 572:	80 81       	ld	r24, Z
- 574:	8d 7f       	andi	r24, 0xFD	; 253
- 576:	80 83       	st	Z, r24
+ 56e:	f8 94       	cli
+		TCCR1B &= ~((1 << CS11) | (1 << CS10));			// Turn off timer and gyro.
+ 570:	e1 e8       	ldi	r30, 0x81	; 129
+ 572:	f0 e0       	ldi	r31, 0x00	; 0
+ 574:	80 81       	ld	r24, Z
+ 576:	8c 7f       	andi	r24, 0xFC	; 252
 		reset_w();
- 578:	5d d1       	rcall	.+698    	; 0x834 <reset_w>
+ 578:	80 83       	st	Z, r24
+ 57a:	5c d1       	rcall	.+696    	; 0x834 <reset_w>
 		sei();
- 57a:	78 94       	sei
- 57c:	16 c0       	rjmp	.+44     	; 0x5aa <__vector_19+0xb4>
+ 57c:	78 94       	sei
+ 57e:	16 c0       	rjmp	.+44     	; 0x5ac <__vector_19+0xb6>
 	} 
 	else if(choose_sensor == 5)							// On the Raspberry PI, check for 80 which is 90 degrees or 160 which is 180 degrees.
- 57e:	89 81       	ldd	r24, Y+1	; 0x01
- 580:	85 30       	cpi	r24, 0x05	; 5
- 582:	21 f4       	brne	.+8      	; 0x58c <__vector_19+0x96>
+ 580:	89 81       	ldd	r24, Y+1	; 0x01
+ 582:	85 30       	cpi	r24, 0x05	; 5
+ 584:	21 f4       	brne	.+8      	; 0x58e <__vector_19+0x98>
 	{
 		SPDR = gyro_send;
- 584:	80 91 5f 01 	lds	r24, 0x015F	; 0x80015f <gyro_send>
- 588:	8e bd       	out	0x2e, r24	; 46
- 58a:	0f c0       	rjmp	.+30     	; 0x5aa <__vector_19+0xb4>
+ 586:	80 91 5f 01 	lds	r24, 0x015F	; 0x80015f <gyro_send>
+ 58a:	8e bd       	out	0x2e, r24	; 46
+ 58c:	0f c0       	rjmp	.+30     	; 0x5ac <__vector_19+0xb6>
 	} 
 	else if(choose_sensor == 6) 
- 58c:	89 81       	ldd	r24, Y+1	; 0x01
- 58e:	86 30       	cpi	r24, 0x06	; 6
- 590:	21 f4       	brne	.+8      	; 0x59a <__vector_19+0xa4>
+ 58e:	89 81       	ldd	r24, Y+1	; 0x01
+ 590:	86 30       	cpi	r24, 0x06	; 6
+ 592:	21 f4       	brne	.+8      	; 0x59c <__vector_19+0xa6>
 	{
 		SPDR = roadmark_send;							// Roadmark is in the form of 0b000000LR. L = left, R = right.
- 592:	80 91 5a 01 	lds	r24, 0x015A	; 0x80015a <__data_end>
- 596:	8e bd       	out	0x2e, r24	; 46
- 598:	08 c0       	rjmp	.+16     	; 0x5aa <__vector_19+0xb4>
+ 594:	80 91 5a 01 	lds	r24, 0x015A	; 0x80015a <__data_end>
+ 598:	8e bd       	out	0x2e, r24	; 46
+ 59a:	08 c0       	rjmp	.+16     	; 0x5ac <__vector_19+0xb6>
 	}
 	else if(choose_sensor == 7)
- 59a:	89 81       	ldd	r24, Y+1	; 0x01
- 59c:	87 30       	cpi	r24, 0x07	; 7
+ 59c:	89 81       	ldd	r24, Y+1	; 0x01
+ 59e:	87 30       	cpi	r24, 0x07	; 7
 	{
 		reflex_high = init_reflex_calibrate();
- 59e:	29 f4       	brne	.+10     	; 0x5aa <__vector_19+0xb4>
- 5a0:	10 df       	rcall	.-480    	; 0x3c2 <init_reflex_calibrate>
- 5a2:	90 93 5d 01 	sts	0x015D, r25	; 0x80015d <reflex_high+0x1>
- 5a6:	80 93 5c 01 	sts	0x015C, r24	; 0x80015c <reflex_high>
+ 5a0:	29 f4       	brne	.+10     	; 0x5ac <__vector_19+0xb6>
+ 5a2:	0f df       	rcall	.-482    	; 0x3c2 <init_reflex_calibrate>
+ 5a4:	90 93 5d 01 	sts	0x015D, r25	; 0x80015d <reflex_high+0x1>
+ 5a8:	80 93 5c 01 	sts	0x015C, r24	; 0x80015c <reflex_high>
 	}
- 5aa:	0f 90       	pop	r0
- 5ac:	df 91       	pop	r29
- 5ae:	cf 91       	pop	r28
- 5b0:	ff 91       	pop	r31
- 5b2:	ef 91       	pop	r30
- 5b4:	bf 91       	pop	r27
- 5b6:	af 91       	pop	r26
- 5b8:	9f 91       	pop	r25
- 5ba:	8f 91       	pop	r24
- 5bc:	7f 91       	pop	r23
- 5be:	6f 91       	pop	r22
- 5c0:	5f 91       	pop	r21
- 5c2:	4f 91       	pop	r20
- 5c4:	3f 91       	pop	r19
- 5c6:	2f 91       	pop	r18
- 5c8:	0f 90       	pop	r0
- 5ca:	0b be       	out	0x3b, r0	; 59
- 5cc:	0f 90       	pop	r0
- 5ce:	0f be       	out	0x3f, r0	; 63
- 5d0:	0f 90       	pop	r0
- 5d2:	1f 90       	pop	r1
- 5d4:	18 95       	reti
+ 5ac:	0f 90       	pop	r0
+ 5ae:	df 91       	pop	r29
+ 5b0:	cf 91       	pop	r28
+ 5b2:	ff 91       	pop	r31
+ 5b4:	ef 91       	pop	r30
+ 5b6:	bf 91       	pop	r27
+ 5b8:	af 91       	pop	r26
+ 5ba:	9f 91       	pop	r25
+ 5bc:	8f 91       	pop	r24
+ 5be:	7f 91       	pop	r23
+ 5c0:	6f 91       	pop	r22
+ 5c2:	5f 91       	pop	r21
+ 5c4:	4f 91       	pop	r20
+ 5c6:	3f 91       	pop	r19
+ 5c8:	2f 91       	pop	r18
+ 5ca:	0f 90       	pop	r0
+ 5cc:	0b be       	out	0x3b, r0	; 59
+ 5ce:	0f 90       	pop	r0
+ 5d0:	0f be       	out	0x3f, r0	; 63
+ 5d2:	0f 90       	pop	r0
+ 5d4:	1f 90       	pop	r1
+ 5d6:	18 95       	reti
 
-000005d6 <read_line_front>:
+000005d8 <read_line_front>:
 
 volatile int w_int;
 volatile int w_send;
 
 int8_t read_line_front(int reflex_high)
 {
- 5d6:	ef 92       	push	r14
- 5d8:	ff 92       	push	r15
- 5da:	0f 93       	push	r16
- 5dc:	1f 93       	push	r17
- 5de:	cf 93       	push	r28
- 5e0:	df 93       	push	r29
- 5e2:	cd b7       	in	r28, 0x3d	; 61
- 5e4:	de b7       	in	r29, 0x3e	; 62
- 5e6:	2c 97       	sbiw	r28, 0x0c	; 12
- 5e8:	0f b6       	in	r0, 0x3f	; 63
- 5ea:	f8 94       	cli
- 5ec:	de bf       	out	0x3e, r29	; 62
- 5ee:	0f be       	out	0x3f, r0	; 63
- 5f0:	cd bf       	out	0x3d, r28	; 61
- 5f2:	7c 01       	movw	r14, r24
+ 5d8:	ef 92       	push	r14
+ 5da:	ff 92       	push	r15
+ 5dc:	0f 93       	push	r16
+ 5de:	1f 93       	push	r17
+ 5e0:	cf 93       	push	r28
+ 5e2:	df 93       	push	r29
+ 5e4:	cd b7       	in	r28, 0x3d	; 61
+ 5e6:	de b7       	in	r29, 0x3e	; 62
+ 5e8:	2c 97       	sbiw	r28, 0x0c	; 12
+ 5ea:	0f b6       	in	r0, 0x3f	; 63
+ 5ec:	f8 94       	cli
+ 5ee:	de bf       	out	0x3e, r29	; 62
+ 5f0:	0f be       	out	0x3f, r0	; 63
+ 5f2:	cd bf       	out	0x3d, r28	; 61
+ 5f4:	7c 01       	movw	r14, r24
 	int i;
 	volatile int8_t data;
 	volatile uint8_t indata = 0;
- 5f4:	1a 82       	std	Y+2, r1	; 0x02
+ 5f6:	1a 82       	std	Y+2, r1	; 0x02
 	volatile int sum = 0;
- 5f6:	1c 82       	std	Y+4, r1	; 0x04
- 5f8:	1b 82       	std	Y+3, r1	; 0x03
+ 5f8:	1c 82       	std	Y+4, r1	; 0x04
+ 5fa:	1b 82       	std	Y+3, r1	; 0x03
 	volatile int sum_index = 0;
- 5fa:	1e 82       	std	Y+6, r1	; 0x06
- 5fc:	1d 82       	std	Y+5, r1	; 0x05
+ 5fc:	1e 82       	std	Y+6, r1	; 0x06
+ 5fe:	1d 82       	std	Y+5, r1	; 0x05
 	volatile int roadmarkLeft = 0;
- 5fe:	18 86       	std	Y+8, r1	; 0x08
- 600:	1f 82       	std	Y+7, r1	; 0x07
+ 600:	18 86       	std	Y+8, r1	; 0x08
+ 602:	1f 82       	std	Y+7, r1	; 0x07
 	volatile int roadmarkRight = 0;
- 602:	1a 86       	std	Y+10, r1	; 0x0a
- 604:	19 86       	std	Y+9, r1	; 0x09
+ 604:	1a 86       	std	Y+10, r1	; 0x0a
+ 606:	19 86       	std	Y+9, r1	; 0x09
 	volatile int pivot = 0;	
- 606:	1c 86       	std	Y+12, r1	; 0x0c
- 608:	1b 86       	std	Y+11, r1	; 0x0b
+ 608:	1c 86       	std	Y+12, r1	; 0x0c
+ 60a:	1b 86       	std	Y+11, r1	; 0x0b
 	
 	for(i = 1; i < 12; i++)
- 60a:	01 e0       	ldi	r16, 0x01	; 1
- 60c:	10 e0       	ldi	r17, 0x00	; 0
- 60e:	38 c0       	rjmp	.+112    	; 0x680 <read_line_front+0xaa>
+ 60c:	01 e0       	ldi	r16, 0x01	; 1
+ 60e:	10 e0       	ldi	r17, 0x00	; 0
+ 610:	38 c0       	rjmp	.+112    	; 0x682 <read_line_front+0xaa>
 	{
 		PORTA &= 0xF0;														// Resets the 4 LSB bits in PORT A.
- 610:	82 b1       	in	r24, 0x02	; 2
- 612:	80 7f       	andi	r24, 0xF0	; 240
- 614:	82 b9       	out	0x02, r24	; 2
+ 612:	82 b1       	in	r24, 0x02	; 2
+ 614:	80 7f       	andi	r24, 0xF0	; 240
+ 616:	82 b9       	out	0x02, r24	; 2
 		PORTA |= i;															// Set multiplexer to index i.
- 616:	82 b1       	in	r24, 0x02	; 2
- 618:	80 2b       	or	r24, r16
- 61a:	82 b9       	out	0x02, r24	; 2
+ 618:	82 b1       	in	r24, 0x02	; 2
+ 61a:	80 2b       	or	r24, r16
+ 61c:	82 b9       	out	0x02, r24	; 2
 		PORTD |= 0x20;														// Start sensor.
- 61c:	8b b1       	in	r24, 0x0b	; 11
- 61e:	80 62       	ori	r24, 0x20	; 32
- 620:	8b b9       	out	0x0b, r24	; 11
+ 61e:	8b b1       	in	r24, 0x0b	; 11
+ 620:	80 62       	ori	r24, 0x20	; 32
+ 622:	8b b9       	out	0x0b, r24	; 11
 		
 
 		indata = is_active_reflex(reflex_high);								// 1 if current sensor sees tape, 0 otherwise.
- 622:	c7 01       	movw	r24, r14
- 624:	8d dd       	rcall	.-1254   	; 0x140 <is_active_reflex>
- 626:	8a 83       	std	Y+2, r24	; 0x02
+ 624:	c7 01       	movw	r24, r14
+ 626:	8c dd       	rcall	.-1256   	; 0x140 <is_active_reflex>
+ 628:	8a 83       	std	Y+2, r24	; 0x02
 		PORTD &= 0xDF;														// Turn off sensor.
- 628:	8b b1       	in	r24, 0x0b	; 11
- 62a:	8f 7d       	andi	r24, 0xDF	; 223
- 62c:	8b b9       	out	0x0b, r24	; 11
+ 62a:	8b b1       	in	r24, 0x0b	; 11
+ 62c:	8f 7d       	andi	r24, 0xDF	; 223
+ 62e:	8b b9       	out	0x0b, r24	; 11
 		
 		sum += indata;									
- 62e:	2a 81       	ldd	r18, Y+2	; 0x02
- 630:	8b 81       	ldd	r24, Y+3	; 0x03
- 632:	9c 81       	ldd	r25, Y+4	; 0x04
- 634:	82 0f       	add	r24, r18
- 636:	91 1d       	adc	r25, r1
- 638:	9c 83       	std	Y+4, r25	; 0x04
- 63a:	8b 83       	std	Y+3, r24	; 0x03
+ 630:	2a 81       	ldd	r18, Y+2	; 0x02
+ 632:	8b 81       	ldd	r24, Y+3	; 0x03
+ 634:	9c 81       	ldd	r25, Y+4	; 0x04
+ 636:	82 0f       	add	r24, r18
+ 638:	91 1d       	adc	r25, r1
+ 63a:	9c 83       	std	Y+4, r25	; 0x04
+ 63c:	8b 83       	std	Y+3, r24	; 0x03
 		sum_index += (i)*indata;
- 63c:	8a 81       	ldd	r24, Y+2	; 0x02
- 63e:	80 9f       	mul	r24, r16
- 640:	90 01       	movw	r18, r0
- 642:	81 9f       	mul	r24, r17
- 644:	30 0d       	add	r19, r0
- 646:	11 24       	eor	r1, r1
- 648:	8d 81       	ldd	r24, Y+5	; 0x05
- 64a:	9e 81       	ldd	r25, Y+6	; 0x06
- 64c:	82 0f       	add	r24, r18
- 64e:	93 1f       	adc	r25, r19
- 650:	9e 83       	std	Y+6, r25	; 0x06
- 652:	8d 83       	std	Y+5, r24	; 0x05
+ 63e:	8a 81       	ldd	r24, Y+2	; 0x02
+ 640:	80 9f       	mul	r24, r16
+ 642:	90 01       	movw	r18, r0
+ 644:	81 9f       	mul	r24, r17
+ 646:	30 0d       	add	r19, r0
+ 648:	11 24       	eor	r1, r1
+ 64a:	8d 81       	ldd	r24, Y+5	; 0x05
+ 64c:	9e 81       	ldd	r25, Y+6	; 0x06
+ 64e:	82 0f       	add	r24, r18
+ 650:	93 1f       	adc	r25, r19
+ 652:	9e 83       	std	Y+6, r25	; 0x06
+ 654:	8d 83       	std	Y+5, r24	; 0x05
 
 		if ((i == 1) && (indata == 1)) {									// Sees left turn.
- 654:	01 30       	cpi	r16, 0x01	; 1
- 656:	11 05       	cpc	r17, r1
- 658:	39 f4       	brne	.+14     	; 0x668 <read_line_front+0x92>
- 65a:	8a 81       	ldd	r24, Y+2	; 0x02
- 65c:	81 30       	cpi	r24, 0x01	; 1
- 65e:	21 f4       	brne	.+8      	; 0x668 <read_line_front+0x92>
+ 656:	01 30       	cpi	r16, 0x01	; 1
+ 658:	11 05       	cpc	r17, r1
+ 65a:	39 f4       	brne	.+14     	; 0x66a <read_line_front+0x92>
+ 65c:	8a 81       	ldd	r24, Y+2	; 0x02
+ 65e:	81 30       	cpi	r24, 0x01	; 1
+ 660:	21 f4       	brne	.+8      	; 0x66a <read_line_front+0x92>
 			roadmarkLeft = 1;
- 660:	81 e0       	ldi	r24, 0x01	; 1
- 662:	90 e0       	ldi	r25, 0x00	; 0
- 664:	98 87       	std	Y+8, r25	; 0x08
- 666:	8f 83       	std	Y+7, r24	; 0x07
+ 662:	81 e0       	ldi	r24, 0x01	; 1
+ 664:	90 e0       	ldi	r25, 0x00	; 0
+ 666:	98 87       	std	Y+8, r25	; 0x08
+ 668:	8f 83       	std	Y+7, r24	; 0x07
 		}
 		if ((i == 11) && (indata == 1)) {									// Sees right turn.
- 668:	0b 30       	cpi	r16, 0x0B	; 11
- 66a:	11 05       	cpc	r17, r1
- 66c:	39 f4       	brne	.+14     	; 0x67c <read_line_front+0xa6>
- 66e:	8a 81       	ldd	r24, Y+2	; 0x02
- 670:	81 30       	cpi	r24, 0x01	; 1
- 672:	21 f4       	brne	.+8      	; 0x67c <read_line_front+0xa6>
+ 66a:	0b 30       	cpi	r16, 0x0B	; 11
+ 66c:	11 05       	cpc	r17, r1
+ 66e:	39 f4       	brne	.+14     	; 0x67e <read_line_front+0xa6>
+ 670:	8a 81       	ldd	r24, Y+2	; 0x02
+ 672:	81 30       	cpi	r24, 0x01	; 1
+ 674:	21 f4       	brne	.+8      	; 0x67e <read_line_front+0xa6>
 			roadmarkRight = 1;
- 674:	81 e0       	ldi	r24, 0x01	; 1
- 676:	90 e0       	ldi	r25, 0x00	; 0
- 678:	9a 87       	std	Y+10, r25	; 0x0a
- 67a:	89 87       	std	Y+9, r24	; 0x09
+ 676:	81 e0       	ldi	r24, 0x01	; 1
+ 678:	90 e0       	ldi	r25, 0x00	; 0
+ 67a:	9a 87       	std	Y+10, r25	; 0x0a
+ 67c:	89 87       	std	Y+9, r24	; 0x09
 	volatile int sum_index = 0;
 	volatile int roadmarkLeft = 0;
 	volatile int roadmarkRight = 0;
 	volatile int pivot = 0;	
 	
 	for(i = 1; i < 12; i++)
- 67c:	0f 5f       	subi	r16, 0xFF	; 255
- 67e:	1f 4f       	sbci	r17, 0xFF	; 255
- 680:	0c 30       	cpi	r16, 0x0C	; 12
- 682:	11 05       	cpc	r17, r1
- 684:	2c f2       	brlt	.-118    	; 0x610 <read_line_front+0x3a>
+ 67e:	0f 5f       	subi	r16, 0xFF	; 255
+ 680:	1f 4f       	sbci	r17, 0xFF	; 255
+ 682:	0c 30       	cpi	r16, 0x0C	; 12
+ 684:	11 05       	cpc	r17, r1
+ 686:	2c f2       	brlt	.-118    	; 0x612 <read_line_front+0x3a>
 		if ((i == 11) && (indata == 1)) {									// Sees right turn.
 			roadmarkRight = 1;
 		}
 	}
 
 	if (sum == 0)															// Sees no tape.
- 686:	8b 81       	ldd	r24, Y+3	; 0x03
- 688:	9c 81       	ldd	r25, Y+4	; 0x04
- 68a:	89 2b       	or	r24, r25
- 68c:	29 f4       	brne	.+10     	; 0x698 <read_line_front+0xc2>
+ 688:	8b 81       	ldd	r24, Y+3	; 0x03
+ 68a:	9c 81       	ldd	r25, Y+4	; 0x04
+ 68c:	89 2b       	or	r24, r25
+ 68e:	29 f4       	brne	.+10     	; 0x69a <read_line_front+0xc2>
 	{
 		pivot = 12;
- 68e:	8c e0       	ldi	r24, 0x0C	; 12
- 690:	90 e0       	ldi	r25, 0x00	; 0
- 692:	9c 87       	std	Y+12, r25	; 0x0c
- 694:	8b 87       	std	Y+11, r24	; 0x0b
- 696:	09 c0       	rjmp	.+18     	; 0x6aa <read_line_front+0xd4>
+ 690:	8c e0       	ldi	r24, 0x0C	; 12
+ 692:	90 e0       	ldi	r25, 0x00	; 0
+ 694:	9c 87       	std	Y+12, r25	; 0x0c
+ 696:	8b 87       	std	Y+11, r24	; 0x0b
+ 698:	09 c0       	rjmp	.+18     	; 0x6ac <read_line_front+0xd4>
 	} else {
 		pivot = (sum_index*2)/sum;											// Center of mass calculation, multiply with 2 to get decimals.
- 698:	8d 81       	ldd	r24, Y+5	; 0x05
- 69a:	9e 81       	ldd	r25, Y+6	; 0x06
- 69c:	88 0f       	add	r24, r24
- 69e:	99 1f       	adc	r25, r25
- 6a0:	6b 81       	ldd	r22, Y+3	; 0x03
- 6a2:	7c 81       	ldd	r23, Y+4	; 0x04
- 6a4:	e7 d2       	rcall	.+1486   	; 0xc74 <__divmodhi4>
- 6a6:	7c 87       	std	Y+12, r23	; 0x0c
- 6a8:	6b 87       	std	Y+11, r22	; 0x0b
+ 69a:	8d 81       	ldd	r24, Y+5	; 0x05
+ 69c:	9e 81       	ldd	r25, Y+6	; 0x06
+ 69e:	88 0f       	add	r24, r24
+ 6a0:	99 1f       	adc	r25, r25
+ 6a2:	6b 81       	ldd	r22, Y+3	; 0x03
+ 6a4:	7c 81       	ldd	r23, Y+4	; 0x04
+ 6a6:	e6 d2       	rcall	.+1484   	; 0xc74 <__divmodhi4>
+ 6a8:	7c 87       	std	Y+12, r23	; 0x0c
+ 6aa:	6b 87       	std	Y+11, r22	; 0x0b
 	}
 
 	return data = (int8_t)(pivot + roadmarkLeft*128 + roadmarkRight*64);	// Center of mass calculation on bit 0-6, 7 bit for right turn, 8 bit for left turn.
- 6aa:	8b 85       	ldd	r24, Y+11	; 0x0b
- 6ac:	9c 85       	ldd	r25, Y+12	; 0x0c
- 6ae:	29 85       	ldd	r18, Y+9	; 0x09
- 6b0:	3a 85       	ldd	r19, Y+10	; 0x0a
- 6b2:	4f 81       	ldd	r20, Y+7	; 0x07
- 6b4:	58 85       	ldd	r21, Y+8	; 0x08
- 6b6:	44 0f       	add	r20, r20
- 6b8:	24 0f       	add	r18, r20
- 6ba:	30 e4       	ldi	r19, 0x40	; 64
- 6bc:	23 9f       	mul	r18, r19
- 6be:	80 0d       	add	r24, r0
- 6c0:	11 24       	eor	r1, r1
- 6c2:	89 83       	std	Y+1, r24	; 0x01
+ 6ac:	8b 85       	ldd	r24, Y+11	; 0x0b
+ 6ae:	9c 85       	ldd	r25, Y+12	; 0x0c
+ 6b0:	29 85       	ldd	r18, Y+9	; 0x09
+ 6b2:	3a 85       	ldd	r19, Y+10	; 0x0a
+ 6b4:	4f 81       	ldd	r20, Y+7	; 0x07
+ 6b6:	58 85       	ldd	r21, Y+8	; 0x08
+ 6b8:	44 0f       	add	r20, r20
+ 6ba:	24 0f       	add	r18, r20
+ 6bc:	30 e4       	ldi	r19, 0x40	; 64
+ 6be:	23 9f       	mul	r18, r19
+ 6c0:	80 0d       	add	r24, r0
+ 6c2:	11 24       	eor	r1, r1
+ 6c4:	89 83       	std	Y+1, r24	; 0x01
 }
- 6c4:	2c 96       	adiw	r28, 0x0c	; 12
- 6c6:	0f b6       	in	r0, 0x3f	; 63
- 6c8:	f8 94       	cli
- 6ca:	de bf       	out	0x3e, r29	; 62
- 6cc:	0f be       	out	0x3f, r0	; 63
- 6ce:	cd bf       	out	0x3d, r28	; 61
- 6d0:	df 91       	pop	r29
- 6d2:	cf 91       	pop	r28
- 6d4:	1f 91       	pop	r17
- 6d6:	0f 91       	pop	r16
- 6d8:	ff 90       	pop	r15
- 6da:	ef 90       	pop	r14
- 6dc:	08 95       	ret
+ 6c6:	2c 96       	adiw	r28, 0x0c	; 12
+ 6c8:	0f b6       	in	r0, 0x3f	; 63
+ 6ca:	f8 94       	cli
+ 6cc:	de bf       	out	0x3e, r29	; 62
+ 6ce:	0f be       	out	0x3f, r0	; 63
+ 6d0:	cd bf       	out	0x3d, r28	; 61
+ 6d2:	df 91       	pop	r29
+ 6d4:	cf 91       	pop	r28
+ 6d6:	1f 91       	pop	r17
+ 6d8:	0f 91       	pop	r16
+ 6da:	ff 90       	pop	r15
+ 6dc:	ef 90       	pop	r14
+ 6de:	08 95       	ret
 
-000006de <read_line_back>:
+000006e0 <read_line_back>:
 
 int8_t read_line_back(int reflex_high)
 {
- 6de:	ef 92       	push	r14
- 6e0:	ff 92       	push	r15
- 6e2:	0f 93       	push	r16
- 6e4:	1f 93       	push	r17
- 6e6:	cf 93       	push	r28
- 6e8:	df 93       	push	r29
- 6ea:	cd b7       	in	r28, 0x3d	; 61
- 6ec:	de b7       	in	r29, 0x3e	; 62
- 6ee:	28 97       	sbiw	r28, 0x08	; 8
- 6f0:	0f b6       	in	r0, 0x3f	; 63
- 6f2:	f8 94       	cli
- 6f4:	de bf       	out	0x3e, r29	; 62
- 6f6:	0f be       	out	0x3f, r0	; 63
- 6f8:	cd bf       	out	0x3d, r28	; 61
- 6fa:	7c 01       	movw	r14, r24
+ 6e0:	ef 92       	push	r14
+ 6e2:	ff 92       	push	r15
+ 6e4:	0f 93       	push	r16
+ 6e6:	1f 93       	push	r17
+ 6e8:	cf 93       	push	r28
+ 6ea:	df 93       	push	r29
+ 6ec:	cd b7       	in	r28, 0x3d	; 61
+ 6ee:	de b7       	in	r29, 0x3e	; 62
+ 6f0:	28 97       	sbiw	r28, 0x08	; 8
+ 6f2:	0f b6       	in	r0, 0x3f	; 63
+ 6f4:	f8 94       	cli
+ 6f6:	de bf       	out	0x3e, r29	; 62
+ 6f8:	0f be       	out	0x3f, r0	; 63
+ 6fa:	cd bf       	out	0x3d, r28	; 61
+ 6fc:	7c 01       	movw	r14, r24
 	int i;
 	volatile int8_t data;
 	volatile uint8_t indata = 0;
- 6fc:	1a 82       	std	Y+2, r1	; 0x02
+ 6fe:	1a 82       	std	Y+2, r1	; 0x02
 	volatile int sum = 0;
- 6fe:	1c 82       	std	Y+4, r1	; 0x04
- 700:	1b 82       	std	Y+3, r1	; 0x03
+ 700:	1c 82       	std	Y+4, r1	; 0x04
+ 702:	1b 82       	std	Y+3, r1	; 0x03
 	volatile int sum_index = 0;
- 702:	1e 82       	std	Y+6, r1	; 0x06
- 704:	1d 82       	std	Y+5, r1	; 0x05
+ 704:	1e 82       	std	Y+6, r1	; 0x06
+ 706:	1d 82       	std	Y+5, r1	; 0x05
 	volatile int pivot = 0;	
- 706:	18 86       	std	Y+8, r1	; 0x08
- 708:	1f 82       	std	Y+7, r1	; 0x07
+ 708:	18 86       	std	Y+8, r1	; 0x08
+ 70a:	1f 82       	std	Y+7, r1	; 0x07
 	
 	for(i = 1; i < 12; i++)
- 70a:	01 e0       	ldi	r16, 0x01	; 1
- 70c:	10 e0       	ldi	r17, 0x00	; 0
- 70e:	25 c0       	rjmp	.+74     	; 0x75a <read_line_back+0x7c>
+ 70c:	01 e0       	ldi	r16, 0x01	; 1
+ 70e:	10 e0       	ldi	r17, 0x00	; 0
+ 710:	24 c0       	rjmp	.+72     	; 0x75a <read_line_back+0x7a>
 	{
 		PORTD &= 0xF0;														// Resets the 4 LSB bits in PORT A.
- 710:	8b b1       	in	r24, 0x0b	; 11
- 712:	80 7f       	andi	r24, 0xF0	; 240
- 714:	8b b9       	out	0x0b, r24	; 11
+ 712:	8b b1       	in	r24, 0x0b	; 11
+ 714:	80 7f       	andi	r24, 0xF0	; 240
+ 716:	8b b9       	out	0x0b, r24	; 11
 		PORTD |= i;															// Set multiplexer to index i.
- 716:	8b b1       	in	r24, 0x0b	; 11
- 718:	80 2b       	or	r24, r16
- 71a:	8b b9       	out	0x0b, r24	; 11
+ 718:	8b b1       	in	r24, 0x0b	; 11
+ 71a:	80 2b       	or	r24, r16
+ 71c:	8b b9       	out	0x0b, r24	; 11
 		PORTD |= 0x10;														// Start sensor.
- 71c:	8b b1       	in	r24, 0x0b	; 11
- 71e:	80 61       	ori	r24, 0x10	; 16
- 720:	8b b9       	out	0x0b, r24	; 11
+ 71e:	8b b1       	in	r24, 0x0b	; 11
+ 720:	80 61       	ori	r24, 0x10	; 16
+ 722:	8b b9       	out	0x0b, r24	; 11
 		
 
-		indata = is_active_reflex(reflex_high - 1);								// 1 if current sensor sees tape, 0 otherwise.
- 722:	c7 01       	movw	r24, r14
- 724:	01 97       	sbiw	r24, 0x01	; 1
+		indata = is_active_reflex(reflex_high);								// 1 if current sensor sees tape, 0 otherwise.
+ 724:	c7 01       	movw	r24, r14
  726:	0c dd       	rcall	.-1512   	; 0x140 <is_active_reflex>
  728:	8a 83       	std	Y+2, r24	; 0x02
 		PORTD &= 0xEF;														// Turn off sensor.
@@ -1333,7 +1331,7 @@ int8_t read_line_back(int reflex_high)
  758:	1f 4f       	sbci	r17, 0xFF	; 255
  75a:	0c 30       	cpi	r16, 0x0C	; 12
  75c:	11 05       	cpc	r17, r1
- 75e:	c4 f2       	brlt	.-80     	; 0x710 <read_line_back+0x32>
+ 75e:	cc f2       	brlt	.-78     	; 0x712 <read_line_back+0x32>
 		
 		sum += indata;									
 		sum_index += (i)*indata;
@@ -1343,14 +1341,14 @@ int8_t read_line_back(int reflex_high)
  760:	8b 81       	ldd	r24, Y+3	; 0x03
  762:	9c 81       	ldd	r25, Y+4	; 0x04
  764:	89 2b       	or	r24, r25
- 766:	29 f4       	brne	.+10     	; 0x772 <read_line_back+0x94>
+ 766:	29 f4       	brne	.+10     	; 0x772 <read_line_back+0x92>
 	{
 		pivot = 12;
  768:	8c e0       	ldi	r24, 0x0C	; 12
  76a:	90 e0       	ldi	r25, 0x00	; 0
  76c:	98 87       	std	Y+8, r25	; 0x08
  76e:	8f 83       	std	Y+7, r24	; 0x07
- 770:	09 c0       	rjmp	.+18     	; 0x784 <read_line_back+0xa6>
+ 770:	09 c0       	rjmp	.+18     	; 0x784 <read_line_back+0xa4>
 	} else {
 		pivot = (sum_index*2)/sum;											// Center of mass calculation, multiply with 2 to get decimals.
  772:	8d 81       	ldd	r24, Y+5	; 0x05
@@ -1423,9 +1421,9 @@ uint8_t read_gyro()
  7d2:	00 d0       	rcall	.+0      	; 0x7d4 <read_gyro+0x6>
  7d4:	cd b7       	in	r28, 0x3d	; 61
  7d6:	de b7       	in	r29, 0x3e	; 62
-		volatile int8_t indata = AD_convert() - 130;						// 129 is digital voltage with 0 rotation.
+		volatile int8_t indata = AD_convert() - 126;						// 126 is digital voltage with 0 rotation.
  7d8:	77 dc       	rcall	.-1810   	; 0xc8 <AD_convert>
- 7da:	82 58       	subi	r24, 0x82	; 130
+ 7da:	8e 57       	subi	r24, 0x7E	; 126
  7dc:	89 83       	std	Y+1, r24	; 0x01
 		w_int += indata*4;													// Looses the two MSB, multiply with 4.
  7de:	29 81       	ldd	r18, Y+1	; 0x01

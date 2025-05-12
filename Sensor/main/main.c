@@ -52,7 +52,7 @@ int main()
 		init_line_front();
 		line_front = read_line_front(reflex_high);
 		
-		roadmark_send = line_front >> 6;					// Roadmark bits to the right.
+		roadmark_send = (line_front >> 6) & (0x03);			// Roadmark bits to the right.
 		line_front_send = line_front & (0x3F);				// MSB to 0. 
 
 		init_line_back();
@@ -83,18 +83,16 @@ ISR(SPI_STC_vect)
 	else if(choose_sensor == 2) 
 	{
 		SPDR = line_back_send;
-		//volatile uint8_t test = 12; 
-		//SPDR = test;
-		//sei();
 	}
 	else if(choose_sensor == 3) 
 	{
+		reset_w();
 		TCCR1B |= (1 << CS11) | (1 << CS10);			// Start timer and gyro.
 	} 
 	else if(choose_sensor == 4) 
 	{
 		cli();
-		TCCR1B &= ~(1 << CS11) | (1 << CS10);			// Turn off timer and gyro.
+		TCCR1B &= ~((1 << CS11) | (1 << CS10));			// Turn off timer and gyro.
 		reset_w();
 		sei();
 	} 

@@ -156,7 +156,17 @@ def get_sensordata(data_list): #hämta sensordata från IR och uppdatera i GUI
     text4.config(text=f"Avstånd till hinder: {data_list[0]}")
     text1.config(text=f"Rotation platta: {data_list[2]}")
     text5.config(text=f"Lateral position: {data_list[1]}")
+    text2.config(text=f"Gaspådrag: {data_list[4]}, {data_list[3]}")
 
+    global ir_data
+    #ir_data += 1
+    try:
+        ir_data = bt.sendbyte(0x00)  #IR
+        text4.config(text=f"Avstånd till hinder: {ir_data}")
+    except:
+        print("Kunde inte hämta sensordata")
+   # bt.sendbyte(0x01)  #Reflex
+    # bt.sendbyte(0x02)  #Gyro
     return
 
 
@@ -188,7 +198,7 @@ def auto_pressed():
             except:
                 pass
        
-        for ruta in [ruta1, ruta2, ruta3]:
+        for ruta in [ruta1, ruta3]:
             ruta.config(bg="#d3d3d3")
             for widget in ruta.winfo_children():
                 try:
@@ -238,7 +248,7 @@ def manuell_pressed():
             except:
                 pass
 
-        for ruta in [ruta1, ruta2, ruta3]:
+        for ruta in [ruta1, ruta3]:
             ruta.config(bg="SystemButtonFace")
             for widget in ruta.winfo_children():
                 try:
@@ -292,7 +302,7 @@ def start_pressed():
 
 
     elif start_active_color == "red":
-        #stop_receive_data()
+        stop_receive_data()
         #cancel_auto = bt.sendbyte(0x41)
         buttonStart.config(bg="green")
         buttonStart.config(text="Start")
@@ -334,6 +344,9 @@ def startdata_pressed():
         stop_receive_data()
         buttonStartdata.config(bg="green")
         buttonStartdata.config(text="Start data")
+
+def calibrate_sensor():
+    bt.sendbyte(0x67)
 
 
 def start_receive_data():
@@ -488,6 +501,23 @@ buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
 ###############################################################
 ###############################################################
 
+#kalibrerings-knappen
+
+kalibreringknapp_width = autoknapp_width
+kalibreringknapp_height = autoknapp_height
+kalibreringknapp_x = winwidth*0.62
+kalibreringknapp_y = winheight*0.04
+
+Kalibreringknapp = tk.Frame(master=window, width=kalibreringknapp_width, height=kalibreringknapp_height, bd=0, relief="solid",bg=window.cget("bg"), padx=4, pady=4)
+Kalibreringknapp.place(x=kalibreringknapp_x, y=kalibreringknapp_y)
+Kalibreringknapp.pack_propagate(False)
+
+buttonKalibrering = tk.Button(Kalibreringknapp, text="Kalibrera linjesensor", bg="green", fg="white", font=("Arial", 16), command=calibrate_sensor)
+buttonKalibrering.pack(fill="both", expand=True, padx=1, pady=1)
+
+###############################################################
+###############################################################
+
 # Data-rutan
 data_width = winwidth*0.44
 data_height = winheight*0.2
@@ -542,7 +572,6 @@ Kontrollruta.place(x=kontroll_x, y=kontroll_y)
 Kontrollruta.grid_rowconfigure(0, weight=1)
 Kontrollruta.grid_rowconfigure(1, weight=1)
 Kontrollruta.grid_columnconfigure(0, weight=1)
-Kontrollruta.grid_columnconfigure(1, weight=1)
 
 
 
@@ -558,10 +587,6 @@ ruta1.grid_columnconfigure(0, uniform=True)
 ruta1.grid_columnconfigure(1, uniform=True)
 ruta1.grid_columnconfigure(2, uniform=True)
 ruta1.grid_rowconfigure(1, uniform=True)
-
-
-ruta2 = tk.Frame(Kontrollruta, relief="solid", bd = 2)
-ruta2.grid(row=0, column=1, rowspan=2, sticky="nsew")
 
 
 ruta3 = tk.Frame(Kontrollruta, relief="solid", bd = 2)
@@ -581,23 +606,23 @@ textC.grid(column= 0, row = 0, sticky="nsw")
 textR = tk.Label(Lagerknapp, text="Rader: ", font=("Arial", 15))
 textR.grid(column= 0, row = 1, sticky="nsw")
 
-buttonaddW = tk.Button(Lagerknapp, text="+", width =8, height=4, command=lambda: increase_lager_width())
+buttonaddW = tk.Button(Lagerknapp, text="+", font=("Arial", 15), width =6, height=2, command=lambda: increase_lager_width())
 buttonaddW.grid(row = 0, column=2, padx=5, pady= 5)
 
 textW = tk.Label(Lagerknapp, text=lagerbredd, font=("Arial", 15))
 textW.grid(row = 0, column=1)
 
-buttonsubW = tk.Button(Lagerknapp, text="-", width =8, height=4, command=lambda: decrease_lager_width())
+buttonsubW = tk.Button(Lagerknapp, text="-", font=("Arial", 15), width =6, height=2, command=lambda: decrease_lager_width())
 buttonsubW.grid(row = 0, column=0, padx=5, pady= 5)
 
 
-buttonaddH = tk.Button(Lagerknapp, text="+", width =8, height=4, command=lambda: increase_lager_height())
+buttonaddH = tk.Button(Lagerknapp, text="+",  font=("Arial", 15), width =6, height=2, command=lambda: increase_lager_height())
 buttonaddH.grid(row = 1, column=2, padx=5, pady= 5)
 
 textH = tk.Label(Lagerknapp, text=lagerhöjd, font=("Arial", 15))
 textH.grid(row = 1, column=1)
 
-buttonsubH = tk.Button(Lagerknapp, text="-", width =8, height=4, command=lambda: decrease_lager_height())
+buttonsubH = tk.Button(Lagerknapp, text="-", font=("Arial", 15), width =6, height=2, command=lambda: decrease_lager_height())
 buttonsubH.grid(row = 1, column=0, padx=5, pady= 5)
 
 resetbutton = tk.Button(Lagerknapp, text="Reset", width =8, height=4, command=lambda: reset_lager())
@@ -639,47 +664,32 @@ platta.grid(column= 1, row = 0)
 pressed_keys = list()
 
 
-# INNEHÅLL RUTA2
 
-gripklotext = tk.Label(ruta2, text="Gripklo", font=("Arial", 15))
-gripklotext.pack(pady=5)
-
-button_open = tk.Button(ruta2, text="Öppna", width =20, height=3)
-button_open.pack(padx=30, pady=25)
-
-button_close = tk.Button(ruta2, text="Stäng", width =20, height=3)
-button_close.pack(padx=30, pady=25)
-
-button_turnright = tk.Button(ruta2, text="Vrid höger", width =20, height=3)
-button_turnright.pack(padx=30, pady=25)
-
-button_turnleft = tk.Button(ruta2, text="Vrid vänster", width =20, height=3)
-button_turnleft.pack(padx=30, pady=25)
 
 
 
 # INNEHÅLL RUTA3
 
-button_minus = tk.Button(ruta3, text="- \n (Y)", font=("Arial", 20), width =3, height=1)
+button_minus = tk.Button(ruta3, text="- (H)", font=("Arial", 15), width =7, height=1)
 button_minus.grid(row = 1, column=0, padx=5, pady= 5)
 button_minus.bind("<ButtonPress-1>", lambda e: simulate_key_event("-", "press"))
 button_minus.bind("<ButtonRelease-1>", lambda e: simulate_key_event("-", "release"))
 
-servo = tk.Label(ruta3, text="Servo " + str(current_joint), font=("Arial", 15))
+servo = tk.Label(ruta3, text="Led " + str(current_joint), font=("Arial", 15))
 servo.grid(row=1, column=1)
 
-button_plus = tk.Button(ruta3, text="+", font=("Arial", 20), width =3, height=1)
+button_plus = tk.Button(ruta3, text="+ (Y)", font=("Arial", 15), width =7, height=1)
 button_plus.grid(row = 1, column=2, padx=5, pady= 5)
 button_plus.bind("<ButtonPress-1>", lambda e: simulate_key_event("+", "press"))
 button_plus.bind("<ButtonRelease-1>", lambda e: simulate_key_event("+", "release"))
 
-button_counterclockwise = tk.Button(ruta3, text="CCW", width =20, height=3)
+button_counterclockwise = tk.Button(ruta3, text="CCW (Z)", font=("Arial", 9), width =15, height=3)
 button_counterclockwise.grid(row = 2, column=0, padx=5, pady= 5)
 button_counterclockwise.bind("<ButtonPress-1>", lambda e: simulate_key_event("z", "press"))
 button_counterclockwise.bind("<ButtonRelease-1>", lambda e: simulate_key_event("z", "release"))
 
 
-button_clockwise = tk.Button(ruta3, text="CW", width =20, height=3)
+button_clockwise = tk.Button(ruta3, text="CW (C)", font=("Arial", 9), width =15, height=3)
 button_clockwise.grid(row = 2, column=2, padx=5, pady= 5)
 button_clockwise.bind("<ButtonPress-1>", lambda e: simulate_key_event("a", "press"))
 button_clockwise.bind("<ButtonRelease-1>", lambda e: simulate_key_event("a", "release"))
@@ -792,11 +802,16 @@ def draw_lager():
             y1, y2 = yposlist[i], yposlist[i + 1]
             line = Canvas.create_line(x, y1, x, y2, fill="black", width=5, tags="line")
             lines.append((line, (x, y1, x, y2)))
+
     
-    #Draw nodes
+
+    #Draw nodes and save the positions in a list
+    #node_positions = []
+
     node_count = 1
     for xpos in xposlist:
         for ypos in yposlist:
+            #node_positions[node_count] = (xpos, ypos)
             draw_circle(Canvas, xpos, ypos, 16, color="lightgray")
             Canvas.create_text(xpos, ypos, text=str(node_count), fill="black", font=("Arial", 14))
             node_count += 1
