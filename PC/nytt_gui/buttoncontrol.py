@@ -253,7 +253,7 @@ def start_pressed():
         dg.timeractive = True
         dg.timer(dg.window)
         global gather_data
-        gather_data = False  #ska vara true
+        gather_data = True  #ska vara true
         dg.buttonStart.config(bg="red")
         dg.buttonStart.config(text="Avbryt")
 
@@ -285,6 +285,7 @@ def start_pressed():
 
 
     elif start_active_color == "red":
+        dg.remove_styr_info()
         gather_data = False
         dg.timeractive = False
         dg.timer(dg.window)
