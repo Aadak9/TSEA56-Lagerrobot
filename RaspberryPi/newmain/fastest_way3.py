@@ -110,33 +110,40 @@ def held_karp_väg(matris):
     path = list(reversed(path))
     return slutkostnad, path
 
-def node_to_xy(node, lagerbredd):
+def node_to_xy(node, lagerbredd, lagerhöjd):
     nx = lagerbredd + 1
-    x = (node - 1) % nx
-    y = (node - 1) // nx
-    return (x, y)
+    ny = lagerhöjd + 1
+    for i in range(0, nx):
+        for j in range(0, ny):
+            if node == j + ny * i + 1:
+                return(i, j)
+            else:
+                continue
+            
+    return(0,0)
+            
 
 def get_direction(p1, p2):
     return (p2[0] - p1[0], p2[1] - p1[1])
 
 def direction_to_angle(direction):
     # Gör om (dx, dy) till en riktning i grader
-    if direction == (1, 0):
+    if direction == (0, 1):
         return 0    # nedåt
-    elif direction == (0, 1):
+    elif direction == (1, 0):
         return 90   # höger
-    elif direction == (-1, 0):
-        return 180  # uppåt
     elif direction == (0, -1):
+        return 180  # uppåt
+    elif direction == (-1, 0):
         return 270  # vänster
     else:
         return None # ogiltig
 
-def sväng_instructions(correct_path, lagerbredd):
+def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
     directions = []
-    # Ta bort 'goal' om den finns
-    pos = [node_to_xy(n, lagerbredd) for n in correct_path if isinstance(n, int)]
-    #print(pos)
+    # Ta bort 'goal'
+    pos = [node_to_xy(n, lagerbredd, lagerhöjd) for n in correct_path if isinstance(n, int)]
+    print(pos)
     if len(pos) < 2:
         return directions
 
@@ -180,8 +187,11 @@ def sväng_instructions(correct_path, lagerbredd):
 
     return directions
 
-Graf = skapa_graf(3, 3)
-målnoder = {1:[1], 2:[13,14], 3:[10,14], 4:[14,15]} #noder som ska besökas, där första noden är start och slutnod
+lagerbredd = 3
+lagerhöjd = 3
+
+Graf = skapa_graf(lagerhöjd, lagerbredd) #höjd, bredd (står fel i funktionen)
+målnoder = {1:[1], 2:[1,2], 3:[10,14]} #noder som ska besökas, där första noden är start och slutnod
 matris = skapa_avståndsmatris(Graf, målnoder)
 kostnad, ordning = held_karp_väg(matris)
 
@@ -199,4 +209,4 @@ correct_path = [item for sublist in path for item in sublist]
 print(correct_path)
 print(kostnad)
 
-print(sväng_instructions(correct_path, 3))
+print(sväng_instructions(correct_path, lagerbredd, lagerhöjd))
