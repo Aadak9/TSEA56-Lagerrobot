@@ -1,5 +1,6 @@
 import bluetooth as bt
 import draw_gui as dg
+import data_saver as ds
 import time
 
 global pressed_keys
@@ -254,6 +255,7 @@ def start_pressed():
         dg.timer(dg.window)
         global gather_data
         gather_data = True  #ska vara true
+        dg.data_time_start = time.time() #börjar mäta datatid
         dg.buttonStart.config(bg="red")
         dg.buttonStart.config(text="Avbryt")
 
@@ -287,6 +289,8 @@ def start_pressed():
     elif start_active_color == "red":
         dg.remove_styr_info()
         gather_data = False
+        ds.save_data_to_file()
+        ds.data_list = []
         dg.timeractive = False
         dg.timer(dg.window)
         dg.buttonStart.config(bg="green")
@@ -323,12 +327,15 @@ def startdata_pressed():
 
     if data_active_color == "green":
         gather_data = True
+        dg.data_time_start = time.time() #börjar mäta data tid
         dg.buttonStartdata.config(bg="red")
         dg.buttonStartdata.config(text="Avbryt data")
         
 
     elif data_active_color == "red":
         gather_data = False
+        ds.save_data_to_file()
+        ds.data_list = []
         dg.buttonStartdata.config(bg="green")
         dg.buttonStartdata.config(text="Start data")
 
