@@ -623,6 +623,7 @@ def data_loop(window):
     try:
         new_plan = bt.send_and_receive(0x80)
         if new_plan == 1:
+            print("HEJ")
             length_of_plan = bt.receive_data(1)
             print(length_of_plan)
             plan = []
@@ -630,13 +631,13 @@ def data_loop(window):
                 data = bt.receive_data(length_of_plan - len(plan))
                 if not data:
                     raise ConnectionError("misslyckad öveföring av plan")
-                print(data)
                 if type(data) == list:
                     plan += data
                 else:
                     plan.append(data)
-                print(plan)
+            print(f"målnoder {plan}")
             draw_styr(plan, max_rows_per_col)
+
     except:
         print("Ny data misslyckat")
     
