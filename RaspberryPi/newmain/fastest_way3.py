@@ -201,6 +201,9 @@ def fastest_way(lagerbredd, lagerhöjd, målnoder):
 	Graf = skapa_graf(lagerhöjd, lagerbredd)
 	matris = skapa_avståndsmatris(Graf, målnoder)
 	kostnad, ordning = held_karp_väg(matris)
+	key = list(målnoder)[-1]
+	if målnoder[key] != [1]:
+		målnoder[len(målnoder)+1] = [1] #ska alltid avsluta i nod 1
 
 	path = []
 	#beräkna vägen till alla varor
@@ -212,20 +215,31 @@ def fastest_way(lagerbredd, lagerhöjd, målnoder):
 			path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], 0))
 
 	correct_path = [item for sublist in path for item in sublist]
+	nodeorder = []
+	
+	for i in correct_path:
+		if isinstance(i,int):
+			nodeorder.append(i)
+	
 
-<<<<<<< HEAD
-	#print(correct_path)
-	#print(kostnad)
+    #print(correct_path)
+    #print(kostnad)
 	#print(sväng_instructions(correct_path, lagerbredd))	
-	väg = deque(sväng_instructions(correct_path, lagerbredd))
-	väg.append("lämna")
+	väg = deque(sväng_instructions(correct_path, lagerbredd, lagerhöjd))
+	if väg[-1] != "lämna":
+		väg.append("lämna")
 	
-	return väg
-=======
-	print(kostnad)
-	print(sväng_instructions(correct_path, lagerbredd, lagerhöjd))	
-	
-	return sväng_instructions(correct_path, lagerbredd, lagerhöjd)
->>>>>>> 905b098ff321b2027b44b051dd7142c5cdcbd17d
+	return väg, nodeorder
 
-fastest_way(3, 3, {1:[1], 2:[2,6]})
+def find_location(path, nodeorder): 
+	diff = len(nodeorder) - len(path)
+	current_node = nodeorder[diff]
+	next_node = nodeorder[diff + 1]
+	new_nodeorder = nodeorder[diff:]
+	
+	return current_node, next_node
+	
+
+#fastest_way(3, 3, {1:[1], 2:[2,6]})
+
+

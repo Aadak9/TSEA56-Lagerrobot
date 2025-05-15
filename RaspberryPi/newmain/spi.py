@@ -32,3 +32,21 @@ def send_spi(spi, data):
             time.sleep(0.001)
             response = spi.xfer2([data])[0]
     return response
+
+
+
+def load_angle(spi_styr, joint):
+	with spi_lock:
+		spi_styr.xfer2([0x50])
+		time.sleep(0.001)
+		spi_styr.xfer2([joint])
+		time.sleep(0.001)
+		spi_styr.xfer2([0x00])
+		time.sleep(0.001)
+		anglehigh = spi_styr.xfer2([0x00])[0]
+		time.sleep(0.001)
+		anglelow = spi_styr.xfer2([0x00])[0]
+		angle = (anglehigh << 8) + anglelow
+		return angle
+		
+

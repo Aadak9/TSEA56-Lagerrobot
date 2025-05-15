@@ -85,7 +85,7 @@ void USART_Transmit( unsigned char* data, unsigned int size )
 	unsigned char data[] = {header, header, ID, Length, Instruction, Checksum};
 	unsigned char data_size = sizeof(data) / sizeof(data[0]);
 	USART_Transmit(data, data_size);
-	_delay_us(10);}void move_2servo(unsigned int ID1, unsigned int ID2, unsigned int angle){	load_servo(ID1, angle);	load_servo(ID2, angle);	action();		}void add1degree(unsigned int ID){	unsigned int angle = get_angle(ID);	if(angle < 1023)
+	_delay_us(10);}void move_2servo(unsigned int ID1, unsigned int ID2, unsigned int angle){	load_servo(ID1, angle);	load_servo(ID2, 1023 - angle);	action();		}void add1degree(unsigned int ID){	unsigned int angle = get_angle(ID);	if(angle < 1023)
 	{					
 		angle += rotatespeed;
 		move_servo(ID, angle);
