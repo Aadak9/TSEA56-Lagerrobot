@@ -198,8 +198,11 @@ def remove_path(Graf, n1, n2):
             
 
 def fastest_way_hinder(lagerbredd, lagerhöjd, målnoder, hinder):
-
-    målnoder[len(målnoder)+1] = [1] #ska alltid avsluta i nod 1
+	
+    key = list(målnoder)[-1]
+    if målnoder[key] != [1]:
+	    målnoder[len(målnoder)+1] = [1] #ska alltid avsluta i nod 1
+	    
     Graf = skapa_graf(lagerhöjd, lagerbredd) # skapa fullständig graf
     for i in hinder:
         Graf = remove_path(Graf, i[0], i[1]) #ta bort varje hinder, sista i listan är sist påkommna hindret
@@ -219,11 +222,20 @@ def fastest_way_hinder(lagerbredd, lagerhöjd, målnoder, hinder):
             path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], 0))
 
     correct_path = [item for sublist in path for item in sublist]
-    print(sväng_instructions(correct_path, lagerbredd, lagerhöjd, hinder))	
+    
+    nodeorder = []
+    for i in correct_path:
+        if isinstance(i,int):
+            nodeorder.append(i)
 
-    return sväng_instructions(correct_path, lagerbredd, lagerhöjd, hinder)
+    väg = deque(sväng_instructions(correct_path, lagerbredd, lagerhöjd, hinder))
+    
+    if väg[-1] != "lämna" :
+        väg.append("lämna")
+
+    return väg, nodeorder
 
 
 
-fastest_way_hinder(4, 3, {1:[20], 2:[14,18], 3:[13,17], 4:[4,8]}, [[3,7], [11,12], [18,19], [9,13], [16,20]])
+#fastest_way_hinder(4, 3, {1:[20], 2:[14,18], 3:[13,17], 4:[4,8]}, [[3,7], [11,12], [18,19], [9,13], [16,20]])
 #bredd, höjd, dictionary med målnoder där första är startnod och resterande är plockstationer, lista med hinder där sista är sist påkomna hindret

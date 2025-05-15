@@ -18,10 +18,14 @@ def check_obstacle(spi_sensor):
 def control_loop(spi_styr, spi_sensor, KP, KD):
     try:
         time.sleep(0.001)
+        
+        
+        
         regler_error_front = 6 - spi.send_spi(spi_sensor, 1)/2
         regler_error_back = 6 - spi.send_spi(spi_sensor, 2)/2
-        
         output = r.PDController(regler_error_front, regler_error_back, KP, KD)
+            
+        
         output = int(output * 100)
         status = 1 if output > 0 else 0
         output = abs(output)
@@ -67,6 +71,56 @@ def rotate_right(spi_styr, spi_sensor):
         print("gyrofel")   
 
 
+
+def rotate_right_180(spi_styr, spi_sensor):
+	try:
+	    spi.send_spi(spi_sensor, 3)
+	    time.sleep(0.05)
+	    angle = 0
+	    while (angle < 121):
+		    angle = spi.send_spi(spi_sensor, 5)
+		    spi.send_spi(spi_styr, 0x4) #rotera höger
+		    time.sleep(0.001)
+		    if not Automatic:
+			    break            
+	    spi.send_spi(spi_sensor, 4)
+	except:
+		print("gyrofel")  
+
 def drive_fwd(spi_styr):
 	spi.send_spi(spi_styr, 0x1)
+
+
+
+def load_all_angles(spi_styr):
+	angles = []
+	with (open("sparade_vinklar.txt", "a")) as file:
+		for i in range(1,9):
+			angle = spi.load_angle(spi_styr, i)
+			angles.append(str(angle))
+			angles.append(" ")
+		print(angles)
+		file.writelines(angles)
+		file.write("\n")
+	
+
+def move_joint(spi_styr, joint, angle):
+	spi_styr.xfer2([0x60])
+	anglehigh = (angle >> 8) & 0xFF
+	anglelow = angle & 0xFF
+	spi_styr.xfer2([joint])
+	time.sleep(0.001)
+	spi_styr.xfer2([anglehigh])
+	time.sleep(0.001)
+	spi_styr.xfer2([anglelow])
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
     
