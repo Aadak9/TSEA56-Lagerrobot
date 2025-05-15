@@ -12,7 +12,7 @@ def check_roadmark(spi_sensor):
 def check_obstacle(spi_sensor):
     time.sleep(0.001)
     distance = spi.send_spi(spi_sensor, 0)
-    return (distance <= 15)
+    return (distance <= 10)
 
 
 def control_loop(spi_styr, spi_sensor, KP, KD):
@@ -37,9 +37,9 @@ def control_loop(spi_styr, spi_sensor, KP, KD):
 def rotate_left(spi_styr, spi_sensor):
     try:
         spi.send_spi(spi_sensor, 3)
-        time.sleep(0.1)
+        time.sleep(0.05)
         angle = 0
-        while (angle <= 60):
+        while (angle < 60):
             angle = spi.send_spi(spi_sensor, 5)
             time.sleep(0.001)
             spi.send_spi(spi_styr, 0x2) #rotera vänster
@@ -54,9 +54,9 @@ def rotate_left(spi_styr, spi_sensor):
 def rotate_right(spi_styr, spi_sensor):	
     try:
         spi.send_spi(spi_sensor, 3)
-        time.sleep(0.1)
+        time.sleep(0.05)
         angle = 0
-        while (angle <= 60):
+        while (angle < 60):
             angle = spi.send_spi(spi_sensor, 5)
             spi.send_spi(spi_styr, 0x4) #rotera höger
             time.sleep(0.001)

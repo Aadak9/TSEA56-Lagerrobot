@@ -2,7 +2,10 @@ import tkinter as tk
 import buttoncontrol as bc
 import bluetooth as bt
 from buttoncontrol import current_joint
+import data_saver as ds
 import time
+import json
+
 global buttonManuell, Manuellknapp, Autoknapp, buttonAuto, Kontrollruta, Lager, Canvas, ruta1, ruta3, buttonStartdata, buttonStart, Lagerknapp, textH, textW
 Canvas = None
 global lagerbredd, lagerhöjd
@@ -14,6 +17,10 @@ timeractive = False
 global window
 window = tk.Tk()
 
+global data_time_start
+data_time_start = time.time()
+global data_time_current
+data_time_current = time.time()
 
 global placed_goods
 placed_goods = []
@@ -208,15 +215,58 @@ def draw_gui(window):
     text_tid = tk.Label(Data, text="Total körningstid: --- ", font=("Arial", 15))
     text_tid.grid(column= 1, row = 2, sticky="nsw")
 
+    ###############################################################
+    ###############################################################
+
+
+    # Styrbeslut-rutan
+    styr_width = winwidth * 0.2
+    styr_height = winheight * 0.53
+    styr_x = winwidth * 0.51
+    styr_y = ((winheight - winheight*0.75) / 2 + winheight*0.75 - styr_height)
+
+    global Styrruta
+
+    Styrruta = tk.Frame(master=window, width=styr_width, height=styr_height, bd=1, relief="solid", highlightthickness=6, padx=4, pady=4)
+    Styrruta.place(x=styr_x, y=styr_y)
+    Styrruta.grid_propagate(False)
+    #Styrruta.config(highlightbackground="green", highlightcolor="green")
+
+    Styrruta.place(x=styr_x, y=styr_y)
+
+
+    # Rubrik i toppen, som sträcker sig över båda kolumnerna
+    rubrik = tk.Label(Styrruta, text="Styrbeslut", font=("Arial", 12, "bold"))
+    rubrik.grid(row=0, column=0, columnspan=3, pady=(0, 10))
+
+    # Testdata
+    #data_list = []
+       # "höger", "vänster", "rakt", "goal", "rotera", "höger", "vänster", "rakt", "goal", "rotera", 
+       # "höger", "vänster", "rakt", "goal", "rotera", "höger", "vänster", "rakt", "goal", "rotera","höger", "vänster", "rakt", "goal", "rotera",
+      # "höger", "vänster", "rakt", "goal", "rotera", "höger", "vänster", "rakt", "goal", "rotera","höger", "vänster", "rakt", "goal", "rotera"]
+
+    global max_rows_per_col
+    radhöjd = 26
+    marginal = 60
+    tillgänglig_höjd = styr_height - marginal  # minus rubrikens höjd m.m.
+    max_rows_per_col = int(tillgänglig_höjd // radhöjd)
+
+    #draw_styr(data_list, max_rows_per_col)
+
+
+    # konfigurera kolumnbredd om du vill ha jämn fördelning
+    Styrruta.grid_columnconfigure(0, weight=1)
+    Styrruta.grid_columnconfigure(1, weight=1)
+    Styrruta.grid_columnconfigure(2, weight=1)
 
     ###############################################################
     ###############################################################
 
 
     # Kontrollruta-rutan
-    kontroll_width = winwidth * 0.44
+    kontroll_width = winwidth * 0.23
     kontroll_height = winheight * 0.53
-    kontroll_x = winwidth * 0.51
+    kontroll_x = winwidth * 0.72
     kontroll_y = ((winheight - winheight*0.75) / 2 + winheight*0.75 - kontroll_height)
 
     Kontrollruta = tk.Frame(master=window, width=kontroll_width, height=kontroll_height, bd=1, relief="solid", highlightthickness=6, padx=4, pady=4)
@@ -457,28 +507,6 @@ def draw_lager():
             node_count += 1
 
     print(placed_goods)
-    """
-    # Draw horizontal lines
-    for y in yposlist:
-        for i in range(len(xposlist) - 1):
-            x1, x2 = xposlist[i], xposlist[i + 1]
-            line = Canvas.create_line(x1, y, x2, y, fill="black", width=5, tags="line")
-            lines.append((line, (x1, y, x2, y)))
-
-    # Draw vertical lines
-    for x in xposlist:
-        for i in range(len(yposlist) - 1):
-            y1, y2 = yposlist[i], yposlist[i + 1]
-            line = Canvas.create_line(x, y1, x, y2, fill="black", width=5, tags="line")
-            lines.append((line, (x, y1, x, y2)))
-    
-    #Draw nodes
-    node_count = 1
-    for xpos in xposlist:
-        for ypos in yposlist:
-            draw_circle(Canvas, xpos, ypos, 16, color="lightgray")
-            Canvas.create_text(xpos, ypos, text=str(node_count), fill="black", font=("Arial", 14))
-            node_count += 1"""
 
 
 
@@ -518,23 +546,6 @@ def on_line_click(event):
     print("Alla placerade varor:", placed_goods)
 
 
-    """
-    global Canvas
-    clicked_items = Canvas.find_withtag("current")
-    if not clicked_items:
-        return
-
-    item = clicked_items[0]
-    coords = Canvas.coords(item)
-    x1, y1, x2, y2 = coords
-
-    mx = (x1 + x2) / 2
-    my = (y1 + y2) / 2
-
-    node = Canvas.create_oval(mx - 10, my - 10, mx + 10, my + 10, fill="green", outline="black")
-    Canvas.tag_bind(node, "<Button-1>", remove_node)
-    """
-
 def remove_node(event):
     global placed_goods
     node_id = Canvas.find_withtag("current")[0]
@@ -554,11 +565,6 @@ def remove_node(event):
                 pass
 
     Canvas.delete(node_id)
-
-
-#def remove_node(event):
- #   Canvas.delete("current")
-
 
 
 def update_joint(current_joint):
@@ -585,11 +591,21 @@ def display_sensor_value(sensor, value):
 
 
 def data_loop(window):
+    data_list = []
+    global time
+    global data_time_current
+    global data_time_start
+    global max_rows_per_col
     if not bc.gather_data:
         window.after(100, lambda: data_loop(window))
         return
+    
+    data_time_current = time.time()
+    elapsed_time = data_time_current - data_time_start
+    data_list.append(elapsed_time)
     try:
         IR_data = bt.send_and_receive(0x60)
+        data_list.append(IR_data)
     except:
         print("IR misslyckat")
     display_sensor_value("IR", str(IR_data))
@@ -597,17 +613,20 @@ def data_loop(window):
     try:
         Reflex_data = bt.send_and_receive(0x61)
         Reflex_data = 6 - Reflex_data/2
+        data_list.append(Reflex_data)
     except:
         print("Reflex misslyckat")
     display_sensor_value("Reflex", str(Reflex_data))
 
     try:
         leftgas = bt.send_and_receive(0x66)
+        data_list.append(leftgas)
     except:
         print("Vänster gas misslyckat")
 
     try:    
         rightgas = bt.send_and_receive(0x65)
+        data_list.append(rightgas)
     except:
         print("Höger gas misslyckat")
     gas_value = str(leftgas) + ", " + str(rightgas)
@@ -615,10 +634,34 @@ def data_loop(window):
 
     try:
         Gyro_data = bt.send_and_receive(0x62)
+        data_list.append(Gyro_data)
     except:
         print("Gyro misslyckat")
     display_sensor_value("Gyro", str(Gyro_data))
-    
+
+    try:
+        new_plan = bt.send_and_receive(0x80)
+        if new_plan == 1:
+            print("HEJ")
+            length_of_plan = bt.receive_data(1)
+            print(length_of_plan)
+            plan = []
+            while len(plan) < length_of_plan:
+                data = bt.receive_data(length_of_plan - len(plan))
+                if not data:
+                    raise ConnectionError("misslyckad öveföring av plan")
+                if type(data) == list:
+                    plan += data
+                else:
+                    plan.append(data)
+            print(f"målnoder {plan}")
+            draw_styr(plan, max_rows_per_col)
+
+    except:
+        print("Ny data misslyckat")
+
+
+    ds.data_list.append(data_list)
     print("letar data")
     
     window.after(500, lambda: data_loop(window))
@@ -631,6 +674,47 @@ def timer(window):
         display_sensor_value("Time", str(elapsed_time))
 
     window.after(1000, lambda: timer(window))
+
+
+def draw_styr(data_list, max_rows_per_col):
+    global Styrruta
+    print(data_list)
+
+    for widget in Styrruta.winfo_children():
+        if isinstance(widget, tk.Label) and widget.grid_info().get("row") != 0:
+            widget.destroy()
+
+    # Lägg till numrerade etiketter i vänster och höger kolumn
+    for idx, item in enumerate(data_list):
+        num = idx + 1
+
+        if item == 2:
+            text = "vänster"
+        elif item == 3:
+            text = "rakt"
+        elif item == 4:
+            text = "vänd"
+        elif item == 5:
+            text = "plocka"
+        elif item == 6:
+            text = "lämna"
+        elif item == 7:
+            text = "höger"
+
+
+        # Beräkna kolumn och rad
+        col = idx // max_rows_per_col       # 0 = vänster, 1 = mitten, 2 = höger
+        row = (idx % max_rows_per_col) + 1  # +1 för att rubriken ligger i rad 0
+
+        label = tk.Label(Styrruta, text=f"{num}. {text}", anchor="w", font=("Arial", 9), justify="left")
+        label.grid(row=row, column=col, sticky="w", padx=5, pady=2)
+
+        
+
+def remove_styr_info():
+    print("slutar")
+    global max_rows_per_col
+    draw_styr([], max_rows_per_col)
 
 
 

@@ -85,9 +85,9 @@ Inga problem
 3. Kommande vecka tänker vi lösa ovanstående problem samt förhoppningsvis utevckla regleringen och påbörja mer av den automatiska styrningen. 
 
 ## Vecka 19 (Grupp XX)(rapporteras måndag v 20)
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+1. Den gångna veckan har vi fått kortaste väg att funka till stor del (läsa in karta från gui och skapa styrbeslut). Lyckats med gyro-svängar. Skrivit på dokument (framförallt kappa och anvöndarhandledning). Snyggade till filer och filuppdelade för enkelhet och funktionalitet. 
+2. Just nu har vi problem med att kortaste väg inte funkar för icke-kvadratiska banor. Datavisning under manuellt funkar fortfarande inte. Inte alltid konsekvent i regleringen. 
+3. Kommande vecka tänker vi fixa ovanstående problem. Se till att kortaste väg algoritmen funkar med hinder. Visa styrbeslut i gui. Korg till varorna. Fixa automatisk styrning av armen. Plotta data (bevis för tid). 
 
 ## Vecka 20 (Grupp XX)(rapporteras måndag v 21)
 1. Den gångna veckan har vi ...

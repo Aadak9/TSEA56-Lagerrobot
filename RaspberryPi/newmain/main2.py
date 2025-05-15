@@ -5,7 +5,12 @@ import time
 import threading
 from collections import deque
 import handle_map as hm
+import json
 
+global next_move
+next_move = None
+global new_plan
+new_plan = False
 
 size = 1024
 
@@ -14,7 +19,7 @@ has_seen_roadmark = False
 def autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan):
     global has_seen_roadmark
     roadmark_status = auto.check_roadmark(spi_sensor)
-    
+    next_move = nav_plan[0]
     if(auto.check_obstacle(spi_sensor)):
         auto.rotate_left(spi_styr, spi_sensor)
         auto.rotate_left(spi_styr, spi_sensor)
@@ -23,14 +28,30 @@ def autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan):
         has_seen_roadmark = False
         auto.control_loop(spi_styr, spi_sensor, KP, KD)
     elif(roadmark_status == 1): # and dags att plocka vara
-        #stanna och plocka vara
-        auto.drive_fwd(spi_styr) # Kör förbi plockstaion
+        if(next_move == "plocka"):
+            spi.send_spi(spi_styr, 0) #stanna och plocka vara
+            time.sleep(2)
+            next_move = nav_plan.popleft()
+            if(nav_plan[0] == "vänd"):
+                auto.rotate_right(spi_styr, spi_sensor)
+                auto.rotate_right(spi_styr, spi_sensor)
+                nav_plan.popleft()
+        else:
+	        auto.drive_fwd(spi_styr) # Kör förbi plockstaion
     elif(roadmark_status == 2): # and dags att plocka vara
-        #stanna och plocka vara
-        auto.drive_fwd(spi_styr) # Kör förbi plockstaion
+        if(next_move == "plocka"):
+            spi.send_spi(spi_styr, 0) #stanna och plocka vara
+            time.sleep(2)
+            next_move = nav_plan.popleft()
+            if(nav_plan[0] == "vänd"):
+                auto.rotate_right(spi_styr, spi_sensor)
+                auto.rotate_right(spi_styr, spi_sensor)
+                nav_plan.popleft()
+        else:
+	        auto.drive_fwd(spi_styr) # Kör förbi plockstaion
     elif(roadmark_status == 3 and not has_seen_roadmark): #sväng utifrån planerad väg
         has_seen_roadmark = True
-        time.sleep(0.14)
+        time.sleep(0.125)
         if(nav_plan):
             next_move = nav_plan.popleft()
         else:
@@ -40,9 +61,12 @@ def autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan):
         if(next_move == "rakt"):
             auto.drive_fwd(spi_styr)
         elif(next_move == "vänster"):
-           auto.rotate_left(spi_styr, spi_sensor)  
+            auto.rotate_left(spi_styr, spi_sensor)  
         elif(next_move == "höger"):
             auto.rotate_right(spi_styr, spi_sensor)
+        elif(next_move == "lämna"):
+            spi.send_spi(spi_styr, 0)
+			
 
     else:
         #print(nav_plan)
@@ -54,6 +78,7 @@ def autonomous_loop(spi_styr, spi_sensor, KP, KD, nav_plan):
 
 
 def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
+    global new_plan
     try:
         if(data == "20"): #Ändrar aktuell armled
             data = client.recv(size) 
@@ -94,6 +119,17 @@ def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
             print(f"gas vänster {response}")
             client.send(response.to_bytes(1, 'big'))
             
+        elif data == "80": #skicka styrbeslut
+            print("hej1")
+            print(new_plan)
+            if new_plan:
+                client.send(b'\x01')
+                print("hej2")
+                hm.send_map(nav_plan, client)
+                print("skickat all data")
+                new_plan = False
+            else:
+                client.send(b'\x00')
         
         else:
             try:
@@ -108,6 +144,7 @@ def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
 
 def bluetooth_listener(s, spi_styr, spi_sensor):
     #global Automatic
+    global new_plan
     global nav_plan
     client, _ = s.accept()
     print("Bluetooth connected")
@@ -120,6 +157,9 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
                     spi.send_spi(spi_styr, 0)
                 else:
                     nav_plan = hm.update_path(client)
+                    new_plan = True
+                    print(nav_plan)
+                    
                 auto.Automatic = not auto.Automatic
                 continue
             else:
@@ -137,17 +177,19 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
 def main():
     #global Automatic
     global nav_plan
+    nav_plan = 0
     s = bt.init_bluetooth()
     spi_styr, spi_sensor = spi.initspi()
 
     #skapa styrbeslutslistan
 
-    nav_plan = deque(["vänster", "rakt", "höger", "höger", "vänster", "vänster", "vänster", "vänster" , "höger", "vänster", "höger", "vänster" ]) #hårdkodad för nu
+    #nav_plan = deque(["rakt", "rakt", "rakt", "rakt", "rakt", "rakt", "rakt" ,"rakt" ,"rakt","rakt"]) #hårdkodad för nu
 
     bt_thread = threading.Thread(target=bluetooth_listener, args=(s, spi_styr, spi_sensor), daemon=True)
     bt_thread.start()
 
     KP, KD = 100, 100
+    
 
     while True:
         old_Automatic = auto.Automatic

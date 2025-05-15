@@ -44,7 +44,36 @@ def update_path(client):
 		nodnumber += 1
 	
 	väg = fw.fastest_way(int(lagerbredd), int(lagerhöjd), målnoder)
-	print(väg)
 	return väg	
+		
+	
+def send_map(nav_plan, client):
+	plan = list(nav_plan)
+	print(len(plan))
+	client.send(len(plan).to_bytes(1, 'big'))
+	for value in plan:
+
+		if value == "vänster":
+			client.send(b'\x02')
+			print("skickat vänster")
+		elif value == "rakt":
+			client.send(b'\x03')
+			print("skickat rakt")
+		elif value == "vänd":
+			client.send(b'\x04')
+			print("skickat vänd")
+		elif value == "plocka":	
+			client.send(b'\x05')
+			print("skickat plocka")
+		elif value == "lämna":	
+			client.send(b'\x06')
+			print("skickat lämna")
+		elif value == "höger":
+			client.send(b'\x07')
+			print("skickat höger")
+	return
+			
+		
+			
 		
 	

@@ -68,18 +68,21 @@ def skapa_avståndsmatris(graf, nodes):
     
     return matris
  
-def held_karp_väg(matris):
+def held_karp_väg(matris, start_index=0, end_index=None):
     n = len(matris)
+    if end_index is None:
+        end_index = n - 1  # standard: sista nod
+
     dp = [[float('inf')] * n for _ in range(1 << n)]
     parent = [[-1] * n for _ in range(1 << n)]
-    dp[1][0] = 0  # Startar i nod 0
+    dp[1 << start_index][start_index] = 0  # Startar i start_index
 
     for mask in range(1 << n):
         for u in range(n):
             if not (mask & (1 << u)):
                 continue
             for v in range(n):
-                if mask & (1 << v):
+                if mask & (1 << v) or v == start_index:
                     continue
                 next_mask = mask | (1 << v)
                 new_cost = dp[mask][u] + matris[u][v]
@@ -87,20 +90,14 @@ def held_karp_väg(matris):
                     dp[next_mask][v] = new_cost
                     parent[next_mask][v] = u
 
-    # Hitta bästa retur till start
-    slutkostnad = float('inf')
-    sista_nod = -1
+    # Avsluta i end_index, inte tillbaka till start
     full_mask = (1 << n) - 1
-    for i in range(1, n):
-        cost = dp[full_mask][i] + matris[i][0]
-        if cost < slutkostnad:
-            slutkostnad = cost
-            sista_nod = i
+    slutkostnad = dp[full_mask][end_index]
+    current = end_index
+    path = []
 
     # Återskapa vägen baklänges
-    path = [0]
     mask = full_mask
-    current = sista_nod
     while current != -1:
         path.append(current)
         prev = parent[mask][current]
@@ -109,6 +106,7 @@ def held_karp_väg(matris):
 
     path = list(reversed(path))
     return slutkostnad, path
+
 
 def node_to_xy(node, lagerbredd, lagerhöjd):
     nx = lagerbredd + 1
@@ -139,7 +137,7 @@ def direction_to_angle(direction):
     else:
         return None # ogiltig
 
-def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
+def sväng_instructions(correct_path, lagerbredd, lagerhöjd, hinder):
     directions = []
     # Ta bort 'goal'
     pos = [node_to_xy(n, lagerbredd, lagerhöjd) for n in correct_path if isinstance(n, int)]
@@ -147,9 +145,13 @@ def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
         return directions
 
     # Start: initial riktning
-    prev_angle = 0
-    #print("dir" + str(prev_dir))
-    #print("angle" + str(prev_angle))
+    if hinder[-1][0] == correct_path[0]:
+        prev_dir = get_direction(node_to_xy(hinder[-1][1], lagerbredd, lagerhöjd),node_to_xy(hinder[-1][0], lagerbredd, lagerhöjd))
+        prev_angle = direction_to_angle(prev_dir)
+    elif hinder[-1][1] == correct_path[0]:
+        prev_dir = get_direction(node_to_xy(hinder[-1][0], lagerbredd, lagerhöjd),node_to_xy(hinder[-1][1], lagerbredd, lagerhöjd))
+        prev_angle = direction_to_angle(prev_dir)
+   
     
     for i in range(0, len(pos)-1):
         #print(correct_path[i])
@@ -157,6 +159,7 @@ def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
         #print("curr dir" + str(current_dir))    
         current_angle = direction_to_angle(current_dir)
         #print("curr angle" + str(current_angle))
+
         if prev_angle is None or current_angle is None:
             directions.append("plocka")  # vändning vid oklar rörelse
         else:
@@ -171,17 +174,14 @@ def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
             elif delta == 180:
                 directions.append("vänd")  # vändning
             else:
-                directions.append("vänd")  # fallback, vändning
+                directions.append("vänd")  # vändning
 
             prev_angle = current_angle
-        
+    
     if current_angle == 270:
         directions.append("höger")
     elif current_angle == 180:
         directions.append("rakt")
-
-
-        #print("priv angle " + str(prev_angle))
 
 
     return directions
@@ -197,35 +197,33 @@ def remove_path(Graf, n1, n2):
     return(Graf)
             
 
-def fastest_way(lagerbredd, lagerhöjd, målnoder):
-	Graf = skapa_graf(lagerhöjd, lagerbredd)
-	matris = skapa_avståndsmatris(Graf, målnoder)
-	kostnad, ordning = held_karp_väg(matris)
+def fastest_way_hinder(lagerbredd, lagerhöjd, målnoder, hinder):
 
-	path = []
-	#beräkna vägen till alla varor
-	for i in range(len(ordning)-1):
-		if len(path) > 0: 
-			last_path = path[i-1]
-			path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], last_path[-3]))
-		else:
-			path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], 0))
+    målnoder[len(målnoder)+1] = [1] #ska alltid avsluta i nod 1
+    Graf = skapa_graf(lagerhöjd, lagerbredd) # skapa fullständig graf
+    for i in hinder:
+        Graf = remove_path(Graf, i[0], i[1]) #ta bort varje hinder, sista i listan är sist påkommna hindret
 
-	correct_path = [item for sublist in path for item in sublist]
+    matris = skapa_avståndsmatris(Graf, målnoder)
 
-<<<<<<< HEAD
-	#print(correct_path)
-	#print(kostnad)
-	#print(sväng_instructions(correct_path, lagerbredd))	
-	väg = deque(sväng_instructions(correct_path, lagerbredd))
-	väg.append("lämna")
-	
-	return väg
-=======
-	print(kostnad)
-	print(sväng_instructions(correct_path, lagerbredd, lagerhöjd))	
-	
-	return sväng_instructions(correct_path, lagerbredd, lagerhöjd)
->>>>>>> 905b098ff321b2027b44b051dd7142c5cdcbd17d
+    kostnad, ordning = held_karp_väg(matris, start_index=0, end_index=(len(målnoder)-1))
 
-fastest_way(3, 3, {1:[1], 2:[2,6]})
+
+    path = []
+    #beräkna vägen till alla varor
+    for i in range(len(ordning)-1):
+        if len(path) > 0: 
+            last_path = path[i-1]
+            path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], last_path[-3]))
+        else:
+            path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], 0))
+
+    correct_path = [item for sublist in path for item in sublist]
+    print(sväng_instructions(correct_path, lagerbredd, lagerhöjd, hinder))	
+
+    return sväng_instructions(correct_path, lagerbredd, lagerhöjd, hinder)
+
+
+
+fastest_way_hinder(4, 3, {1:[20], 2:[14,18], 3:[13,17], 4:[4,8]}, [[3,7], [11,12], [18,19], [9,13], [16,20]])
+#bredd, höjd, dictionary med målnoder där första är startnod och resterande är plockstationer, lista med hinder där sista är sist påkomna hindret
