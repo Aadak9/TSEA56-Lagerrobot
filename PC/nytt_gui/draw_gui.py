@@ -2,8 +2,10 @@ import tkinter as tk
 import buttoncontrol as bc
 import bluetooth as bt
 from buttoncontrol import current_joint
+import data_saver as ds
 import time
 import json
+
 global buttonManuell, Manuellknapp, Autoknapp, buttonAuto, Kontrollruta, Lager, Canvas, ruta1, ruta3, buttonStartdata, buttonStart, Lagerknapp, textH, textW
 Canvas = None
 global lagerbredd, lagerhöjd
@@ -15,6 +17,10 @@ timeractive = False
 global window
 window = tk.Tk()
 
+global data_time_start
+data_time_start = time.time()
+global data_time_current
+data_time_current = time.time()
 
 global placed_goods
 placed_goods = []
@@ -585,12 +591,21 @@ def display_sensor_value(sensor, value):
 
 
 def data_loop(window):
+    data_list = []
+    global time
+    global data_time_current
+    global data_time_start
     global max_rows_per_col
     if not bc.gather_data:
         window.after(100, lambda: data_loop(window))
         return
+    
+    data_time_current = time.time()
+    elapsed_time = data_time_current - data_time_start
+    data_list.append(elapsed_time)
     try:
         IR_data = bt.send_and_receive(0x60)
+        data_list.append(IR_data)
     except:
         print("IR misslyckat")
     display_sensor_value("IR", str(IR_data))
@@ -598,17 +613,20 @@ def data_loop(window):
     try:
         Reflex_data = bt.send_and_receive(0x61)
         Reflex_data = 6 - Reflex_data/2
+        data_list.append(Reflex_data)
     except:
         print("Reflex misslyckat")
     display_sensor_value("Reflex", str(Reflex_data))
 
     try:
         leftgas = bt.send_and_receive(0x66)
+        data_list.append(leftgas)
     except:
         print("Vänster gas misslyckat")
 
     try:    
         rightgas = bt.send_and_receive(0x65)
+        data_list.append(rightgas)
     except:
         print("Höger gas misslyckat")
     gas_value = str(leftgas) + ", " + str(rightgas)
@@ -616,6 +634,7 @@ def data_loop(window):
 
     try:
         Gyro_data = bt.send_and_receive(0x62)
+        data_list.append(Gyro_data)
     except:
         print("Gyro misslyckat")
     display_sensor_value("Gyro", str(Gyro_data))
@@ -623,6 +642,7 @@ def data_loop(window):
     try:
         new_plan = bt.send_and_receive(0x80)
         if new_plan == 1:
+            print("HEJ")
             length_of_plan = bt.receive_data(1)
             print(length_of_plan)
             plan = []
@@ -630,16 +650,18 @@ def data_loop(window):
                 data = bt.receive_data(length_of_plan - len(plan))
                 if not data:
                     raise ConnectionError("misslyckad öveföring av plan")
-                print(data)
                 if type(data) == list:
                     plan += data
                 else:
                     plan.append(data)
-                print(plan)
+            print(f"målnoder {plan}")
             draw_styr(plan, max_rows_per_col)
+
     except:
         print("Ny data misslyckat")
-    
+
+
+    ds.data_list.append(data_list)
     print("letar data")
     
     window.after(500, lambda: data_loop(window))
