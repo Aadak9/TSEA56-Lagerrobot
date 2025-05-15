@@ -54,13 +54,13 @@ volatile unsigned long timertime = 14000;
 	init_pwm();
 	
 	_delay_ms(200);
-	
 	for(unsigned int i=1; i <= 7; i++)
 	{
 		set_speed(i, 40);
-		unsigned int angle = get_angle(i);
-		move_servo(i, angle);
+		//unsigned int angle = get_angle(i);
+		//move_servo(i, angle);
 	}
+	
 	set_speed(8, 500);
 	/*
 	while(1)

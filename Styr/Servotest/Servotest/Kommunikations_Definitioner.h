@@ -30,3 +30,7 @@
 #define SEND_LEFT_GAS 0x40
 
 #define SEND_RIGHT_GAS 0x41
+
+#define SEND_ANGLE 0x50
+
+#define MOVE_SERVO 0x60
