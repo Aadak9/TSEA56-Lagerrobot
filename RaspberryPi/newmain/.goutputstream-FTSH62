@@ -32,13 +32,11 @@ def autonomous_loop(spi_styr, spi_sensor, KP, KD):
 	global nodeorder
 	global obstacles
 	global goods_deposited
-	try:
-		next_move = nav_plan[0]
-	except:
-		return
 	roadmark_status = auto.check_roadmark(spi_sensor)
+	next_move = nav_plan[0]
 	målnoder = hm.get_målnoder()
-
+	#if(goods_deposited):
+	#	return
 	
 	if(auto.check_obstacle(spi_sensor)):
 		spi.send_spi(spi_styr, 0) #stanna
@@ -99,7 +97,7 @@ def autonomous_loop(spi_styr, spi_sensor, KP, KD):
 			auto.rotate_right(spi_styr, spi_sensor)
 		elif(next_move == "lämna"):
 			spi.send_spi(spi_styr, 0)
-			auto.empty_basket3(spi_styr)
+			auto.empty_basket2(spi_styr)
 			goods_deposited = True
 			
 	else:
@@ -111,7 +109,6 @@ def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
 	global nav_plan
 	global målnoder
 	global goal_collected
-	global goods_deposited
 	try:
 		if(data == "20"): #Ändrar aktuell armled
 			data = client.recv(size) 
@@ -155,17 +152,10 @@ def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
 				new_plan = False
 			else:
 				client.send(b'\x00')
-		elif data == "81": #upplockade varor
+		elif data == "81":
 			if goal_collected:
 				client.send(b'\x01')
 				goal_collected = False
-			else:
-				client.send(b'\x00')
-				
-		elif data == "82": #avbryta autonomt läge i gui
-			if goods_deposited:
-				client.send(b'\x01')
-				goods_deposited = False
 			else:
 				client.send(b'\x00')
         
@@ -183,7 +173,6 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
 	global nav_plan
 	global nodeorder
 	global goods_deposited
-	global obstacles
 	client, _ = s.accept()
 	print("Bluetooth connected")
 	while True:
@@ -193,11 +182,9 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
 				if auto.Automatic:
 					spi.send_spi(spi_styr, 0)
 				else:
-					nav_plan = hm.update_path(client) #tagit bort att den ska ta emot nodeorder
-					print("jag har nu kört update path i main")
+					nav_plan, nodeorder = hm.update_path(client)
 					new_plan = True  
 					goods_deposited = False
-					obstacles = []
 				auto.Automatic = not auto.Automatic
 				continue
 			else:
@@ -247,7 +234,7 @@ def main():
 	auto.pick_right(spi_styr)
 	"""
 	#auto.pick_left(spi_styr)
-	#auto.empty_basket3(spi_styr)
+
 	#auto.pick_right(spi_styr)
 	#auto.empty_basket2(spi_styr)
 	while True:
