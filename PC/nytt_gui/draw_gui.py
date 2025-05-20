@@ -16,6 +16,8 @@ global timeractive
 timeractive = False
 global window
 window = tk.Tk()
+global goals #antalet plockade varor
+goals = 0
 
 global data_time_start
 data_time_start = time.time()
@@ -28,7 +30,7 @@ placed_goods = []
 
 def draw_gui(window):
 
-    global buttonManuell, Manuellknapp, Autoknapp, buttonAuto, Kontrollruta, Lager, ruta1, ruta3, buttonStartdata, buttonStart, Lagerknapp, textH, textW
+    global buttonManuell, Manuellknapp, Autoknapp, buttonAuto, Kontrollruta, Lager, ruta1, ruta3, buttonStartdata, buttonStart, Lagerknapp, textH, textW, placed_goods, goals
 
     window.title("Robot") 
     window.configure(background="grey")
@@ -203,7 +205,7 @@ def draw_gui(window):
     text_gas = tk.Label(Data, text="Gaspådrag: ", font=("Arial", 15))
     text_gas.grid(column= 0, row = 1, sticky="nsw")
 
-    text_varor = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
+    text_varor = tk.Label(Data, text="Upplockade varor: " + str(goals) + " av " + str(len(placed_goods)), font=("Arial", 15))
     text_varor.grid(column= 0, row = 2, sticky="nsw")
 
     text_IR = tk.Label(Data, text=f"Avstånd till hinder: ", font=("Arial", 15))
@@ -572,18 +574,20 @@ def update_joint(current_joint):
     servo.update()
 
 
-def display_sensor_value(sensor, value):
-    global text_lateral, text_gas, text_varor, text_IR, text_rotation, text_tid
-    if sensor == "IR":
+def display_sensor_value(data, value):
+    global text_lateral, text_gas, text_varor, text_IR, text_rotation, text_tid, text_varor, placed_goods
+    if data == "IR":
         text_IR.config(text="Avstånd till hinder: " + value)
-    elif sensor == "Reflex":
+    elif data == "Reflex":
         text_lateral.config(text="Lateral position: " + value)
-    elif sensor == "Gas":
+    elif data == "Gas":
         text_gas.config(text="Gaspådrag: " + value)
-    elif sensor == "Gyro":
+    elif data == "Gyro":
         text_rotation.config(text="Rotation platta: " + value)
-    elif sensor == "Time":
+    elif data == "Time":
         text_tid.config(text="Total körningstid: " + value)
+    elif data == "Vara":
+        text_varor.config(text="Upplockade varor: " + value + " av " + str(len(placed_goods)))
 
 
 
@@ -596,6 +600,7 @@ def data_loop(window):
     global data_time_current
     global data_time_start
     global max_rows_per_col
+    global goals
     if not bc.gather_data:
         window.after(100, lambda: data_loop(window))
         return
@@ -643,7 +648,6 @@ def data_loop(window):
     try:
         new_plan = bt.send_and_receive(0x80)
         if new_plan == 1:
-            print("HEJ")
             length_of_plan = bt.receive_data(1)
             print(length_of_plan)
             plan = []
@@ -655,12 +659,21 @@ def data_loop(window):
                     plan += data
                 else:
                     plan.append(data)
-            print(f"målnoder {plan}")
             draw_styr(plan, max_rows_per_col)
 
     except:
         print("Ny data misslyckat")
 
+    try:
+        picked_up_goal = bt.send_and_receive(0x81)
+        if picked_up_goal == 1:
+            goals += 1
+            print("upplockade varor" + str(goals))
+        else:
+            pass
+    except:
+        print("misslyckad överföring av upplockade varor")
+    display_sensor_value("Vara", str(goals))
 
     ds.data_list.append(data_list)
     print("letar data")
