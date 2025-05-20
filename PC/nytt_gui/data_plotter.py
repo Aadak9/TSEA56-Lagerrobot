@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import csv
+import os
+
 
 def plot_data():
     time = []
@@ -8,7 +10,9 @@ def plot_data():
     LeftGas = []
     RightGas = []
     Gyro = []
-    with open("Sparad_data.csv", "r") as file:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, "Sparad_data.csv")
+    with open(file_path, "r") as file:
         reader = csv.reader(file)
         for row in reader:
             cleaned = []
@@ -57,4 +61,3 @@ def plot_data():
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
 
-plot_data()

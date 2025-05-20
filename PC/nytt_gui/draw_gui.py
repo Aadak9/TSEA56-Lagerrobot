@@ -145,7 +145,7 @@ def draw_gui(window):
     ###############################################################
 
     #startdata-knappen
-
+    """
     startdataknapp_width = autoknapp_width/2
     startdataknapp_height = autoknapp_height
     startdataknapp_x = winwidth*0.51
@@ -157,7 +157,7 @@ def draw_gui(window):
 
     buttonStartdata = tk.Button(Startdataknapp, text="Starta data", bg="green", fg="white", font=("Arial", 16), command=bc.startdata_pressed)
     buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
-
+    """
 
     ###############################################################
     ###############################################################
@@ -639,7 +639,7 @@ def data_loop(window):
     display_sensor_value("Gas", gas_value)
 
     try:
-        Gyro_data = bt.send_and_receive(0x62)
+        Gyro_data = bt.send_and_receive(0x62) * 1.5
         data_list.append(Gyro_data)
     except:
         print("Gyro misslyckat")
@@ -660,6 +660,7 @@ def data_loop(window):
                 else:
                     plan.append(data)
             draw_styr(plan, max_rows_per_col)
+            print(plan)
 
     except:
         print("Ny data misslyckat")
@@ -674,6 +675,15 @@ def data_loop(window):
     except:
         print("misslyckad överföring av upplockade varor")
     display_sensor_value("Vara", str(goals))
+
+    try:
+        stop_autonom = bt.send_and_receive(0x82)
+        if stop_autonom == 1:
+            bc.start_pressed()
+        else:
+            pass
+    except:
+        print("misslyckad dataöverföring av avbryt autonom")
 
     ds.data_list.append(data_list)
     print("letar data")

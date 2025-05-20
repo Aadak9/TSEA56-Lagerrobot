@@ -1,6 +1,7 @@
 import bluetooth as bt
 import draw_gui as dg
 import data_saver as ds
+import data_plotter as dp
 import time
 
 global pressed_keys
@@ -187,7 +188,7 @@ def auto_pressed():
         dg.buttonStart.pack(fill="both", expand=True, padx=1, pady=1)            
         dg.buttonStart.lift()
         dg.buttonStart.config(bg="green")
-        dg.buttonStartdata.pack_forget()
+        #dg.buttonStartdata.pack_forget()
 
 
     elif (auto_active_color == "green"):
@@ -232,9 +233,9 @@ def manuell_pressed():
                 except:
                     pass
 
-        dg.buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
-        dg.buttonStartdata.lift()          
-        dg.buttonStart.pack_forget()
+        #dg.buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
+        #dg.buttonStartdata.lift()          
+        #dg.buttonStart.pack_forget()
 
     elif (manuell_active_color == "green"):
         dg.buttonAuto.config(bg="grey")
@@ -290,6 +291,7 @@ def start_pressed():
         dg.remove_styr_info()
         gather_data = False
         ds.save_data_to_file()
+        dp.plot_data()
         ds.data_list = []
         dg.timeractive = False
         dg.timer(dg.window)
@@ -320,7 +322,7 @@ def start_pressed():
                 widget.config(state="normal")
             except:
                 pass
-
+"""
 def startdata_pressed():
     global gather_data
     data_active_color = dg.buttonStartdata.cget("bg")
@@ -335,11 +337,12 @@ def startdata_pressed():
     elif data_active_color == "red":
         gather_data = False
         ds.save_data_to_file()
+        dp.plot_data()
         ds.data_list = []
         dg.buttonStartdata.config(bg="green")
         dg.buttonStartdata.config(text="Start data")
 
-
+"""
 
 
 
