@@ -193,7 +193,7 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
 				if auto.Automatic:
 					spi.send_spi(spi_styr, 0)
 				else:
-					nav_plan = hm.update_path(client) #tagit bort att den ska ta emot nodeorder
+					nav_plan, nodeorder = hm.update_path(client) #tagit bort att den ska ta emot nodeorder
 					print("jag har nu kört update path i main")
 					new_plan = True  
 					goods_deposited = False

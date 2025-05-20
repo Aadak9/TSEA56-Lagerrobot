@@ -24,10 +24,10 @@ def control_loop(spi_styr, spi_sensor, KP, KD):
 	try:
 		time.sleep(0.001)
 		regler_error_front = 6 - spi.send_spi(spi_sensor, 1)/2
-		if(regler_error_front > 3):
-			regler_error_front = 3
-		elif(regler_error_front < -3):
-			regler_error_front = -3
+		if(regler_error_front > 1):
+			regler_error_front = 1
+		elif(regler_error_front < -1):
+			regler_error_front = -1
 		regler_error_back = 6 - spi.send_spi(spi_sensor, 2)/2
 		if(regler_error_back > 3):
 			regler_error_back = 3
@@ -87,8 +87,8 @@ def rotate_right_180(spi_styr, spi_sensor):
 	try:
 		rotate_right(spi_styr, spi_sensor)
 		time.sleep(0.001)
-		drive_bwd(spi_styr)
-		time.sleep(0.12)
+		#drive_bwd(spi_styr)
+		#time.sleep(0.06)
 		rotate_right(spi_styr, spi_sensor)
 		
 	except:

@@ -231,7 +231,7 @@ def fastest_way(lagerbredd, lagerhöjd, målnoder):
 	if väg[-1] != "lämna":
 		väg.append("lämna")
 	
-	return väg, correct_path #tagit bort att den returnerar nodeorder
+	return väg, nodeorder, correct_path #tagit bort att den returnerar nodeorder
 
 
 def find_location(path, nodeorder): 

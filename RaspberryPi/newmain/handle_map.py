@@ -47,9 +47,9 @@ def update_path(client):
 		målnoder[nodnumber] = nod
 		nodnumber += 1
 	print("jag ska nu kalla på fastest way")
-	väg, correct_path = fw.fastest_way(int(lagerbredd), int(lagerhöjd), målnoder)
+	väg, nodeorder, correct_path = fw.fastest_way(int(lagerbredd), int(lagerhöjd), målnoder)
 	print("jag har nu kört fastest way")
-	return väg	
+	return väg, nodeorder
 
 
 def remove_goal_node(current_node, next_node):
