@@ -647,7 +647,6 @@ def data_loop(window):
     try:
         new_plan = bt.send_and_receive(0x80)
         if new_plan == 1:
-            print("HEJ")
             length_of_plan = bt.receive_data(1)
             print(length_of_plan)
             plan = []
@@ -659,7 +658,6 @@ def data_loop(window):
                     plan += data
                 else:
                     plan.append(data)
-            print(f"målnoder {plan}")
             draw_styr(plan, max_rows_per_col)
 
     except:
