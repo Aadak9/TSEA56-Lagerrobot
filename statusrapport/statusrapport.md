@@ -90,9 +90,9 @@ Inga problem
 3. Kommande vecka tänker vi fixa ovanstående problem. Se till att kortaste väg algoritmen funkar med hinder. Visa styrbeslut i gui. Korg till varorna. Fixa automatisk styrning av armen. Plotta data (bevis för tid). 
 
 ## Vecka 20 (Grupp XX)(rapporteras måndag v 21)
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+1. Den gångna veckan har vi fixat autonom styrning av armen. Skapat en egen bana med större rutor. Skrivit vidare på dokument. Fixat så att snabbste väg med hinder funkar och med banor som inte är kvadratiska. Fixat så man kan se upplockade varor och styrbeslut i gui. Satte på korg på roboten. Finslipade 180 graders svängar. 
+2. Just nu har vi inga stora problem. 
+3. Kommande vecka tänker vi finslipa funktioner, detta inkluderar amren och eventuellt regleringen. Fixa det sista med datavisning. Skriva färdigt dokument. 
 
 ## Vecka 21 (Grupp XX)(rapporteras måndag v 22)
 1. Den gångna veckan har vi ...

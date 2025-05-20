@@ -16,6 +16,8 @@ global timeractive
 timeractive = False
 global window
 window = tk.Tk()
+global goals #antalet plockade varor
+goals = 0
 
 global data_time_start
 data_time_start = time.time()
@@ -28,7 +30,7 @@ placed_goods = []
 
 def draw_gui(window):
 
-    global buttonManuell, Manuellknapp, Autoknapp, buttonAuto, Kontrollruta, Lager, ruta1, ruta3, buttonStartdata, buttonStart, Lagerknapp, textH, textW
+    global buttonManuell, Manuellknapp, Autoknapp, buttonAuto, Kontrollruta, Lager, ruta1, ruta3, buttonStartdata, buttonStart, Lagerknapp, textH, textW, placed_goods, goals
 
     window.title("Robot") 
     window.configure(background="grey")
@@ -143,7 +145,7 @@ def draw_gui(window):
     ###############################################################
 
     #startdata-knappen
-
+    """
     startdataknapp_width = autoknapp_width/2
     startdataknapp_height = autoknapp_height
     startdataknapp_x = winwidth*0.51
@@ -155,7 +157,7 @@ def draw_gui(window):
 
     buttonStartdata = tk.Button(Startdataknapp, text="Starta data", bg="green", fg="white", font=("Arial", 16), command=bc.startdata_pressed)
     buttonStartdata.pack(fill="both", expand=True, padx=1, pady=1)
-
+    """
 
     ###############################################################
     ###############################################################
@@ -203,7 +205,7 @@ def draw_gui(window):
     text_gas = tk.Label(Data, text="Gaspådrag: ", font=("Arial", 15))
     text_gas.grid(column= 0, row = 1, sticky="nsw")
 
-    text_varor = tk.Label(Data, text="Upplockade varor: ", font=("Arial", 15))
+    text_varor = tk.Label(Data, text="Upplockade varor: " + str(goals) + " av " + str(len(placed_goods)), font=("Arial", 15))
     text_varor.grid(column= 0, row = 2, sticky="nsw")
 
     text_IR = tk.Label(Data, text=f"Avstånd till hinder: ", font=("Arial", 15))
@@ -379,8 +381,8 @@ def draw_gui(window):
 
     button_minus = tk.Button(ruta3, text="- (H)", font=("Arial", 15), width =7, height=1)
     button_minus.grid(row = 1, column=0, padx=5, pady= 5)
-    button_minus.bind("<ButtonPress-1>", lambda e: bc.simulate_key_event("-", "press"))
-    button_minus.bind("<ButtonRelease-1>", lambda e: bc.simulate_key_event("-", "release"))
+    button_minus.bind("<ButtonPress-1>", lambda e: bc.simulate_key_event("h", "press"))
+    button_minus.bind("<ButtonRelease-1>", lambda e: bc.simulate_key_event("h", "release"))
     
     global servo, current_joint
     servo = tk.Label(ruta3, text="Led " + str(current_joint), font=("Arial", 15))
@@ -388,8 +390,8 @@ def draw_gui(window):
 
     button_plus = tk.Button(ruta3, text="+ (Y)", font=("Arial", 15), width =7, height=1)
     button_plus.grid(row = 1, column=2, padx=5, pady= 5)
-    button_plus.bind("<ButtonPress-1>", lambda e: bc.simulate_key_event("+", "press"))
-    button_plus.bind("<ButtonRelease-1>", lambda e: bc.simulate_key_event("+", "release"))
+    button_plus.bind("<ButtonPress-1>", lambda e: bc.simulate_key_event("y", "press"))
+    button_plus.bind("<ButtonRelease-1>", lambda e: bc.simulate_key_event("y", "release"))
 
     button_counterclockwise = tk.Button(ruta3, text="CCW (Z)", font=("Arial", 9), width =15, height=3)
     button_counterclockwise.grid(row = 2, column=0, padx=5, pady= 5)
@@ -572,18 +574,20 @@ def update_joint(current_joint):
     servo.update()
 
 
-def display_sensor_value(sensor, value):
-    global text_lateral, text_gas, text_varor, text_IR, text_rotation, text_tid
-    if sensor == "IR":
+def display_sensor_value(data, value):
+    global text_lateral, text_gas, text_varor, text_IR, text_rotation, text_tid, text_varor, placed_goods
+    if data == "IR":
         text_IR.config(text="Avstånd till hinder: " + value)
-    elif sensor == "Reflex":
+    elif data == "Reflex":
         text_lateral.config(text="Lateral position: " + value)
-    elif sensor == "Gas":
+    elif data == "Gas":
         text_gas.config(text="Gaspådrag: " + value)
-    elif sensor == "Gyro":
+    elif data == "Gyro":
         text_rotation.config(text="Rotation platta: " + value)
-    elif sensor == "Time":
+    elif data == "Time":
         text_tid.config(text="Total körningstid: " + value)
+    elif data == "Vara":
+        text_varor.config(text="Upplockade varor: " + value + " av " + str(len(placed_goods)))
 
 
 
@@ -596,6 +600,7 @@ def data_loop(window):
     global data_time_current
     global data_time_start
     global max_rows_per_col
+    global goals
     if not bc.gather_data:
         window.after(100, lambda: data_loop(window))
         return
@@ -615,6 +620,7 @@ def data_loop(window):
         Reflex_data = 6 - Reflex_data/2
         data_list.append(Reflex_data)
     except:
+        data_list.append(None)
         print("Reflex misslyckat")
     display_sensor_value("Reflex", str(Reflex_data))
 
@@ -633,7 +639,7 @@ def data_loop(window):
     display_sensor_value("Gas", gas_value)
 
     try:
-        Gyro_data = bt.send_and_receive(0x62)
+        Gyro_data = bt.send_and_receive(0x62) * 1.5
         data_list.append(Gyro_data)
     except:
         print("Gyro misslyckat")
@@ -642,7 +648,6 @@ def data_loop(window):
     try:
         new_plan = bt.send_and_receive(0x80)
         if new_plan == 1:
-            print("HEJ")
             length_of_plan = bt.receive_data(1)
             print(length_of_plan)
             plan = []
@@ -654,12 +659,31 @@ def data_loop(window):
                     plan += data
                 else:
                     plan.append(data)
-            print(f"målnoder {plan}")
             draw_styr(plan, max_rows_per_col)
+            print(plan)
 
     except:
         print("Ny data misslyckat")
 
+    try:
+        picked_up_goal = bt.send_and_receive(0x81)
+        if picked_up_goal == 1:
+            goals += 1
+            print("upplockade varor" + str(goals))
+        else:
+            pass
+    except:
+        print("misslyckad överföring av upplockade varor")
+    display_sensor_value("Vara", str(goals))
+
+    try:
+        stop_autonom = bt.send_and_receive(0x82)
+        if stop_autonom == 1:
+            bc.start_pressed()
+        else:
+            pass
+    except:
+        print("misslyckad dataöverföring av avbryt autonom")
 
     ds.data_list.append(data_list)
     print("letar data")
@@ -675,7 +699,55 @@ def timer(window):
 
     window.after(1000, lambda: timer(window))
 
+def draw_styr(data_list, max_rows_per_col):
+    global Styrruta
+    print(data_list)
 
+    for widget in Styrruta.winfo_children():
+        if isinstance(widget, tk.Label) and widget.grid_info().get("row") != 0:
+            widget.destroy()
+
+    i = 0           # index i data_list
+    step_num = 1    # numrering av instruktioner
+    row_counts = [0, 0, 0]  # antal rader per kolumn (0, 1, 2)
+
+    while i < len(data_list):
+        item = data_list[i]
+
+        if item == 5:
+            if i + 2 < len(data_list):
+                nod1 = data_list[i + 1]
+                nod2 = data_list[i + 2]
+                text = f"Vara: {nod1}-{nod2}"
+                i += 3  # hoppa över 5 och de två efterföljande
+            else:
+                text = "Fel: för få värden efter 5"
+                i += 1
+        else:
+            if item == 2:
+                text = "vänster"
+            elif item == 3:
+                text = "rakt"
+            elif item == 4:
+                text = "vänd"
+            elif item == 6:
+                text = "lämna"
+            elif item == 7:
+                text = "höger"
+            else:
+                text = f"okänd: {item}"
+            i += 1
+
+        # Beräkna kolumn och rad baserat på step_num
+        col = (step_num - 1) // max_rows_per_col
+        row = row_counts[col] + 1
+        row_counts[col] += 1
+
+        label = tk.Label(Styrruta, text=f"{step_num}. {text}", anchor="w", font=("Arial", 9), justify="left")
+        label.grid(row=row, column=col, sticky="w", padx=5, pady=2)
+
+        step_num += 1
+"""
 def draw_styr(data_list, max_rows_per_col):
     global Styrruta
     print(data_list)
@@ -701,6 +773,8 @@ def draw_styr(data_list, max_rows_per_col):
         elif item == 7:
             text = "höger"
 
+    
+
 
         # Beräkna kolumn och rad
         col = idx // max_rows_per_col       # 0 = vänster, 1 = mitten, 2 = höger
@@ -709,7 +783,7 @@ def draw_styr(data_list, max_rows_per_col):
         label = tk.Label(Styrruta, text=f"{num}. {text}", anchor="w", font=("Arial", 9), justify="left")
         label.grid(row=row, column=col, sticky="w", padx=5, pady=2)
 
-        
+   """     
 
 def remove_styr_info():
     print("slutar")

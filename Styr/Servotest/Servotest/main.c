@@ -56,7 +56,7 @@ volatile unsigned long timertime = 14000;
 	_delay_ms(200);
 	for(unsigned int i=1; i <= 7; i++)
 	{
-		set_speed(i, 40);
+		set_speed(i, 80);
 		//unsigned int angle = get_angle(i);
 		//move_servo(i, angle);
 	}
