@@ -65,7 +65,7 @@ def on_key_press(event):
     if autonom_active:
         return #ej möjliggöra knapptryck i autonomt läge
     key = event.keysym.upper()
-    if key in ["W", "A", "S", "D", "Q", "E", "Y", "H", "Z", "C"] and (key not in pressed_keys):
+    if key in ["W", "A", "S", "D", "Q", "E", "Y", "H", "Z", "C", "+", "-"] and (key not in pressed_keys):
         pressed_keys.append(key)
         update_action()
     
@@ -291,7 +291,6 @@ def start_pressed():
         dg.remove_styr_info()
         gather_data = False
         ds.save_data_to_file()
-        dp.plot_data()
         ds.data_list = []
         dg.timeractive = False
         dg.timer(dg.window)
@@ -322,6 +321,7 @@ def start_pressed():
                 widget.config(state="normal")
             except:
                 pass
+        dp.plot_data()
 """
 def startdata_pressed():
     global gather_data

@@ -381,8 +381,8 @@ def draw_gui(window):
 
     button_minus = tk.Button(ruta3, text="- (H)", font=("Arial", 15), width =7, height=1)
     button_minus.grid(row = 1, column=0, padx=5, pady= 5)
-    button_minus.bind("<ButtonPress-1>", lambda e: bc.simulate_key_event("-", "press"))
-    button_minus.bind("<ButtonRelease-1>", lambda e: bc.simulate_key_event("-", "release"))
+    button_minus.bind("<ButtonPress-1>", lambda e: bc.simulate_key_event("h", "press"))
+    button_minus.bind("<ButtonRelease-1>", lambda e: bc.simulate_key_event("h", "release"))
     
     global servo, current_joint
     servo = tk.Label(ruta3, text="Led " + str(current_joint), font=("Arial", 15))
@@ -390,8 +390,8 @@ def draw_gui(window):
 
     button_plus = tk.Button(ruta3, text="+ (Y)", font=("Arial", 15), width =7, height=1)
     button_plus.grid(row = 1, column=2, padx=5, pady= 5)
-    button_plus.bind("<ButtonPress-1>", lambda e: bc.simulate_key_event("+", "press"))
-    button_plus.bind("<ButtonRelease-1>", lambda e: bc.simulate_key_event("+", "release"))
+    button_plus.bind("<ButtonPress-1>", lambda e: bc.simulate_key_event("y", "press"))
+    button_plus.bind("<ButtonRelease-1>", lambda e: bc.simulate_key_event("y", "release"))
 
     button_counterclockwise = tk.Button(ruta3, text="CCW (Z)", font=("Arial", 9), width =15, height=3)
     button_counterclockwise.grid(row = 2, column=0, padx=5, pady= 5)
@@ -699,7 +699,55 @@ def timer(window):
 
     window.after(1000, lambda: timer(window))
 
+def draw_styr(data_list, max_rows_per_col):
+    global Styrruta
+    print(data_list)
 
+    for widget in Styrruta.winfo_children():
+        if isinstance(widget, tk.Label) and widget.grid_info().get("row") != 0:
+            widget.destroy()
+
+    i = 0           # index i data_list
+    step_num = 1    # numrering av instruktioner
+    row_counts = [0, 0, 0]  # antal rader per kolumn (0, 1, 2)
+
+    while i < len(data_list):
+        item = data_list[i]
+
+        if item == 5:
+            if i + 2 < len(data_list):
+                nod1 = data_list[i + 1]
+                nod2 = data_list[i + 2]
+                text = f"Vara: {nod1}-{nod2}"
+                i += 3  # hoppa över 5 och de två efterföljande
+            else:
+                text = "Fel: för få värden efter 5"
+                i += 1
+        else:
+            if item == 2:
+                text = "vänster"
+            elif item == 3:
+                text = "rakt"
+            elif item == 4:
+                text = "vänd"
+            elif item == 6:
+                text = "lämna"
+            elif item == 7:
+                text = "höger"
+            else:
+                text = f"okänd: {item}"
+            i += 1
+
+        # Beräkna kolumn och rad baserat på step_num
+        col = (step_num - 1) // max_rows_per_col
+        row = row_counts[col] + 1
+        row_counts[col] += 1
+
+        label = tk.Label(Styrruta, text=f"{step_num}. {text}", anchor="w", font=("Arial", 9), justify="left")
+        label.grid(row=row, column=col, sticky="w", padx=5, pady=2)
+
+        step_num += 1
+"""
 def draw_styr(data_list, max_rows_per_col):
     global Styrruta
     print(data_list)
@@ -725,6 +773,8 @@ def draw_styr(data_list, max_rows_per_col):
         elif item == 7:
             text = "höger"
 
+    
+
 
         # Beräkna kolumn och rad
         col = idx // max_rows_per_col       # 0 = vänster, 1 = mitten, 2 = höger
@@ -733,7 +783,7 @@ def draw_styr(data_list, max_rows_per_col):
         label = tk.Label(Styrruta, text=f"{num}. {text}", anchor="w", font=("Arial", 9), justify="left")
         label.grid(row=row, column=col, sticky="w", padx=5, pady=2)
 
-        
+   """     
 
 def remove_styr_info():
     print("slutar")
