@@ -615,6 +615,7 @@ def data_loop(window):
         Reflex_data = 6 - Reflex_data/2
         data_list.append(Reflex_data)
     except:
+        data_list.append(None)
         print("Reflex misslyckat")
     display_sensor_value("Reflex", str(Reflex_data))
 
