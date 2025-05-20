@@ -298,6 +298,7 @@ def start_pressed():
         dg.buttonStart.config(text="Start")
         dg.Lager.config(highlightbackground="green", highlightcolor ="green")
         dg.Lagerknapp.config(highlightbackground="green", highlightcolor ="green")
+        dg.goals = 0
 
         for widget in dg.Lager.winfo_children():
             try:
@@ -357,6 +358,7 @@ def send_lager_info():
     num_nodes = len(dg.placed_goods)*2
     print(dg.placed_goods)
     bt.sendbyte(num_nodes)
+    print("klart")
 
     for node_list in dg.placed_goods:
         bt.sendbyte(node_list[0])
