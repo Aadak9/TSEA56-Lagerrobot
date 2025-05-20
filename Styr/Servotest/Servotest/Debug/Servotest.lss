@@ -1614,8 +1614,8 @@ int main(void)
 	{
      adc:	d0 e0       	ldi	r29, 0x00	; 0
      ade:	05 c0       	rjmp	.+10     	; 0xaea <main+0x36>
-     ae0:	68 e2       	ldi	r22, 0x28	; 40
-		set_speed(i, 40);
+     ae0:	60 e5       	ldi	r22, 0x50	; 80
+		set_speed(i, 80);
 		//unsigned int angle = get_angle(i);
      ae2:	70 e0       	ldi	r23, 0x00	; 0
      ae4:	ce 01       	movw	r24, r28
