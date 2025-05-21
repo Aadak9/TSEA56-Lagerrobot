@@ -84,7 +84,7 @@ def autonomous_loop(spi_styr, spi_sensor, KP, KD):
 			
 	elif(roadmark_status == 3 and not has_seen_roadmark): #sväng utifrån planerad väg
 		has_seen_roadmark = True
-		time.sleep(0.12)
+		time.sleep(0.08)
 		if(nav_plan):
 			next_move = nav_plan.popleft()
 		else:
@@ -127,9 +127,9 @@ def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
 			response = spi.send_spi(spi_sensor, 1)
 			client.send(response.to_bytes(1, 'big'))	
 		elif data == "67": #kalibrera linjesensor
-			auto.load_all_angles(spi_styr) #OBS ta bort sen, endast för test
-			#spi.send_spi(spi_sensor, 7)
-			#time.sleep(0.01)
+			#auto.load_all_angles(spi_styr) #OBS ta bort sen, endast för test
+			spi.send_spi(spi_sensor, 7)
+			time.sleep(0.01)
 			
 		elif data == "63": #Starta gyro
 			spi.send_spi(spi_sensor, 3)
@@ -194,7 +194,6 @@ def bluetooth_listener(s, spi_styr, spi_sensor):
 					spi.send_spi(spi_styr, 0)
 				else:
 					nav_plan, nodeorder = hm.update_path(client) #tagit bort att den ska ta emot nodeorder
-					print("jag har nu kört update path i main")
 					new_plan = True  
 					goods_deposited = False
 					obstacles = []
@@ -246,6 +245,7 @@ def main():
 	
 	auto.pick_right(spi_styr)
 	"""
+	
 	#auto.pick_left(spi_styr)
 	#auto.empty_basket3(spi_styr)
 	#auto.pick_right(spi_styr)
