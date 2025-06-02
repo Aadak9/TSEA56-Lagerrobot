@@ -100,9 +100,9 @@ Inga problem
 3. Kommande vecka tänker vi påbörja presentation och förbereda opponering.
 
 ## Vecka 22 (Grupp XX)(rapporteras måndag v 23)
-1. Den gångna veckan har vi ...
+1. Den gångna veckan har vi inte arbetat på projektet på grund av tentap. 
 2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+3. Kommande vecka tänker vi frdigställa presentation och opponering samt genomföra framläggning och demonstration av körning. 
 
 ## Vecka 23 (Grupp XX)(rapporteras måndag v 24)
 1. Den gångna veckan har vi ...
