@@ -94,15 +94,15 @@ Inga problem
 2. Just nu har vi inga stora problem. 
 3. Kommande vecka tänker vi finslipa funktioner, detta inkluderar amren och eventuellt regleringen. Fixa det sista med datavisning. Skriva färdigt dokument. 
 
-## Vecka 21 (Grupp XX)(rapporteras måndag v 22)
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+## Vecka 21 (Grupp 06)(rapporteras måndag v 22)
+1. Den gångna veckan har vi installerat en ny robotarm och konfigurerat den för att kunna plocka och lämna varor. Vi har finjuterat många småsaker med roboten och därefter redovisat - och fått godkänt på BP5b. Vi har även skrivit klart och lämnat in tekniska dokumentationen, användarhandledning och kappa. 
+2. Just nu har vi inga problem.
+3. Kommande vecka tänker vi påbörja presentation och förbereda opponering.
 
 ## Vecka 22 (Grupp XX)(rapporteras måndag v 23)
-1. Den gångna veckan har vi ...
+1. Den gångna veckan har vi inte arbetat på projektet på grund av tentap. 
 2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+3. Kommande vecka tänker vi frdigställa presentation och opponering samt genomföra framläggning och demonstration av körning. 
 
 ## Vecka 23 (Grupp XX)(rapporteras måndag v 24)
 1. Den gångna veckan har vi ...
