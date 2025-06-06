@@ -127,7 +127,6 @@ def bluetooth_control_loop(data, client, spi_styr, spi_sensor):
 			response = spi.send_spi(spi_sensor, 1)
 			client.send(response.to_bytes(1, 'big'))	
 		elif data == "67": #kalibrera linjesensor
-			#auto.load_all_angles(spi_styr) #OBS ta bort sen, endast för test
 			spi.send_spi(spi_sensor, 7)
 			time.sleep(0.01)
 			
@@ -218,38 +217,11 @@ def main():
 	s = bt.init_bluetooth()
 	spi_styr, spi_sensor = spi.initspi()
 
-	#skapa styrbeslutslistan
-
-	#nav_plan = deque(["vänster", "höger", "rakt", "höger", "höger", "rakt", "vänster" ,"rakt" ,"rakt","rakt"]) #hårdkodad för nu
-
 	bt_thread = threading.Thread(target=bluetooth_listener, args=(s, spi_styr, spi_sensor), daemon=True)
 	bt_thread.start()
 
 	KP, KD = 100, 100
 
-	"""
-	auto.move_joint(spi_styr, 3, 500)
-	time.sleep(0.001)
-	auto.move_joint(spi_styr, 1, 0)
-	time.sleep(0.001)
-	auto.move_joint(spi_styr, 5, 0)
-	time.sleep(2)
-	auto.move_joint(spi_styr, 2, 500)
-	time.sleep(0.001)
-	auto.move_joint(spi_styr, 6, 100)
-	time.sleep(0.001)
-	auto.move_joint(spi_styr, 4, 900)
-	"""
-	
-	"""
-	
-	auto.pick_right(spi_styr)
-	"""
-	
-	#auto.pick_left(spi_styr)
-	#auto.empty_basket3(spi_styr)
-	#auto.pick_right(spi_styr)
-	#auto.empty_basket2(spi_styr)
 	while True:
 		old_Automatic = auto.Automatic
 		if auto.Automatic:

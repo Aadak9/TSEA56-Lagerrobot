@@ -24,7 +24,7 @@ volatile enum {
 
 volatile uint8_t reglerstyr_high = 0;
 volatile uint8_t reglerstyr_low = 0;
-volatile uint8_t reglertecken = 0; // 0 inneb�r positivt tal
+volatile uint8_t reglertecken = 0; // 0 inneb�r positivt tal
 volatile float reglerstyr = 0;
 volatile uint8_t current_action = 0;
 volatile uint8_t last_action = 0;
@@ -98,7 +98,7 @@ ISR(SPI_STC_vect) {
 			{
 				reglerstyr *= -1;
 			}
-			spi_state = SPI_STATE_WAITING; // Reset for next command
+			spi_state = SPI_STATE_WAITING; // Vänta på nytt kommando
 			break;
 
 
@@ -114,7 +114,6 @@ ISR(SPI_STC_vect) {
 			angle = get_angle(target_joint);
 			angle_low = angle & 0xFF;
 			angle_high = (angle >> 8) & 0xFF;
-			//SPDR = angle_high;
 			spi_state = SPI_STATE_SEND_HIGH_ANGLE;
 			break;
 			
@@ -152,7 +151,7 @@ ISR(SPI_STC_vect) {
 			
 			
 		default:
-			spi_state = SPI_STATE_WAITING; // Fail-safe reset
+			spi_state = SPI_STATE_WAITING; 
 			break;
 	}
 } 

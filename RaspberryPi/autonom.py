@@ -4,8 +4,6 @@ import regler as r
 import spi as spi
 Automatic = False
 
-#global old_output
-#old_output = 2
 
 def check_roadmark(spi_sensor):
 	time.sleep(0.001)
@@ -35,9 +33,6 @@ def control_loop(spi_styr, spi_sensor, KP, KD):
 			regler_error_back = -3
 			
 		output = r.PDController(regler_error_front, regler_error_back, KP, KD)
-		#if(abs(output - old_output) > 0.1 * old_output):
-		#	output = 0.1*old_output
-		#old_output = output
 		output = int(output * 100)
 		status = 1 if output > 0 else 0
 		output = abs(output)
@@ -87,8 +82,6 @@ def rotate_right_180(spi_styr, spi_sensor):
 	try:
 		rotate_right(spi_styr, spi_sensor)
 		time.sleep(0.001)
-		#drive_bwd(spi_styr)
-		#time.sleep(0.06)
 		rotate_right(spi_styr, spi_sensor)
 		
 	except:
