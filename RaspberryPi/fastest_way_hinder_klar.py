@@ -6,8 +6,8 @@ import itertools
 def skapa_graf(lagerbredd, lagerhöjd):
 	#skapar dictionary med alla grannar nedåt och till höger för alla noder i lagret
 	graf = {}
-	nx = lagerbredd + 1
-	ny = lagerhöjd + 1
+	ny = lagerbredd + 1
+	nx = lagerhöjd + 1
 	for y in range(ny):
 		for x in range(nx):
 			node = y * nx + x + 1
@@ -23,11 +23,12 @@ def skapa_graf(lagerbredd, lagerhöjd):
 				graf[node].append(node - 1)
 			# övre granne
 			if y > 0:
-				graf[node].append(node-nx)
+				graf[node].append(node - nx)
 	return graf
 
 
-def bfs(graf, startnod, målnod, next_node, last_node):    
+def bfs(graf, startnod, målnod, next_node, last_node): 
+	# Beräknar korstaste vägen mellan två ndoer
 	paths = [] 
 	for i  in range(len(startnod)):
 		queue = deque([[startnod[i]]])
@@ -43,15 +44,17 @@ def bfs(graf, startnod, målnod, next_node, last_node):
 				if [node, neighbor] == målnod or [neighbor, node] == målnod or [neighbor] == målnod:
 					paths.append(new_path + ['goal'])
 				queue.append(new_path)
+	
 	if last_node == 0:
 		return min(paths, key=len)
-	if len(målnod) == 1 and målnod[0] in startnod and last_node != 1:
+	if len(målnod) == 1 and målnod[0] in startnod and last_node != 1:  #om varan ligger jämte nod 1 och inte kommer från nod 1 ...
 		for i in startnod:
 			if [i] != målnod:
-				return [målnod[0], 'goal']
+				return [målnod[0], 'goal']  #... ska den åka ut
 	
 	shortest_dist = min(len(l) for l in paths)
 	shortest_paths = [l for l in paths if len(l) == shortest_dist]
+	# Om två vägar är lika lång och en kräver vändning så välj den som inte vänder
 	check = False
 	for i in range(len(shortest_paths)-1):
 		if len(shortest_paths) > 1 and shortest_paths[i][0] != shortest_paths[i+1][0]:
@@ -65,10 +68,10 @@ def bfs(graf, startnod, målnod, next_node, last_node):
 		shortest = [next_node] + shortest
 	
 	return shortest
-	#skriv om så att den bara tar bort om sträckan är lika lång från båda närliggande noder.
 
     
 def skapa_avståndsmatris(graf, nodes):
+	#Skapar avståndsmatris med längden mellan varje par noder
 	ant_noder  = len(nodes) 
 	matris = [[0]*ant_noder for _ in range(ant_noder)]
 	for i in range(ant_noder):
@@ -83,39 +86,37 @@ def skapa_avståndsmatris(graf, nodes):
 	return matris
  
  
-def held_karp_väg(matris):
+def held_karp_väg(matris, start_index=0, end_index=None):
+	# Beräknar kortaste vägen från start, genom alla målnoder och till slut samt kostnaden för den vägen
 	n = len(matris)
+	if end_index is None:
+		end_index = n - 1  # standard: sista nod
+
 	dp = [[float('inf')] * n for _ in range(1 << n)]
 	parent = [[-1] * n for _ in range(1 << n)]
-	dp[1][0] = 0  # Startar i nod 0
+	dp[1 << start_index][start_index] = 0  # Startar i start_index
 
 	for mask in range(1 << n):
 		for u in range(n):
-			if not (mask & (1 << u)):
+			if not (mask & (1 << u)): #hoppa över om startnoden inte är med
 				continue
 			for v in range(n):
-				if mask & (1 << v):
+				if mask & (1 << v) or v == start_index: #hoppa över om v redan besökt eller är startnoden
 					continue
 				next_mask = mask | (1 << v)
 				new_cost = dp[mask][u] + matris[u][v]
-				if new_cost < dp[next_mask][v]:
+				if new_cost < dp[next_mask][v]: #uppdatera minsta kostnaden
 					dp[next_mask][v] = new_cost
 					parent[next_mask][v] = u
 
-	# Hitta bästa retur till start
-	slutkostnad = float('inf')
-	sista_nod = -1
+	# Välj den väg som slutar i end_index
 	full_mask = (1 << n) - 1
-	for i in range(1, n):
-		cost = dp[full_mask][i] + matris[i][0]
-		if cost < slutkostnad:
-			slutkostnad = cost
-			sista_nod = i
+	slutkostnad = dp[full_mask][end_index]
+	current = end_index
+	path = []
 
 	# Återskapa vägen baklänges
-	path = [0]
 	mask = full_mask
-	current = sista_nod
 	while current != -1:
 		path.append(current)
 		prev = parent[mask][current]
@@ -127,6 +128,7 @@ def held_karp_väg(matris):
 
 
 def node_to_xy(node, lagerbredd, lagerhöjd):
+	#Tilldelar koordinater till noden
 	nx = lagerbredd + 1
 	ny = lagerhöjd + 1
 	for i in range(0, nx):
@@ -140,6 +142,7 @@ def node_to_xy(node, lagerbredd, lagerhöjd):
             
 
 def get_direction(p1, p2):
+	#Beräknar differans i koordinater mellan två noder
 	return (p2[0] - p1[0], p2[1] - p1[1])
 
 
@@ -157,7 +160,8 @@ def direction_to_angle(direction):
 		return None # ogiltig
 
 
-def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
+def sväng_instructions(correct_path, lagerbredd, lagerhöjd, hinder):
+	# Omvanlar nodföljden till styrbeslut
 	directions = []
 	# Ta bort 'goal'
 	pos = [node_to_xy(n, lagerbredd, lagerhöjd) for n in correct_path if isinstance(n, int)]
@@ -165,16 +169,19 @@ def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
 		return directions
 
 	# Start: initial riktning
-	prev_angle = 0
-	#print("dir" + str(prev_dir))
-	#print("angle" + str(prev_angle))
+	if hinder[-1][0] == correct_path[0]:
+		prev_dir = get_direction(node_to_xy(hinder[-1][1], lagerbredd, lagerhöjd),node_to_xy(hinder[-1][0], lagerbredd, lagerhöjd))
+		prev_angle = direction_to_angle(prev_dir)
+	elif hinder[-1][1] == correct_path[0]:
+		prev_dir = get_direction(node_to_xy(hinder[-1][0], lagerbredd, lagerhöjd),node_to_xy(hinder[-1][1], lagerbredd, lagerhöjd))
+		prev_angle = direction_to_angle(prev_dir)
     
 	for i in range(0, len(correct_path)-1):
 		
 		if correct_path[i] == 'goal':
 			directions.append("plocka")
 		
-		elif correct_path[i] != 'goal' and correct_path[i+1] != 'goal':  # vändning vid oklar rörelse
+		elif correct_path[i] != 'goal' and correct_path[i+1] != 'goal':
 			curr = node_to_xy(correct_path[i], lagerbredd, lagerhöjd)
 			next_n = node_to_xy(correct_path[i+1], lagerbredd, lagerhöjd)
 			current_dir = get_direction(curr, next_n)
@@ -204,7 +211,7 @@ def sväng_instructions(correct_path, lagerbredd, lagerhöjd):
 
 
 def remove_path(Graf, n1, n2):
-	#ta bort n1 från n2´s grannar och n2 från n1´s grannar
+	#Ta bort n1 från n2´s grannar och n2 från n1´s grannar
 	for i in Graf:
 		if i == n1:
 			Graf[i].remove(n2)
@@ -214,13 +221,19 @@ def remove_path(Graf, n1, n2):
 	return(Graf)
             
 
-def fastest_way(lagerbredd, lagerhöjd, målnoder):
-	Graf = skapa_graf(lagerhöjd, lagerbredd)
-	matris = skapa_avståndsmatris(Graf, målnoder)
-	kostnad, ordning = held_karp_väg(matris)
+def fastest_way_hinder(lagerbredd, lagerhöjd, målnoder, hinder):
+	
 	key = list(målnoder)[-1]
 	if målnoder[key] != [1]:
 		målnoder[len(målnoder)+1] = [1] #ska alltid avsluta i nod 1
+	    
+	Graf = skapa_graf(lagerbredd, lagerhöjd) # skapa fullständig graf
+	for i in hinder:
+		Graf = remove_path(Graf, i[0], i[1]) #ta bort varje hinder, sista i listan är sist påkommna hindret
+
+	matris = skapa_avståndsmatris(Graf, målnoder)
+
+	kostnad, ordning = held_karp_väg(matris, start_index=0, end_index=(len(målnoder)-1))
 
 	path = []
 	#beräkna vägen till alla varor
@@ -232,31 +245,15 @@ def fastest_way(lagerbredd, lagerhöjd, målnoder):
 			path.append(bfs(Graf, målnoder[ordning[i] + 1], målnoder[ordning[i+1] + 1], 0, 0))
 
 	correct_path = [item for sublist in path for item in sublist]
+    
 	nodeorder = []
-	
 	for i in correct_path:
 		if isinstance(i,int):
 			nodeorder.append(i)
-	
-	#print(correct_path)
-	#print(kostnad)
-	#print(sväng_instructions(correct_path, lagerbredd))	
-	väg = deque(sväng_instructions(correct_path, lagerbredd, lagerhöjd))
-	if väg[-1] != "lämna":
+
+	väg = deque(sväng_instructions(correct_path, lagerbredd, lagerhöjd, hinder))
+    
+	if väg[-1] != "lämna" :
 		väg.append("lämna")
-	
-	return väg, nodeorder, correct_path #tagit bort att den returnerar nodeorder
 
-
-def find_location(path, nodeorder): 
-	diff = len(nodeorder) - len(path)
-	current_node = nodeorder[diff]
-	next_node = nodeorder[diff + 1]
-	new_nodeorder = nodeorder[diff:]
-	
-	return current_node, next_node
-	
-
-#fastest_way(3, 3, {1:[1], 2:[2,6]})
-
-
+	return väg, nodeorder, correct_path
