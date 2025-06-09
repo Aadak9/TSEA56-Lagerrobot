@@ -105,6 +105,6 @@ Inga problem
 3. Kommande vecka tänker vi frdigställa presentation och opponering samt genomföra framläggning och demonstration av körning. 
 
 ## Vecka 23 (Grupp XX)(rapporteras måndag v 24)
-1. Den gångna veckan har vi ...
-2. Just nu har vi inga problem
-3. Kommande vecka tänker vi ...
+1. Den gångna veckan har vi haft presentation, opponering, tävling, samt skrivit färdigt alla texter
+2. Just nu har vi inga problem 
+3. Kommande vecka tänker vi ha sommarlov 😎
